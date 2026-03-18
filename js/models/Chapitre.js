@@ -1,15 +1,14 @@
 export default class Chapitre {
     /**
-     * Crée une instance de Chapitre.
-     * @param {Object} data Données brutes du chapitre issues du JSON
-     * @param {String} projetId Identifiant du projet parent
+     * Crée une instance de Chapitre depuis les données Supabase
      */
     constructor(data, projetId) {
         this.id = data.id;
-        this.projetId = projetId;
+        this.projetId = projetId || data.projet_id;
         this.titre = data.titre;
         this.ordre = data.ordre;
-        // Liste des URLs d'images composant la BD
-        this.pages = data.pages || [];
+        // Jointure Supabase Cloud
+        this.pages = data.pages_urls || data.pages || [];
+        this.isPremium = data.is_premium || false;
     }
 }

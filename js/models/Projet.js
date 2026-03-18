@@ -1,71 +1,100 @@
+import SupabaseService from '../services/SupabaseService.js';
 import Chapitre from './Chapitre.js';
 
 export default class Projet {
     /**
-     * Crée une instance de Projet.
-     * @param {Object} data Données brutes issues de l'API / JSON
+     * Crée une instance de Projet depuis les données Supabase.
      */
     constructor(data) {
         this.id = data.id;
+        this.authorId = data.author_id;
         this.titre = data.titre;
-        this.couverture = data.couverture;
-        this.videoPromoUrl = data.videoPromoUrl || null;
-        this.likes = data.likes || 0; // Donnée métrique persistée
-        this.pegi = data.pegi || "TP"; // TP (Tout Public), 12+, 16+, 18+
-        this.statut = data.statut || "publié"; // statut : "publié", "brouillon", "banni"
-        this.langues = data.langues || ["fr"]; // Localisation (ex: 'fr', 'en', 'jp')
+        this.description = data.description;
+        this.couverture = data.couverture_url || data.couverture;
+        this.videoPromoUrl = data.video_promo_url || data.videoPromoUrl || null;
+        this.likes = data.likes_total || data.likes || 0;
+        this.pegi = data.pegi_rating || data.pegi || "TP";
+        this.statut = data.statut || "publie";
+        this.langues = ["fr"]; 
         
-        // Instanciation directe d'objets Chapitre (POO)
-        this.chapitres = Array.isArray(data.chapitres) 
-            ? data.chapitres.map(chData => new Chapitre(chData, this.id)) 
-            : [];
+        const chaps = data.chapitres || [];
+        chaps.sort((a,b) => a.ordre - b.ordre);
+        
+        this.chapitres = chaps.map(chData => new Chapitre(chData, this.id));
     }
 
     /**
-     * Requête AJAX asynchrone pour charger tous les projets (Simulation de BDD)
-     * @returns {Promise<Projet[]>} Liste d'instances de Projet
+     * Fetch tous les projets et leurs chapitres depuis Supabase
      */
     static async chargerTous() {
         try {
-            // 1. Lecture du Cache Persistant (Séries Modifiées par l'Admin)
-            const localDb = localStorage.getItem('intoon_db');
-            if (localDb) {
-                const dataJSON = JSON.parse(localDb);
-                return dataJSON.map(projetData => new Projet(projetData));
+            const client = SupabaseService.getClient();
+            const { data, error } = await client
+                .from('projets')
+                .select(`
+                    *,
+                    chapitres (
+                        id, titre, pages_urls, is_premium, ordre
+                    )
+                `)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Erreur Supabase (Projets):", error);
+                return [];
             }
-
-            // 2. Fallback: Lecture Initiale depuis le JSON Statique
-            const reponse = await fetch('/data/projets.json');
-            if (!reponse.ok) throw new Error("Erreur réseau");
             
-            const dataJSON = await reponse.json();
-            
-            // 3. Sauvegarde immédiate en base locale pour autoriser les futures écritures Administrateur
-            localStorage.setItem('intoon_db', JSON.stringify(dataJSON));
-
-            return dataJSON.map(projetData => new Projet(projetData));
+            return data.map(p => new Projet(p));
         } catch (erreur) {
-            console.error("Erreur système lors du chargement des projets :", erreur);
+            console.error("Erreur système chargement des projets:", erreur);
             return [];
         }
     }
 
     /**
-     * Écrit la base de données entière dans le navigateur.
-     * Déclenché par le Super Admin (AdminController)
-     * @param {Array} listeProjets
-     */
-    static sauvegarderTous(listeProjets) {
-        localStorage.setItem('intoon_db', JSON.stringify(listeProjets));
-    }
-
-    /**
      * Recherche un projet spécifique par son identifiant
-     * @param {String} id
-     * @returns {Promise<Projet|null>} Instance de Projet ou null si non trouvé
      */
     static async chargerParId(id) {
-        const tous = await Projet.chargerTous();
-        return tous.find(p => p.id === id) || null;
+        try {
+            const client = SupabaseService.getClient();
+            const { data, error } = await client
+                .from('projets')
+                .select(`
+                    *,
+                    chapitres (
+                        id, titre, pages_urls, is_premium, ordre
+                    )
+                `)
+                .eq('id', id)
+                .single();
+
+            if (error || !data) return null;
+            return new Projet(data);
+        } catch (e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Insère un nouveau projet en BDD (Soumission Créateur)
+     */
+    static async ajouter(projetData) {
+        const client = SupabaseService.getClient();
+        const { data, error } = await client
+            .from('projets')
+            .insert([{
+                author_id: projetData.author_id,
+                titre: projetData.titre,
+                description: projetData.description,
+                couverture_url: projetData.couverture,
+                video_promo_url: projetData.videoPromoUrl,
+                statut: projetData.statut || 'brouillon',
+                pegi_rating: projetData.pegi || 'TP'
+            }])
+            .select()
+            .single();
+            
+        if (error) throw error;
+        return data;
     }
 }
