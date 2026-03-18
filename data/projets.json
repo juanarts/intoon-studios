@@ -1,0 +1,59 @@
+[
+  {
+    "id": "shadow-blade",
+    "titre": "The Shadow Blade",
+    "likes": 14205,
+    "pegi": "16+",
+    "statut": "publié",
+    "langues": ["fr", "en", "jp"],
+    "description": "Dans un monde où la lumière est devenue une ressource rare, un guerrier solitaire cherche la rédemption à la pointe de son épée noire. Une saga de dark fantasy sans concession.",
+    "couverture": "/assets/images/monarque_cover.png",
+    "videoPromoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+    "chapitres": [
+      {
+        "id": "chapitre-1",
+        "titre": "L'Éveil",
+        "ordre": 1,
+        "pages": [
+          "https://images.unsplash.com/photo-1544716278-e513176f20b5?w=800",
+          "https://images.unsplash.com/photo-1580477667995-15f2ed6854bf?w=800",
+          "https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=800"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "neon-city",
+    "titre": "Neon City Overdrive",
+    "likes": 8432,
+    "pegi": "12+",
+    "statut": "publié",
+    "langues": ["fr", "en"],
+    "description": "En 2142, les corporations contrôlent tout. Suivez les hacks et les courses illégales d'un groupe d'outsiders tentant de survivre dans cette métropole cyberpunk.",
+    "couverture": "/assets/images/neon_cover.png",
+    "videoPromoUrl": "https://www.w3schools.com/html/mov_bbb.mp4",
+    "chapitres": [
+      {
+        "id": "chapitre-1",
+        "titre": "Connexion Interrompue",
+        "ordre": 1,
+        "pages": [
+          "https://images.unsplash.com/photo-1515630278258-407f66498911?w=800",
+          "https://images.unsplash.com/photo-1542644485-8025227aa61a?w=800"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "magic-academy",
+    "titre": "Académie Arcania",
+    "likes": 21059,
+    "pegi": "TP",
+    "statut": "publié",
+    "langues": ["fr"],
+    "description": "Étudier la magie n'a jamais été aussi mortel. Quand des étudiants commencent à disparaître, un groupe d'élèves de première année doit résoudre le mystère avant les examens.",
+    "couverture": "/assets/images/seoul_cover.png",
+    "videoPromoUrl": null,
+    "chapitres": []
+  }
+]

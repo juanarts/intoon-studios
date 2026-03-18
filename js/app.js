@@ -1,0 +1,131 @@
+import Router from './Router.js';
+import AccueilController from './controllers/AccueilController.js';
+import LecteurController from './controllers/LecteurController.js';
+import FavorisController from './controllers/FavorisController.js';
+import AuteurController from './controllers/AuteurController.js';
+import AuthController from './controllers/AuthController.js';
+import DashboardController from './controllers/DashboardController.js';
+import SoumissionController from './controllers/SoumissionController.js';
+import AdminController from './controllers/AdminController.js';
+import VipController from './controllers/VipController.js';
+import CheckoutController from './controllers/CheckoutController.js';
+import MessagerieController from './controllers/MessagerieController.js';
+import Messagerie from './models/Messagerie.js';
+import Favoris from './models/Favoris.js';
+import Auth from './models/Auth.js';
+import Likes from './models/Likes.js';
+
+/**
+ * Point d'entrée de l'application (Bootstrapper)
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    
+    // Définition déclarative de nos routes MVC étendues
+    const routes = [
+        { path: '/', controller: AccueilController.afficherCatalogue },
+        { path: '/projet/:id', controller: AccueilController.afficherDetailProjet },
+        { path: '/lire/:idProjet/:idChapitre', controller: LecteurController.lireChapitre },
+        { path: '/favoris', controller: FavorisController.afficherFavoris },
+        { path: '/studio', controller: AuteurController.afficher },
+        { path: '/inscription', controller: AuthController.afficherInscription },
+        { path: '/connexion', controller: AuthController.afficherConnexion },
+        { path: '/dashboard', controller: DashboardController.afficher },
+        { path: '/soumission', controller: SoumissionController.afficher },
+        { path: '/admin', controller: AdminController.afficher },
+        { path: '/vip', controller: VipController.afficher },
+        { path: '/checkout', controller: CheckoutController.afficher },
+        { path: '/inbox', controller: MessagerieController.afficher }
+    ];
+
+    // Gestion Dynamique de la Navbar (Simulation Authentification)
+    const rafraichirNavbar = () => {
+        const navLinks = document.querySelector('.nav-links');
+        if (navLinks) {
+            if (Auth.estConnecte()) {
+                const unreadCount = Messagerie.getTotalNonLus ? Messagerie.getTotalNonLus() : 0;
+                const badgeHtml = unreadCount > 0 
+                    ? `<span id="nav-inbox-badge" style="position:absolute; top:-5px; right:-8px; background:var(--primary); color:white; border-radius:10px; width:18px; height:18px; font-size:0.7rem; display:flex; justify-content:center; align-items:center; font-weight:bold;">${unreadCount}</span>`
+                    : `<span id="nav-inbox-badge" style="display:none; position:absolute; top:-5px; right:-8px; background:var(--primary); color:white; border-radius:10px; width:18px; height:18px; font-size:0.7rem; justify-content:center; align-items:center; font-weight:bold;">0</span>`;
+
+                navLinks.innerHTML = `
+                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> Accueil</a>
+                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> Le Studio</a>
+                    <a href="/favoris" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">bookmark</span> Ma Liste</a>
+                    <a href="/inbox" data-link style="position:relative; display:flex; align-items:center; margin:0 10px;" title="Messagerie Privée">
+                        <span class="material-symbols-outlined" style="font-size:1.3rem;">mail</span>
+                        ${badgeHtml}
+                    </a>
+                    <a href="/dashboard" data-link class="btn-secondary" style="display:flex; align-items:center; gap:6px; padding:8px 20px;">
+                        <span class="material-symbols-outlined" style="font-size:1.2rem;">person</span> Mon Compte
+                    </a>
+                `;
+            } else {
+                navLinks.innerHTML = `
+                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> Accueil</a>
+                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> Le Studio</a>
+                    <a href="/connexion" data-link style="display:flex; align-items:center; gap:6px; color:var(--text-muted);">S'identifier</a>
+                    <a href="/inscription" data-link class="btn-primary" style="display:flex; align-items:center; gap:6px; padding:8px 20px;">S'inscrire</a>
+                `;
+            }
+        }
+    };
+    
+    // Écoute l'événement local de changement d'état
+    window.addEventListener('authStateChanged', rafraichirNavbar);
+    rafraichirNavbar(); // État initial au chargement
+    
+    // Déconnexion globale à l'écoute des boutons .btn-logout de n'importe quelle page
+    document.body.addEventListener('click', e => {
+        if (e.target.closest('.btn-logout')) {
+            e.preventDefault();
+            Auth.deconnecter();
+            if (window.appRouter) window.appRouter.navigate('/');
+        }
+    });
+
+    // Écouteur global pour le bouton "Ajouter à ma liste" sans base backend (Délégation d'événement)
+    document.body.addEventListener('click', e => {
+        const btn = e.target.closest('.btn-favori');
+        if (btn) {
+            e.preventDefault();
+            const idProjet = btn.dataset.projetId;
+            const isFav = Favoris.basculer(idProjet);
+            
+            // Met à jour le texte du bouton et le design dynamiquement
+            btn.innerHTML = isFav ? '❤️ Retirer de ma liste' : '🤍 Ajouter à ma liste';
+            btn.style.transform = "scale(0.95)";
+            setTimeout(() => btn.style.transform = "scale(1)", 150);
+        }
+    });
+
+    // Écouteur global pour le système de Cœurs (Likes)
+    document.body.addEventListener('click', e => {
+        const btnLike = e.target.closest('.btn-like');
+        if (btnLike) {
+            e.preventDefault();
+            const id = btnLike.getAttribute('data-id');
+            const estMaintenantLike = Likes.basculerLike(id);
+            
+            const iconSpan = btnLike.querySelector('.like-icon');
+            const countSpan = btnLike.querySelector('.like-count');
+            let count = parseInt(countSpan.textContent);
+            
+            if (estMaintenantLike) {
+                iconSpan.textContent = '❤️';
+                countSpan.textContent = count + 1;
+                btnLike.style.borderColor = 'var(--primary)';
+                btnLike.style.color = 'var(--primary)';
+            } else {
+                iconSpan.textContent = '🤍';
+                countSpan.textContent = count - 1;
+                btnLike.style.borderColor = '#555';
+                btnLike.style.color = 'white';
+            }
+        }
+    });
+
+    // Initialisation du Routeur
+    window.appRouter = new Router(routes);
+    
+    console.log("Webtoon Studio Initialisé - Architecture prête.");
+});

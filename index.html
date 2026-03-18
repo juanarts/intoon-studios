@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTOON STUDIOS - Lisez les meilleurs Webtoons Originaux</title>
+    <meta name="description" content="Plongez dans les univers d'INTOON STUDIOS. Lisez des dizaines de chapitres de webtoons d'action, romance et isekai gratuitement et en avant-première.">
+    <!-- Google Fonts: Inter pour un look Netflix authentique (UI solide et lisible) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800;900&display=swap" rel="stylesheet">
+    <!-- Style principal -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navbar Premium Netflix/Stitch -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" data-link class="logo" style="display:flex; align-items:center;">
+                <span class="material-symbols-outlined" style="font-size:2.2rem; margin-right:8px; color:var(--primary);">auto_stories</span>
+                <span class="logo-red">IN</span><span>TOON</span> 
+                <span style="font-weight:300; font-size:1rem; letter-spacing:3px; margin-left:8px; color:#aaa; margin-top:4px;">STUDIOS</span>
+            </a>
+            <nav class="nav-links">
+                <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.2rem;">home</span> Accueil</a>
+                <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.2rem;">brush</span> Le Studio</a>
+                <a href="/favoris" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.2rem;">bookmark</span> Ma Liste</a>
+                <a href="/connexion" id="btn-connexion" data-link class="btn-secondary" style="display:flex; align-items:center; gap:6px; padding:8px 20px;">
+                    <span class="material-symbols-outlined" style="font-size:1.2rem;">person</span> Mon Compte
+                </a>
+            </nav>
+        </div>
+    </nav>
+
+    <!-- Conteneur MVC: Les vues s'injecteront ici -->
+    <main id="app">
+        <div class="loader">Chargement...</div>
+    </main>
+
+    <!-- Scripts type module pour la POO native -->
+    <script type="module" src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+/* VARIABLES GLOBALES AWWWARDS X NETFLIX X STITCH */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;600;800;900&family=Be+Vietnam+Pro:wght@100;200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+:root {
+    --bg-dark: #050505;
+    --text-main: #f5f7f8;
+    --text-muted: #a0a0a0;
+    --primary: #e50914; /* Rouge pur Netflix conservé absolument */
+    --hover-effect: rgba(255, 255, 255, 0.08);
+    --transition-fast: 0.2s ease-out;
+    --transition-smooth: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    --radius-card: 12px; /* Adouci d'après Stitch */
+    --radius-pill: 50px; /* Rounded-full d'après Stitch */
+    --radius-badge: 6px;
+}
+
+/* RESET */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+    font-weight: 400; /* Font globale clean Stitch */
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, .logo {
+    font-family: 'Outfit', sans-serif;
+}
+
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    vertical-align: middle;
+}
+
+/* CUSTOM SCROLLBAR PREMIUM */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: #222; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* NAVBAR GLASSMORPHISM */
+.navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 80px;
+    background: rgba(5, 5, 5, 0.6);
+    z-index: 1000;
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    transition: background var(--transition-smooth), transform var(--transition-smooth);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4%;
+    height: 100%;
+}
+
+.logo {
+    font-size: 2.2rem;
+    font-weight: 900;
+    text-decoration: none;
+    color: white;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+}
+.logo-red { color: var(--primary); }
+
+.nav-links { display: flex; align-items: center; gap: 30px; }
+.nav-links a {
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    position: relative;
+    transition: color var(--transition-fast);
+}
+.nav-links a:hover { color: white; }
+.nav-links a:not(.btn-primary):not(.btn-secondary)::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; left: 0;
+    width: 0; height: 2px;
+    background: var(--primary);
+    transition: width var(--transition-fast);
+}
+.nav-links a:not(.btn-primary):not(.btn-secondary):hover::after { width: 100%; }
+
+/* BUTTONS PREMIUM "AWWWARDS" (Liquid Glass Glare) */
+.btn-primary, .btn-secondary {
+    position: relative;
+    overflow: hidden; /* Masque le rayon de balayage externe */
+    padding: 12px 30px;
+    border-radius: var(--radius-pill); /* Forme Pilule */
+    font-weight: 700;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1;
+    transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.4s cubic-bezier(0.1, 0.5, 0.1, 1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #e50914 0%, #b81d24 100%);
+    color: white !important;
+    border: none;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.2);
+}
+.btn-primary:hover { 
+    background: linear-gradient(135deg, #f41b26 0%, #c91f27 100%);
+    box-shadow: 0 10px 25px rgba(229, 9, 20, 0.6), 0 0 20px rgba(229,9,20,0.3); 
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: white !important;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08); /* Fond subtilement éclairé */
+    border-color: rgba(255, 255, 255, 0.8); /* Le contour du bouton s'allume ! */
+    box-shadow: 0 5px 20px rgba(255,255,255,0.15); /* Halot de lumière doux externe */
+    transform: translateY(-2px);
+}
+
+/* L'effet Premium Awwwards / Apple (Le trait de lumière oblique qui glisse en hover) */
+.btn-primary::before, .btn-secondary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%;
+    width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: skewX(-25deg);
+    transition: left 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: -1;
+}
+.btn-primary:hover::before, .btn-secondary:hover::before {
+    left: 150%;
+}
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.8); /* Contour illuminé au hover */
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255,255,255,0.1);
+}
+
+/* MAIN CONTAINER ANIMATION */
+#app { padding-top: 80px; min-height: 100vh; animation: fadeInPage 0.8s var(--transition-smooth); }
+@keyframes fadeInPage { from { opacity: 0; } to { opacity: 1; } }
+
+.loader { text-align: center; padding: 100px; font-size: 1.2rem; font-family: 'Outfit', sans-serif; font-weight:600; display: flex; justify-content: center; animation: pulse 1.5s infinite; }
+.error { text-align: center; padding: 100px; font-size: 1.2rem; color: var(--primary); font-weight: bold; }
+@keyframes pulse { 0% { opacity: 0.4; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0.4; transform: scale(0.98); } }
+
+/* CATALOGUE VIEW */
+.page-title { padding: 40px 4% 20px; font-size: 2.2rem; font-weight: 800; letter-spacing:-0.5px; }
+
+.catalogue-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 25px;
+    padding: 0 4% 100px;
+    animation: fadeUp 1s var(--transition-smooth) forwards;
+}
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.projet-card {
+    position: relative;
+    border-radius: var(--radius-card); /* Bords ronds Stitch */
+    overflow: hidden;
+    cursor: pointer;
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    transition: transform var(--transition-smooth), box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+}
+
+.projet-card:hover {
+    transform: scale(1.06) translateY(-8px);
+    z-index: 20;
+    border-color: rgba(229, 9, 20, 0.4);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 30px rgba(229, 9, 20, 0.15);
+}
+
+.projet-cover {
+    width: 100%;
+    aspect-ratio: 3/4; /* Stitch style poster ratio */
+    object-fit: cover;
+    display: block;
+    transition: transform var(--transition-smooth), filter var(--transition-smooth);
+}
+.projet-card:hover .projet-cover { 
+    transform: scale(1.05); 
+    filter: contrast(1.15) brightness(0.7); 
+}
+
+.projet-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(16,25,34,1) 0%, rgba(16,25,34,0.7) 40%, transparent 100%);
+    padding: 50px 15px 15px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+}
+.projet-card:hover .projet-info { opacity: 1; transform: translateY(0); }
+.projet-info h3 { font-size: 1.1rem; font-weight: 700; font-family: 'Be Vietnam Pro', sans-serif; margin-bottom: 2px; text-shadow: 1px 1px 2px rgba(0,0,0,1); }
+.projet-info p { font-size: 0.8rem; color: #bbb; line-height: 1.2; font-family: 'Be Vietnam Pro', sans-serif;}
+
+/* STITCH CARDS BADGES */
+.badge-ranking {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 2px 8px;
+    border-radius: var(--radius-badge);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    z-index: 10;
+}
+
+/* HERO CINEMATIC (Netflix Ultimate) */
+.projet-detail { padding-top: 0; margin-top: -80px; } 
+
+.projet-hero {
+    position: relative;
+    height: 90vh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.projet-trailer, .projet-trailer-fallback {
+    position: absolute;
+    top: 50%; left: 50%;
+    min-width: 100%; min-height: 100%;
+    width: auto; height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: -2;
+    filter: brightness(0.6) contrast(1.1);
+    animation: slowZoom 40s linear infinite alternate;
+}
+@keyframes slowZoom { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -50%) scale(1.15); } }
+
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to right, #050505 5%, rgba(5,5,5,0.7) 40%, transparent 100%), 
+                linear-gradient(to top, #050505 0%, transparent 35%);
+    z-index: -1;
+}
+
+.hero-content {
+    padding: 0 4%;
+    max-width: 700px;
+    margin-top: 140px; /* Descente du texte sous les barres de menus */
+    animation: fadeRight 1.2s var(--transition-smooth) forwards;
+}
+@keyframes fadeRight { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+
+.hero-content h1 { 
+    font-size: 5.5rem; 
+    margin-bottom: 20px; 
+    font-weight: 900; 
+    letter-spacing: -2px;
+    line-height: 1.05; 
+    background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: white; /* Fallback */
+    text-shadow: 0px 10px 30px rgba(0,0,0,0.5); /* Trick for text-shadow with background-clip */
+}
+.description { font-size: 1.3rem; margin-bottom: 40px; color: #e0e0e0; text-shadow: 1px 2px 4px rgba(0,0,0,0.9); font-weight: 400; line-height:1.6; }
+.hero-actions { display: flex; gap: 20px; flex-wrap: wrap; }
+
+/* CHAPTERS LIST */
+.chapitres-list-container { padding: 50px 0 100px; }
+.chapitres-list-container h2 { font-size: 2.2rem; margin-bottom: 30px; font-weight: 800; font-family: 'Outfit', sans-serif;}
+
+.chapitres-list { list-style: none; display: flex; flex-direction: column; gap: 15px; }
+.chapitres-list li a {
+    display: flex;
+    align-items: center;
+    padding: 20px 25px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255,255,255,0.02);
+    border-radius: var(--radius-card); /* Adouci */
+    color: var(--text-main);
+    text-decoration: none;
+    transition: all var(--transition-smooth);
+    backdrop-filter: blur(5px);
+}
+.chapitres-list li a:hover { 
+    background: rgba(255, 255, 255, 0.08); 
+    transform: translateX(10px); 
+    border-color: rgba(255,255,255,0.1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.ch-num { font-size: 2rem; font-weight: 800; font-family: 'Outfit', sans-serif; color: #444; width: 60px; line-height: 1; transition: color var(--transition-fast);}
+.chapitres-list li a:hover .ch-num { color: white; }
+.ch-titre { font-size: 1.15rem; font-weight: 600; font-family: 'Be Vietnam Pro', sans-serif; margin-left: 20px;}
+
+/* LECTEUR BD / WEBTOON */
+.webtoon-reader { display: flex; flex-direction: column; align-items: center; width: 100%; background: #000; }
+.reader-toolbar {
+    position: sticky; top: 0; /* Fully sticky at top since navbar disappears in reader if handled */
+    width: 100%; background: rgba(5, 5, 5, 0.85);
+    padding: 15px 4%;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+.btn-back { color: var(--text-muted); text-decoration: none; font-weight: 600; font-family: 'Outfit', sans-serif; transition: color var(--transition-fast); }
+.btn-back:hover { color: white; }
+.reader-title { font-weight: 500; color: var(--text-muted); font-family: 'Outfit', sans-serif; letter-spacing: 1px;}
+.reader-title strong { color: white; font-weight: 800; }
+
+.reader-content { 
+    display: flex; flex-direction: column; 
+    width: 100%; max-width: 800px; /* Standard Webtoon Format */
+    margin: 0 auto; background: black; 
+    box-shadow: 0 0 100px rgba(0,0,0,1);
+}
+.webtoon-page { width: 100%; display: block; border: none; margin: 0; padding: 0; }
+
+.reader-footer { padding: 80px 4%; text-align: center; background: #050505; width: 100%; border-top: 1px solid #111;}
+
+/* FOOTER GLOBAL */
+footer {
+    background-color: #050505;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    padding: 60px 4% 40px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-weight: 500;}
+footer a:hover { color: white; }
