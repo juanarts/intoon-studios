@@ -5,10 +5,10 @@ export default class Messagerie {
                 conversations: [
                     {
                         id: 'conv-1',
-                        interlocuteur: 'L\\'Équipe Intoon',
+                        interlocuteur: "L'Équipe Intoon",
                         avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Admin&backgroundColor=e50914',
                         messages: [
-                            { id: 'm1', expediteur: 'L\\'Équipe Intoon', texte: 'Bienvenue sur la plateforme ! N\\'hésitez pas à nous contacter ici si vous avez des questions sur la publication de vos œuvres.', date: new Date(Date.now() - 86400000).toISOString() }
+                            { id: 'm1', expediteur: "L'Équipe Intoon", texte: "Bienvenue sur la plateforme ! N'hésitez pas à nous contacter ici si vous avez des questions sur la publication de vos œuvres.", date: new Date(Date.now() - 86400000).toISOString() }
                         ],
                         nonLus: 1,
                         derniereActivite: new Date(Date.now() - 86400000).toISOString()
@@ -18,7 +18,7 @@ export default class Messagerie {
                         interlocuteur: 'Shadow Blade (Fan)',
                         avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=Fan123',
                         messages: [
-                            { id: 'm2', expediteur: 'Shadow Blade (Fan)', texte: 'Salut ! J\\'adore ton dernier chapitre, les décors sont fous !', date: new Date(Date.now() - 3600000).toISOString() }
+                            { id: 'm2', expediteur: 'Shadow Blade (Fan)', texte: "Salut ! J'adore ton dernier chapitre, les décors sont fous !", date: new Date(Date.now() - 3600000).toISOString() }
                         ],
                         nonLus: 0,
                         derniereActivite: new Date(Date.now() - 3600000).toISOString()
