@@ -28,9 +28,49 @@ export default class AccueilController {
 
             app.innerHTML = VueCatalogue.rendreCatalogue(projets, projetsLab, projetEnCours, chapitreEnCours);
             AccueilController.initialiserCarousel();
+            AccueilController.initialiserSmartTV();
         } catch (err) {
             app.innerHTML = '<div class="error">Erreur lors de la récupération du catalogue. Veuillez réessayer.</div>';
         }
+    }
+
+    static initialiserSmartTV() {
+        const app = document.getElementById('app');
+        app.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-cast-tv')) {
+                e.preventDefault();
+                
+                const pinCode = Math.floor(1000 + Math.random() * 9000) + "-" + Math.floor(1000 + Math.random() * 9000);
+                const modale = document.createElement('div');
+                modale.id = 'modal-smart-tv';
+                modale.innerHTML = `
+                    <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; animation:fadeIn 0.3s; backdrop-filter:blur(10px);">
+                        <div style="background:#111; border:1px solid #333; padding:50px; border-radius:16px; max-width:600px; width:90%; text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
+                            <span class="material-symbols-outlined" style="font-size:4rem; color:var(--primary); margin-bottom:20px;">tv</span>
+                            <h2 style="font-size:2rem; margin-bottom:10px; font-family:'Outfit', sans-serif;">Connectez-vous à votre TV</h2>
+                            <p style="color:#aaa; font-size:1.1rem; margin-bottom:30px;">Ouvrez l'application <b>Intoon Studio</b> sur votre Smart TV, Apple TV ou Chromecast, puis scannez ce QR Code avec votre téléphone ou entrez le code PIN ci-dessous.</p>
+                            
+                            <div style="display:flex; justify-content:center; gap:40px; align-items:center; margin-bottom:30px;">
+                                <div style="background:white; padding:15px; border-radius:12px;">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=intoon-tv-auth" alt="QR Code TV" style="display:block;">
+                                </div>
+                                <div style="text-align:left;">
+                                    <div style="color:#666; font-size:0.9rem; text-transform:uppercase; font-weight:bold; letter-spacing:2px; margin-bottom:5px;">Code PIN TV</div>
+                                    <div style="font-size:2.5rem; font-weight:900; letter-spacing:8px; font-family:'Outfit', sans-serif;">${pinCode}</div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-secondary btn-close-tv" style="width:100%; padding:15px; font-size:1.1rem; border:none; background:#333; color:white;">Fermer</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modale);
+
+                modale.querySelector('.btn-close-tv').addEventListener('click', () => {
+                    modale.remove();
+                });
+            }
+        });
     }
 
     static initialiserCarousel() {

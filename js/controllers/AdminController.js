@@ -19,7 +19,7 @@ export default class AdminController {
             app.innerHTML = VueAdmin.rendreDashboard(projets);
 
             // GESTION DES CLICS STANDARDS
-            app.onclick = (e) => {
+            app.onclick = async (e) => {
                 const target = e.target;
                 const modalRoot = document.getElementById('admin-modal-root');
                 if(!modalRoot) return;
@@ -50,7 +50,7 @@ export default class AdminController {
             };
 
             // GESTION STATIQUE DES FICHIERS UPLOADÉS
-            app.onsubmit = (e) => {
+            app.onsubmit = async (e) => {
                 if (e.target.tagName !== 'FORM') return;
                 
                 const formId = e.target.id;

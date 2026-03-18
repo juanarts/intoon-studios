@@ -4,7 +4,7 @@ export default class VueDashboard {
      * @param {Array} projetsFavoris Les favoris
      * @param {Object} utilisateur Les infos de session (pseudo, statut)
      */
-    static rendre(projetsFavoris, utilisateur) {
+    static rendre(projetsFavoris, utilisateur, mesProjets = []) {
         
         // Simuler un historique
         const historiqueHtml = projetsFavoris.length > 0 ? `
@@ -40,6 +40,24 @@ export default class VueDashboard {
                 <!-- Corps... -->
                 <div class="dashboard-content" style="display:flex; gap: 50px; flex-wrap:wrap;">
                     <div class="dashboard-main" style="flex: 2; min-width:300px;">
+                        ${mesProjets.length > 0 ? `
+                        <div class="dashboard-section" style="margin-bottom: 50px; background:rgba(255,255,255,0.02); padding:30px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                            <h2 style="font-size: 1.5rem; margin-bottom: 25px; color: var(--primary); display:flex; align-items:center; gap:10px;"><span class="material-symbols-outlined">movie_creation</span> Fiches de Production (Mes Œuvres)</h2>
+                            <div class="catalogue-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); padding:0;">
+                                ${mesProjets.map(p => `
+                                    <div class="projet-card" style="box-shadow:0 4px 15px rgba(0,0,0,0.5);">
+                                        <img class="projet-cover" src="${p.couverture}" alt="${p.titre}">
+                                        <div class="projet-info" style="transform:none; opacity:1; background:linear-gradient(to top, rgba(0,0,0,0.95), transparent); padding:10px;">
+                                            <h3 style="font-size:1rem; margin-bottom:5px;">${p.titre}</h3>
+                                            <p style="color:${p.statut === 'publié' ? '#22c55e' : p.statut === 'banni' ? '#ef4444' : '#f59e0b'}; font-weight:bold; font-size:0.75rem; text-transform:uppercase; margin-bottom:10px;">${p.statut}</p>
+                                            <button class="btn-primary btn-edit-crew" data-id="${p.id}" style="padding:6px 0; font-size:0.8rem; width:100%; border-radius:4px; margin-bottom:5px;">Gérer le Cast & Crew</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
                         ${historiqueHtml}
                     </div>
 

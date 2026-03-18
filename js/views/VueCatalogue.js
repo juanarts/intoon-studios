@@ -45,6 +45,7 @@ export default class VueCatalogue {
                                 <div class="hero-actions">
                                     ${btnLireHero}
                                     <a href="/projet/${projet.id}" data-link class="btn-secondary" style="font-size:1.1rem; border:none;"><span class="material-symbols-outlined">info</span> Plus d'infos</a>
+                                    <button class="btn-secondary btn-cast-tv" style="font-size:1.1rem; border:none; background:rgba(255,255,255,0.1); margin-left:10px;"><span class="material-symbols-outlined">cast</span> TV</button>
                                 </div>
                             </div>
                         </div>
