@@ -1,33 +1,92 @@
+import SupabaseService from '../services/SupabaseService.js';
+
 export default class Auth {
+    static currentUser = null;
+    static currentRole = 'lecteur';
+
     /**
-     * @returns {Boolean} L'utilisateur est-il connecté (dans la simulation) ?
+     * Initialise la session globale Supabase au chargement de l'app
      */
+    static async initialiser() {
+        const client = SupabaseService.getClient();
+        if (!client) return;
+
+        const { data: { session } } = await client.auth.getSession();
+        
+        if (session) {
+            this.currentUser = session.user;
+            const { data: profil } = await client.from('profils').select('role, pseudo').eq('id', session.user.id).single();
+            if (profil) {
+                this.currentRole = profil.role;
+                this.currentUser.pseudo = profil.pseudo;
+            }
+        }
+
+        // Écoute des changements de session (Multi-onglets, Refresh, etc)
+        client.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN') {
+                this.currentUser = session.user;
+                const { data: profil } = await client.from('profils').select('role, pseudo').eq('id', session.user.id).single();
+                if (profil) {
+                    this.currentRole = profil.role;
+                    this.currentUser.pseudo = profil.pseudo;
+                }
+                window.dispatchEvent(new Event('authStateChanged'));
+            } else if (event === 'SIGNED_OUT') {
+                this.currentUser = null;
+                this.currentRole = 'lecteur';
+                window.dispatchEvent(new Event('authStateChanged'));
+            }
+        });
+    }
+
     static estConnecte() {
-        return localStorage.getItem('intoon_session') !== null;
+        return this.currentUser !== null;
     }
 
-    /**
-     * Démarre une session virtuelle (Avec gestion des rôles Admin/Lecteur)
-     */
-    static connecter(pseudo, role = 'lecteur') {
-        localStorage.setItem('intoon_session', JSON.stringify({ pseudo: pseudo, statut: 'VIP', role: role }));
-        // Émission d'un événement global pour recharger les menus automatiquement
-        window.dispatchEvent(new Event('authStateChanged'));
+    static async inscrire(email, motDePasse, pseudo) {
+        const client = SupabaseService.getClient();
+        // 1. Inscription Auth
+        const { data, error } = await client.auth.signUp({
+            email: email,
+            password: motDePasse,
+        });
+        
+        if (error) throw error;
+        
+        // 2. Création du profil public
+        if (data.user) {
+            await client.from('profils').insert([{
+                id: data.user.id,
+                pseudo: pseudo,
+                role: 'lecteur'
+            }]);
+        }
+        return data;
     }
 
-    /**
-     * Ferme la session virtuelle
-     */
-    static deconnecter() {
-        localStorage.removeItem('intoon_session');
-        window.dispatchEvent(new Event('authStateChanged'));
+    static async connecter(email, motDePasse) {
+        const client = SupabaseService.getClient();
+        const { data, error } = await client.auth.signInWithPassword({
+            email: email,
+            password: motDePasse
+        });
+        if (error) throw error;
+        return data;
     }
 
-    /**
-     * Récupère le profil de l'utilisateur stocké
-     */
+    static async deconnecter() {
+        const client = SupabaseService.getClient();
+        await client.auth.signOut();
+    }
+
     static getUtilisateur() {
-        const data = localStorage.getItem('intoon_session');
-        return data ? JSON.parse(data) : null;
+        return this.currentUser ? { 
+            id: this.currentUser.id, 
+            email: this.currentUser.email,
+            pseudo: this.currentUser.pseudo || 'Utilisateur',
+            statut: 'Membre', 
+            role: this.currentRole 
+        } : null;
     }
 }

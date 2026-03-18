@@ -18,7 +18,10 @@ import Likes from './models/Likes.js';
 /**
  * Point d'entrée de l'application (Bootstrapper)
  */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    
+    // Attendre le chargement de la session Supabase avant de dessiner la page
+    await Auth.initialiser();
     
     // Définition déclarative de nos routes MVC étendues
     const routes = [
