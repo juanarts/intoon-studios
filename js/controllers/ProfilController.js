@@ -88,18 +88,27 @@ export default class ProfilController {
             };
             if (avatarUrl) updateData.avatar_url = avatarUrl;
 
-            await client.from('profils').update(updateData).eq('id', user.id);
+            const { error: updateError } = await client.from('profils').update(updateData).eq('id', user.id);
+            const feedback = document.getElementById('profil-save-feedback');
+
+            if (updateError) throw updateError;
 
             btn.innerHTML = '<span class="material-symbols-outlined">check</span> Sauvegardé !';
             btn.style.background = '#22c55e';
+            if (feedback) { feedback.style.color = '#22c55e'; feedback.innerText = '✅ Profil mis à jour avec succès ! (Rafraîchissez pour voir les changements)'; }
+
             setTimeout(() => {
-                btn.innerHTML = '<span class="material-symbols-outlined">save</span> Enregistrer le profil';
+                btn.innerHTML = '<span class="material-symbols-outlined">save</span> Mettre à jour mon identité';
                 btn.disabled = false;
                 btn.style.background = '';
-            }, 2500);
+                if (feedback) feedback.innerText = '';
+            }, 4000);
         } catch (err) {
-            console.error(err);
-            btn.innerHTML = '❌ Erreur — Réessayer';
+            console.error('Erreur sauvegarde profil:', err);
+            const feedback = document.getElementById('profil-save-feedback');
+            if (feedback) { feedback.style.color = '#ef4444'; feedback.innerText = '❌ Erreur lors de la sauvegarde : ' + err.message; }
+            
+            btn.innerHTML = '❌ Réessayer';
             btn.disabled = false;
         }
     }

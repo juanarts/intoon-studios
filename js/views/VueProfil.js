@@ -159,10 +159,24 @@ export default class VueProfil {
 
     // ── Formulaire de gestion du profil (intégré au Dashboard) ──
     static rendreEditProfil(profil) {
-        const genres = ['Action', 'Romance', 'Fantaisie', 'Horreur', 'Sci-Fi', 'Comédie', 'Drame', 'Aventure', 'Mystère', 'Slice of Life'];
-        const musiques = ['Hip-Hop', 'Lo-fi', 'Jazz', 'Électro', 'Rock', 'Classique', 'R&B', 'Afrobeat', 'Indie', 'Trap'];
+        const categoriesGenres = {
+            '📖 Manga': ['Shōnen', 'Seinen', 'Shōjo', 'Space Opera', 'Isekai', 'Mecha'],
+            '📚 BD Franco-Belge': ['Historique', 'Sci-Fi', 'Aventure', 'Polar', 'Humour'],
+            '🦸 Comics': ['Superheroes', 'Indie', 'Horreur', 'Dark Fantasy']
+        };
+        const musiques = ['Hip-Hop', 'Lo-fi', 'Jazz', 'Électro', 'Rock', 'Classique', 'R&B', 'Afrobeat', 'Nu Metal', 'Métal Industriel', 'Trash Metal', 'Synthwave', 'Trap'];
+        
         const prefGenres = profil?.genres_preferes || [];
         const prefMusique = profil?.style_musique || [];
+
+        const renderTags = (items, name, checkedArray, color, bgColor) => items.map(g => `
+            <label style="cursor:pointer;">
+                <input type="checkbox" name="${name}" value="${g}" ${checkedArray.includes(g) ? 'checked' : ''} style="display:none;">
+                <span class="tag-check" style="padding:5px 12px;border:1px solid ${checkedArray.includes(g) ? color : '#333'};border-radius:20px;font-size:0.8rem;color:${checkedArray.includes(g) ? color : '#888'};background:${checkedArray.includes(g) ? bgColor : 'transparent'};transition:all 0.2s;"
+                onclick="const input=this.previousElementSibling; input.checked=!input.checked; this.style.borderColor=input.checked?'${color}':'#333'; this.style.color=input.checked?'${color}':'#888'; this.style.background=input.checked?'${bgColor}':'transparent';"
+                >${g}</span>
+            </label>
+        `).join('');
 
         return `
         <div style="background:rgba(255,255,255,0.03);border:1px solid #222;border-radius:12px;padding:25px;margin-bottom:30px;">
@@ -173,9 +187,9 @@ export default class VueProfil {
                     <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> Voir mon profil public
                 </a>
             </h3>
-            <form id="form-edit-profil" style="display:flex;flex-direction:column;gap:16px;">
+            <form id="form-edit-profil" style="display:flex;flex-direction:column;gap:18px;">
                 <!-- Avatar Upload -->
-                <div style="display:flex;align-items:center;gap:15px;">
+                <div style="display:flex;align-items:center;gap:15px; margin-bottom:10px;">
                     <img id="avatar-preview" src="${profil?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${profil?.pseudo}`}"
                         style="width:70px;height:70px;border-radius:50%;border:2px solid #333;object-fit:cover;background:#111;">
                     <div>
@@ -196,37 +210,31 @@ export default class VueProfil {
                 </div>
 
                 <!-- Genres préférés -->
-                <div>
-                    <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:8px;">📚 Genres préférés</label>
-                    <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                        ${genres.map(g => `
-                            <label style="cursor:pointer;">
-                                <input type="checkbox" name="genres" value="${g}" ${prefGenres.includes(g) ? 'checked' : ''} style="display:none;">
-                                <span class="tag-check" style="padding:5px 12px;border:1px solid ${prefGenres.includes(g) ? 'var(--primary)' : '#333'};border-radius:20px;font-size:0.8rem;color:${prefGenres.includes(g) ? 'var(--primary)' : '#888'};background:${prefGenres.includes(g) ? 'rgba(229,9,20,0.1)' : 'transparent'};transition:all 0.2s;"
-                                onclick="this.closest('label').querySelector('input').checked=!this.closest('label').querySelector('input').checked; this.style.borderColor=this.closest('label').querySelector('input').checked?'var(--primary)':'#333'; this.style.color=this.closest('label').querySelector('input').checked?'var(--primary)':'#888'; this.style.background=this.closest('label').querySelector('input').checked?'rgba(229,9,20,0.1)':'transparent';"
-                                >${g}</span>
-                            </label>
-                        `).join('')}
-                    </div>
+                <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; border:1px solid #222;">
+                    <label style="color:white;font-size:0.95rem;display:block;margin-bottom:12px; font-weight:bold;">📚 Ce que tu aimes lire</label>
+                    
+                    ${Object.entries(categoriesGenres).map(([titre, genres]) => `
+                        <div style="margin-bottom:12px;">
+                            <div style="font-size:0.75rem; color:#888; text-transform:uppercase; margin-bottom:6px; letter-spacing:1px;">${titre}</div>
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                                ${renderTags(genres, 'genres', prefGenres, 'var(--primary)', 'rgba(229,9,20,0.1)')}
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
 
                 <!-- Style musique -->
-                <div>
-                    <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:8px;">🎵 Style de musique</label>
+                <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; border:1px solid #222;">
+                    <label style="color:white;font-size:0.95rem;display:block;margin-bottom:10px; font-weight:bold;">🎵 C'est quoi ton style de son ?</label>
                     <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                        ${musiques.map(m => `
-                            <label style="cursor:pointer;">
-                                <input type="checkbox" name="musique" value="${m}" ${prefMusique.includes(m) ? 'checked' : ''} style="display:none;">
-                                <span class="tag-check" style="padding:5px 12px;border:1px solid ${prefMusique.includes(m) ? '#a855f7' : '#333'};border-radius:20px;font-size:0.8rem;color:${prefMusique.includes(m) ? '#a855f7' : '#888'};background:${prefMusique.includes(m) ? 'rgba(168,85,247,0.1)' : 'transparent'};transition:all 0.2s;"
-                                onclick="this.closest('label').querySelector('input').checked=!this.closest('label').querySelector('input').checked; this.style.borderColor=this.closest('label').querySelector('input').checked?'#a855f7':'#333'; this.style.color=this.closest('label').querySelector('input').checked?'#a855f7':'#888'; this.style.background=this.closest('label').querySelector('input').checked?'rgba(168,85,247,0.1)':'transparent';"
-                                >${m}</span>
-                            </label>
-                        `).join('')}
+                        ${renderTags(musiques, 'musique', prefMusique, '#a855f7', 'rgba(168,85,247,0.1)')}
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary" style="align-self:flex-start;display:flex;align-items:center;gap:8px;">
-                    <span class="material-symbols-outlined">save</span> Enregistrer le profil
+                <div id="profil-save-feedback" style="font-size:0.85rem; font-weight:bold;"></div>
+
+                <button type="submit" class="btn-primary" style="align-self:flex-start;display:flex;align-items:center;gap:8px; padding:10px 20px;">
+                    <span class="material-symbols-outlined">save</span> Mettre à jour mon identité
                 </button>
             </form>
         </div>`;
