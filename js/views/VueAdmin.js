@@ -166,9 +166,9 @@ export default class VueAdmin {
                         <input type="text" id="chap-titre" placeholder="Titre du Chapitre (ex: L'éveil de l'ombre)" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1.1rem; font-family:'Outfit', sans-serif;" required>
                         <input type="number" id="chap-ordre" placeholder="Numéro (ex: 1, 2, 3...)" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1.1rem;" required>
                         
-                        <label style="color:#aaa; font-size:0.9rem; margin-top:10px; margin-bottom:-10px;">Uploader les planches (Images)</label>
+                        <label style="color:#aaa; font-size:0.9rem; margin-top:10px; margin-bottom:-10px;">Uploader les Planches <span style="color:var(--primary);">*minimum 5*</span> — Format Horizontal (Paysage, max 1400px)</label>
                         <input type="file" id="chap-pages" accept="image/png, image/jpeg, image/webp" multiple style="padding:15px; border-radius:4px; border:1px dashed #444; background:#1a1a20; color:white; font-size:1rem; cursor:pointer;" required>
-                        <p style="font-size:0.8rem; color:#888; font-style:italic; margin-top:-5px;">Maintenez CTRL appuyé pour sélectionner plusieurs images à la suite.</p>
+                        <p id="chap-pages-hint" style="font-size:0.8rem; color:#888; font-style:italic; margin-top:-5px;">⚠️ Format recommandé : <strong>1400×900px</strong> (paysage cinéma). Maintenez CTRL pour sélectionner plusieurs images.</p>
                         
                         <!-- Toggle de Commentaires (Niveau Chapitre) -->
                         <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:4px; display:flex; align-items:center; gap:10px; margin-top:10px;">

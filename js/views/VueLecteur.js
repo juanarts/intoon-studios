@@ -1,103 +1,178 @@
 export default class VueLecteur {
     
-    /**
-     * Génère la vue du Webtoon (Adaptée selon l'état de connexion de l'utilisateur)
-     */
     static rendreLecteur(projet, chapitre, estConnecte = false) {
         if (!chapitre) {
             return `<div class="lecteur-error"><h2>Chapitre introuvable.</h2><a href="/" data-link class="btn-primary">Retour</a></div>`;
         }
 
-        // --- Logique du Mur Payant (Paywall Netflix) ---
-        // S'il est connecté, c'est illimité (999). Sinon, limite de 2 pages.
-        const maximumVuesLibres = estConnecte ? 9999 : 2; 
-        
-        // On récupère uniquement le nombre limite d'images gratuites
+        const maximumVuesLibres = estConnecte ? 9999 : 2;
         const imagesAPrelever = Math.min(chapitre.pages.length, maximumVuesLibres);
+        
+        // Format HORIZONTAL cinématique : 1 planche = 1 slide plein écran
         const pagesVisibles = chapitre.pages.slice(0, imagesAPrelever).map((url, index) => `
-            <img class="webtoon-page" src="${url}" alt="Planche ${index + 1}" style="width:100%; display:block;">
+            <div class="reader-slide" data-index="${index}" style="
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #000;
+                min-height: 90vh;
+                position: relative;
+                flex-shrink: 0;
+            ">
+                <img 
+                    class="webtoon-page-horizontal" 
+                    src="${url}" 
+                    alt="Planche ${index + 1}"
+                    style="
+                        max-width: 1400px;
+                        width: 100%;
+                        height: auto;
+                        object-fit: contain;
+                        display: block;
+                        user-select: none;
+                        -webkit-user-drag: none;
+                    "
+                    loading="${index < 2 ? 'eager' : 'lazy'}"
+                >
+                <div class="slide-number" style="
+                    position: absolute;
+                    bottom: 18px;
+                    right: 24px;
+                    color: rgba(255,255,255,0.25);
+                    font-size: 0.8rem;
+                    font-family: 'Outfit', sans-serif;
+                    letter-spacing: 2px;
+                    pointer-events:none;
+                ">${index + 1} / ${imagesAPrelever}</div>
+            </div>
         `).join('');
 
-        // 2. Si non-connecté et plus long que l'aperçu gratuit, on bloque l'image suivante !
+        // Paywall flou si non-connecté
         let sectionBloqueeHtml = '';
         if (!estConnecte && chapitre.pages.length > maximumVuesLibres) {
-            const imageBloqueeType = chapitre.pages[maximumVuesLibres];
+            const imgBloquee = chapitre.pages[maximumVuesLibres];
             sectionBloqueeHtml = `
-                <div class="paywall-container" style="position:relative; overflow:hidden; width:100%;">
-                    <img class="webtoon-page" src="${imageBloqueeType}" style="filter: blur(12px) brightness(0.5); transform: scale(1.05); width:100%; display:block; pointer-events:none;">
-                    
-                    <div class="paywall-overlay" style="position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; justify-content:center; align-items:center; background: linear-gradient(to bottom, rgba(15,16,20,0.5), rgba(15,16,20,1) 80%); text-align:center; padding: 40px;">
-                        
-                        <h2 style="font-size: 2.8rem; margin-bottom: 15px; color:white; font-weight:800; text-transform:uppercase;">Fin de l'aperçu gratuit</h2>
-                        <p style="font-size: 1.25rem; color:#d0d0d0; margin-bottom:30px; max-width:550px; line-height:1.5;">
-                            Vous êtes captivé par <strong>${projet.titre}</strong> ?<br>Soutenez le studio et débloquez la suite immédiatement en rejoignant la communauté !
-                        </p>
-                        
-                        <a href="/inscription" data-link class="btn-primary" style="font-size:1.3rem; padding: 16px 45px; box-shadow: 0 10px 25px rgba(229,9,20,0.4); text-transform:uppercase; font-weight:800; border-radius:4px;">M'inscrire gratuitement</a>
-                        
-                        <p style="margin-top: 30px; font-size: 1rem; color: #888;">
-                            Vous avez déjà un compte ? <a href="/connexion" data-link style="color:white; text-decoration:none; font-weight:bold;">Se connecter</a>
-                        </p>
+                <div class="reader-slide" style="width:100%; min-height:90vh; display:flex; justify-content:center; align-items:center; background:#000; position:relative; flex-shrink:0;">
+                    <img src="${imgBloquee}" style="max-width:1400px; width:100%; height:auto; filter:blur(16px) brightness(0.35); pointer-events:none;">
+                    <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px;">
+                        <span class="material-symbols-outlined" style="font-size:4rem; color:var(--primary); margin-bottom:20px;">lock</span>
+                        <h2 style="font-size:2.5rem; color:white; margin-bottom:15px; font-family:'Outfit',sans-serif;">Fin de l'aperçu gratuit</h2>
+                        <p style="color:#aaa; font-size:1.1rem; margin-bottom:30px; max-width:450px; line-height:1.6;">Inscrivez-vous gratuitement pour lire la suite de <strong>${projet.titre}</strong>.</p>
+                        <a href="/inscription" data-link class="btn-primary" style="font-size:1.2rem; padding:15px 40px;">M'inscrire gratuitement</a>
+                        <a href="/connexion" data-link style="color:#aaa; margin-top:15px; font-size:0.9rem;">Déjà un compte ? Se connecter</a>
                     </div>
                 </div>
             `;
         }
-        
-        // Si tout le document a été lu
-        const footerComplet = estConnecte || (chapitre.pages.length <= maximumVuesLibres) ? `
-            <div class="reader-footer" style="padding: 60px 4%; text-align: center; background: #08080a;">
-                <div style="font-size: 1.2rem; margin-bottom: 20px;">Fin du chapitre.</div>
-                <a href="/projet/${projet.id}" data-link class="btn-primary">Retour à la Sélection</a>
-            </div>
-        ` : '';
 
-        const formComment = estConnecte ? `
-            <div style="display:flex; align-items:center; gap:15px;">
-                <form id="form-live-comment" style="display:flex; align-items:center; gap:8px;">
-                    <input type="text" id="live-comment-input" placeholder="Soutenir (Abonné VIP)..." maxlength="60" style="background:rgba(255,255,255,0.1); border:1px solid #444; border-radius:20px; padding:6px 15px; color:white; font-size:0.85rem; outline:none; text-transform:lowercase; width:180px;" required>
-                    <button type="submit" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer;">POSTER</button>
-                </form>
-                <button id="toggle-comments" style="background:none; border:none; font-size:1.3rem; cursor:pointer;" title="Désactiver les commentaires transparents">💬</button>
-            </div>
-        ` : `
-            <div style="display:flex; align-items:center; gap:15px;">
-                <span style="font-size:0.8rem; color:#888; font-style:italic;">Abonnement requis pour commenter.</span>
-                <button id="toggle-comments" class="btn-secondary" style="background:transparent; border:none; padding:5px;"><span class="material-symbols-outlined">chat</span></button>
+        // Chapitre suivant
+        const chapSuivant = projet.chapitres.find(c => c.ordre === chapitre.ordre + 1);
+        const footerHtml = `
+            <div class="reader-slide" style="width:100%; min-height:60vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#08080a; flex-shrink:0; gap:25px;">
+                <span class="material-symbols-outlined" style="font-size:3rem; color:var(--primary);">check_circle</span>
+                <h2 style="font-size:2rem; color:white; font-family:'Outfit',sans-serif;">Fin du Chapitre ${chapitre.ordre}</h2>
+                <div style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center;">
+                    ${chapSuivant 
+                        ? `<a href="/lire/${projet.id}/${chapSuivant.id}" data-link class="btn-primary" style="font-size:1.1rem; display:flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">skip_next</span> Chapitre ${chapSuivant.ordre}</a>`
+                        : `<span style="color:#666; font-style:italic;">Dernier chapitre disponible — revenez bientôt !</span>`
+                    }
+                    <a href="/projet/${projet.id}" data-link class="btn-secondary" style="font-size:1.1rem;">Retour à la série</a>
+                </div>
             </div>
         `;
 
+        const formComment = estConnecte ? `
+            <form id="form-live-comment" style="display:flex; align-items:center; gap:8px;">
+                <input type="text" id="live-comment-input" placeholder="Réagir..." maxlength="60" style="background:rgba(255,255,255,0.08); border:1px solid #333; border-radius:20px; padding:6px 14px; color:white; font-size:0.8rem; outline:none; text-transform:lowercase; width:150px;" required>
+                <button type="submit" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer; font-size:0.8rem;">OK</button>
+            </form>
+        ` : `<a href="/connexion" data-link style="color:#666; font-size:0.8rem;">Connexion pour réagir</a>`;
+
         return `
-            <div class="webtoon-reader" style="background:var(--bg-dark); position:relative;">
-                
+            <div class="webtoon-reader" style="background:#000; position:relative; overflow:hidden;">
+
                 <!-- OVERLAY COMMENTAIRES TRANSPARENTS -->
                 <div id="comments-overlay" style="position:fixed; top:120px; left:0; right:0; bottom:80px; pointer-events:none; z-index:45; overflow:hidden;"></div>
 
-                <div class="reader-toolbar" style="position:sticky; top:70px; display:flex; justify-content:space-between; align-items:center; padding:10px 15px; background:rgba(15,16,20,0.95); z-index:50; border-bottom:1px solid #222;">
-                    <div style="flex:1;"><a href="/projet/${projet.id}" data-link class="btn-back">⬅ Détails</a></div>
-                    <div style="flex:2; text-align:center;"><span class="reader-title" style="font-size:0.95rem;"><strong>Ch.${chapitre.ordre}</strong> - ${projet.titre}</span></div>
-                    <div style="flex:1; display:flex; justify-content:flex-end;">
+                <!-- BARRE NETFLIX COLLANTE (haut) -->
+                <div class="reader-toolbar" style="position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%); z-index:100; transition:opacity 0.4s;" id="reader-topbar">
+                    <a href="/projet/${projet.id}" data-link style="color:white; text-decoration:none; display:flex; align-items:center; gap:6px; opacity:0.7; hover:opacity:1; font-size:0.9rem;">
+                        <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_back</span>
+                    </a>
+                    <span style="font-size:0.9rem; color:rgba(255,255,255,0.7); font-family:'Outfit',sans-serif; letter-spacing:1px;">
+                        Ch.<strong>${chapitre.ordre}</strong> — ${projet.titre}
+                    </span>
+                    <div style="display:flex; align-items:center; gap:10px;">
                         ${formComment}
+                        <button id="toggle-comments" style="background:none; border:none; color:rgba(255,255,255,0.5); cursor:pointer; padding:4px;" title="Commentaires"><span class="material-symbols-outlined" style="font-size:1.2rem;">chat</span></button>
                     </div>
                 </div>
-                
-                <div class="reader-content" style="max-width:800px; margin:0 auto; width:100%; box-shadow:0 0 50px rgba(0,0,0,0.8); position:relative; z-index:10;">
-                    ${pagesVisibles.length > 0 ? pagesVisibles : '<div style="padding:100px;text-align:center;">Désolé, aucune image à charger.</div>'}
+
+                <!-- CONTAINER SLIDES VERTICAL (scroll classique entre les planches) -->
+                <div id="reader-slides-container" style="width:100%; position:relative;">
+                    ${pagesVisibles}
                     ${sectionBloqueeHtml}
+                    ${!sectionBloqueeHtml ? footerHtml : ''}
                 </div>
-                
-                <div style="background:#08080a; border-top:1px solid #222; text-align:center; padding:80px 4% 100px; margin-top:0; z-index:20; position:relative;">
-                    <span class="material-symbols-outlined" style="font-size:3.5rem; color:var(--primary); margin-bottom:15px; display:inline-block;">volunteer_activism</span>
-                    <h2 style="font-size:2.2rem; font-family:'Outfit', sans-serif; color:white; margin-bottom:15px;">Soutenez le Créateur !</h2>
-                    <p style="color:#aaa; font-size:1.1rem; line-height:1.6; max-width:600px; margin:0 auto 30px;">
-                        Les webtoons indépendants existent grâce à vous. Si vous avez vibré avec ce chapitre, laissez un pourboire pour financer la suite de l'aventure !
-                    </p>
-                    <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
-                        <button class="btn-primary" onclick="alert('Simulation Stripe : Paiement Unique (3€) validé.')" style="background:#e50914; border:none; padding:15px 30px; font-size:1.1rem; display:flex; align-items:center; gap:10px;"><span class="material-symbols-outlined">local_cafe</span> Offrir un Café (3€)</button>
-                        <a href="/vip" data-link class="btn-secondary" style="border-color:#eab308; color:#eab308!important; background:rgba(234,179,8,0.1); padding:15px 30px; font-size:1.1rem; display:flex; align-items:center; gap:10px;"><span class="material-symbols-outlined">stars</span> Rejoindre le Club VIP</a>
-                    </div>
+
+                <!-- BARRE DE CONTRÔLES NETFLIX (bas, fixe) -->
+                <div id="netflix-controls" style="
+                    position: fixed;
+                    bottom: 24px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: rgba(15,15,20,0.85);
+                    backdrop-filter: blur(16px);
+                    border: 1px solid rgba(255,255,255,0.08);
+                    padding: 10px 20px;
+                    border-radius: 50px;
+                    z-index: 100;
+                    transition: opacity 0.4s, transform 0.4s;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+                ">
+                    <!-- Règle de vitesse -->
+                    <span class="material-symbols-outlined" style="font-size:1rem; color:rgba(255,255,255,0.4);">speed</span>
+                    <input type="range" id="scroll-speed" min="1" max="10" value="3" style="
+                        width: 70px;
+                        accent-color: var(--primary);
+                        cursor: pointer;
+                        background: transparent;
+                    " title="Vitesse de défilement">
+                    
+                    <div style="width:1px; height:20px; background:rgba(255,255,255,0.1); margin:0 4px;"></div>
+
+                    <!-- Stop (retour début) -->
+                    <button id="btn-stop" title="Redémarrer" style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; padding:6px; border-radius:50%; transition:all 0.2s; display:flex;">
+                        <span class="material-symbols-outlined" style="font-size:1.3rem;">stop</span>
+                    </button>
+
+                    <!-- Play / Pause -->
+                    <button id="btn-play-pause" title="Lecture automatique" style="background:white; border:none; color:#000; cursor:pointer; padding:10px; border-radius:50%; transition:all 0.2s; display:flex; box-shadow:0 2px 12px rgba(255,255,255,0.2);">
+                        <span class="material-symbols-outlined" id="play-icon" style="font-size:1.5rem;">play_arrow</span>
+                    </button>
+
+                    <!-- Chapitre suivant -->
+                    ${chapSuivant 
+                        ? `<a href="/lire/${projet.id}/${chapSuivant.id}" data-link title="Chapitre suivant" style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; padding:6px; border-radius:50%; display:flex; text-decoration:none;">
+                            <span class="material-symbols-outlined" style="font-size:1.3rem;">skip_next</span>
+                        </a>`
+                        : `<button disabled style="background:none; border:none; color:rgba(255,255,255,0.2); padding:6px; cursor:not-allowed; display:flex;">
+                            <span class="material-symbols-outlined" style="font-size:1.3rem;">skip_next</span>
+                        </button>`
+                    }
+
+                    <div style="width:1px; height:20px; background:rgba(255,255,255,0.1); margin:0 4px;"></div>
+
+                    <!-- Plein écran -->
+                    <button id="btn-fullscreen" title="Plein écran TV" style="background:none; border:none; color:rgba(255,255,255,0.5); cursor:pointer; padding:6px; display:flex;">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">fullscreen</span>
+                    </button>
                 </div>
-                
-                ${footerComplet}
+
             </div>
         `;
     }
