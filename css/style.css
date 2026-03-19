@@ -78,8 +78,48 @@ h1, h2, h3, h4, .logo {
     color: white;
     letter-spacing: -1px;
     text-transform: uppercase;
+    transition: opacity var(--transition-fast);
 }
+.logo:hover { opacity: 0.9; }
 .logo-red { color: var(--primary); }
+
+/* ANIMATION LOGO SVG UNIQUE */
+.intoon-logo-svg {
+    transition: transform 0.4s var(--transition-smooth), filter 0.4s;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+}
+.logo:hover .intoon-logo-svg {
+    transform: translateY(-2px) scale(1.05);
+    filter: drop-shadow(0 5px 15px rgba(229,9,20,0.4));
+}
+.svg-page-right {
+    transition: all 0.4s ease;
+    transform-origin: 20px 20px;
+}
+.logo:hover .svg-page-right {
+    fill: #fff;
+    animation: flipBookPage 1.5s ease-in-out infinite alternate;
+}
+.svg-dot {
+    transition: all 0.4s ease;
+}
+.logo:hover .svg-dot {
+    filter: drop-shadow(0 0 8px #FFD700);
+    animation: pulseSpark 0.6s infinite alternate;
+}
+.logo:hover .svg-beam {
+    stroke-dashoffset: -10;
+    transition: stroke-dashoffset 1s linear;
+}
+
+@keyframes flipBookPage {
+    0% { transform: skewY(0deg) scaleX(1); }
+    100% { transform: skewY(-2.5deg) scaleX(0.95); }
+}
+@keyframes pulseSpark {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.4); opacity: 1; }
+}
 
 .nav-links { display: flex; align-items: center; gap: 30px; }
 .nav-links a {

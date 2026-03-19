@@ -21,9 +21,24 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" data-link class="logo" style="display:flex; align-items:center;">
-                <span class="material-symbols-outlined" style="font-size:2.2rem; margin-right:8px; color:var(--primary);">auto_stories</span>
-                <span class="logo-red">IN</span><span>TOON</span> 
-                <span class="logo-text-hide" style="font-weight:300; font-size:1rem; letter-spacing:3px; margin-left:8px; color:#aaa; margin-top:4px;">STUDIOS</span>
+                <!-- Logo Vectoriel Personnalisé INTOON (Livre Isométrique + Étincelle Digitale) -->
+                <svg class="intoon-logo-svg" viewBox="0 0 40 40" width="38" height="38" xmlns="http://www.w3.org/2000/svg" style="margin-right:8px; overflow:visible;">
+                    <!-- Couverture arrière (ombre) -->
+                    <path class="svg-shadow" d="M 20 6 L 36 13.5 L 36 33.5 L 20 26 Z" fill="rgba(255,255,255,0.05)" stroke="#444" stroke-width="1.5" stroke-linejoin="round"/>
+                    <!-- Page droite animable -->
+                    <path class="svg-page-right" d="M 20 6 L 34 12.5 L 34 32.5 L 20 26 Z" fill="rgba(255,255,255,0.8)" />
+                    <!-- Couverture avant (Rouge INTOON) -->
+                    <path class="svg-cover-left" d="M 4 13.5 L 20 6 L 20 26 L 4 33.5 Z" fill="var(--primary)" stroke="#c91f27" stroke-width="1" stroke-linejoin="round"/>
+                    <!-- Rayon / Connecteur Tech -->
+                    <path class="svg-beam" d="M 12 18 L 26 12" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2" opacity="0.8"/>
+                    <!-- Puce centrale / Étincelle de création -->
+                    <circle class="svg-dot" cx="20" cy="14.5" r="2.5" fill="#FFD700" />
+                </svg>
+                
+                <div>
+                    <span class="logo-red">IN</span><span>TOON</span> 
+                    <span class="logo-text-hide" style="font-weight:300; font-size:1rem; letter-spacing:3px; margin-left:8px; color:#aaa; margin-top:4px;">STUDIOS</span>
+                </div>
             </a>
             <nav class="nav-links">
                 <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.2rem;">home</span> <span class="nav-text">Accueil</span></a>
