@@ -9,10 +9,12 @@ export default class VueMessagerie {
         
         const listeHtml = conversations.map(c => `
             <div class="conv-item ${activeConv && activeConv.id === c.id ? 'active' : ''}" data-id="${c.id}" style="display:flex; align-items:center; gap:15px; padding:15px; border-bottom:1px solid #222; cursor:pointer; background:${activeConv && activeConv.id === c.id ? '#1a1a20' : 'transparent'}; transition:background 0.2s;">
-                <img src="${c.avatar}" alt="Avatar" style="width:50px; height:50px; border-radius:50%; background:#222; object-fit:cover;">
+                <a href="/profil/${c.idUtilisateur}" data-link title="Voir le profil" style="flex-shrink:0;">
+                    <img src="${c.avatar}" alt="Avatar" style="width:50px; height:50px; border-radius:50%; background:#222; object-fit:cover; border:2px solid transparent; transition:border 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='transparent'">
+                </a>
                 <div style="flex:1; overflow:hidden;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                        <span style="font-weight:bold; color:white; font-size:1.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.interlocuteur}</span>
+                        <a href="/profil/${c.idUtilisateur}" data-link style="font-weight:bold; color:white; font-size:1.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='white'">${c.interlocuteur}</a>
                         <span style="font-size:0.8rem; color:#666;">${this.formaterHeure(c.derniereActivite)}</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -50,9 +52,11 @@ export default class VueMessagerie {
                 <div style="display:flex; flex-direction:column; height:100%;">
                     <!-- Header Chat -->
                     <div style="padding:20px; border-bottom:1px solid #222; display:flex; align-items:center; gap:15px; background:rgba(255,255,255,0.02);">
-                        <img src="${activeConv.avatar}" alt="Avatar" style="width:45px; height:45px; border-radius:50%; background:#222; object-fit:cover;">
+                        <a href="/profil/${activeConv.idUtilisateur}" data-link title="Voir le profil">
+                            <img src="${activeConv.avatar}" alt="Avatar" style="width:45px; height:45px; border-radius:50%; background:#222; object-fit:cover; border:2px solid transparent; transition:border 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='transparent'">
+                        </a>
                         <div>
-                            <h3 style="margin:0; color:white; font-size:1.2rem;">${activeConv.interlocuteur}</h3>
+                            <h3 style="margin:0;"><a href="/profil/${activeConv.idUtilisateur}" data-link style="color:white; font-size:1.2rem; text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='white'">${activeConv.interlocuteur}</a></h3>
                             <span style="font-size:0.85rem; color:#4ade80; display:flex; align-items:center; gap:5px;"><span style="width:8px; height:8px; border-radius:50%; background:#4ade80; display:inline-block;"></span> En ligne</span>
                         </div>
                         <div style="margin-left:auto; display:flex; gap:15px; color:#aaa;">

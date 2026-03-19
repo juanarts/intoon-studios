@@ -2,6 +2,7 @@ import VueProfil from '../views/VueProfil.js';
 import Auth from '../models/Auth.js';
 import Projet from '../models/Projet.js';
 import SupabaseService from '../services/SupabaseService.js';
+import BOT_PROFILS from '../data/BotProfils.js';
 
 export default class ProfilController {
 
@@ -11,6 +12,12 @@ export default class ProfilController {
         app.innerHTML = '<div class="loader">Chargement du profil...</div>';
 
         try {
+            // ── Profils bots statiques (pas de Supabase) ──────────
+            if (BOT_PROFILS[userId]) {
+                app.innerHTML = VueProfil.rendreProfil(BOT_PROFILS[userId], [], false);
+                return;
+            }
+
             const client = SupabaseService.getClient();
 
             // Charger les données du profil depuis Supabase

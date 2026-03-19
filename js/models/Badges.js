@@ -139,6 +139,26 @@ export default class Badges {
             color: '#06b6d4',
             glow: '0 0 10px rgba(6,182,212,0.5)',
         },
+
+        // ─── SPÉCIAUX ──────────────────────────────────────────
+        intoon_team: {
+            id: 'intoon_team',
+            label: 'INTOON 🛡️',
+            description: 'Membre officiel de l\'équipe INTOON STUDIOS.',
+            image: '/assets/badges/badge_intoon_team.png',
+            rarity: 'legendary',
+            color: '#e50914',
+            glow: '0 0 20px rgba(229,9,20,0.8)',
+        },
+        bot: {
+            id: 'bot',
+            label: 'BOT 🤖',
+            description: 'Profil automatisé de test INTOON.',
+            image: '/assets/badges/badge_bot.png',
+            rarity: 'rare',
+            color: '#22d3ee',
+            glow: '0 0 12px rgba(34,211,238,0.6)',
+        },
     };
 
     /** Tous les badges de l'admin (sauf vues/likes) */
@@ -150,10 +170,16 @@ export default class Badges {
 
     static getBadgesUtilisateur(user) {
         if (!user) return [this.CATALOGUE.nouveau];
-        const badges = [];
 
+        // Profils bots : badges définis manuellement via badges_ids
+        if (user.isBot && user.badges_ids) {
+            return user.badges_ids
+                .map(id => this.CATALOGUE[id])
+                .filter(Boolean);
+        }
+
+        const badges = [];
         if (user.role === 'admin') {
-            // L'admin a TOUS les badges legendaires + epiques + rares
             return this.BADGES_ADMIN.map(id => this.CATALOGUE[id]);
         }
         if (user.role === 'createur') {

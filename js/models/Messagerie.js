@@ -5,9 +5,10 @@ export default class Messagerie {
                 conversations: [
                     {
                         id: 'conv-1',
+                        idUtilisateur: 'bot-intoon',
                         interlocuteur: "L'Équipe Intoon 🛡️",
-                        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Admin&backgroundColor=e50914',
-                        badge: 'admin',
+                        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=IntoonTeam&backgroundColor=e50914',
+                        badge: 'intoon_team',
                         messages: [
                             { id: 'm1', expediteur: "L'Équipe Intoon 🛡️", texte: "Bienvenue sur la plateforme ! N'hésitez pas à nous contacter ici si vous avez des questions sur la publication de vos œuvres.", date: new Date(Date.now() - 86400000).toISOString() },
                             { id: 'm2', expediteur: "L'Équipe Intoon 🛡️", texte: "📢 Rappel : format recommandé pour vos planches — paysage 1400×900px, 3 Mo max. Bonne création ! 🎨", date: new Date(Date.now() - 43200000).toISOString() }
@@ -17,6 +18,7 @@ export default class Messagerie {
                     },
                     {
                         id: 'conv-2',
+                        idUtilisateur: 'bot-shadowfan',
                         interlocuteur: 'ShadowFan_42 👤',
                         avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=ShadowFan42',
                         badge: 'lecteur',
@@ -30,6 +32,7 @@ export default class Messagerie {
                     },
                     {
                         id: 'conv-3',
+                        idUtilisateur: 'bot-nightowl',
                         interlocuteur: 'NightOwlReader 🦉',
                         avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=NightOwl99',
                         badge: 'nouveau',
