@@ -5,24 +5,41 @@ export default class Messagerie {
                 conversations: [
                     {
                         id: 'conv-1',
-                        interlocuteur: "L'Équipe Intoon",
+                        interlocuteur: "L'Équipe Intoon 🛡️",
                         avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=Admin&backgroundColor=e50914',
+                        badge: 'admin',
                         messages: [
-                            { id: 'm1', expediteur: "L'Équipe Intoon", texte: "Bienvenue sur la plateforme ! N'hésitez pas à nous contacter ici si vous avez des questions sur la publication de vos œuvres.", date: new Date(Date.now() - 86400000).toISOString() }
+                            { id: 'm1', expediteur: "L'Équipe Intoon 🛡️", texte: "Bienvenue sur la plateforme ! N'hésitez pas à nous contacter ici si vous avez des questions sur la publication de vos œuvres.", date: new Date(Date.now() - 86400000).toISOString() },
+                            { id: 'm2', expediteur: "L'Équipe Intoon 🛡️", texte: "📢 Rappel : format recommandé pour vos planches — paysage 1400×900px, 3 Mo max. Bonne création ! 🎨", date: new Date(Date.now() - 43200000).toISOString() }
                         ],
                         nonLus: 1,
-                        derniereActivite: new Date(Date.now() - 86400000).toISOString()
+                        derniereActivite: new Date(Date.now() - 43200000).toISOString()
                     },
                     {
                         id: 'conv-2',
-                        interlocuteur: 'Shadow Blade (Fan)',
-                        avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=Fan123',
+                        interlocuteur: 'ShadowFan_42 👤',
+                        avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=ShadowFan42',
+                        badge: 'lecteur',
                         messages: [
-                            { id: 'm2', expediteur: 'Shadow Blade (Fan)', texte: "Salut ! J'adore ton dernier chapitre, les décors sont fous !", date: new Date(Date.now() - 3600000).toISOString() }
+                            { id: 'm3', expediteur: 'ShadowFan_42 👤', texte: "Salut ! J'adore ton style graphique, les personnages sont incroyables 🔥", date: new Date(Date.now() - 7200000).toISOString() },
+                            { id: 'm4', expediteur: 'ShadowFan_42 👤', texte: "T'as prévu de sortir le chapitre 2 quand ? j'arrive pas à attendre 😭", date: new Date(Date.now() - 3600000).toISOString() },
+                            { id: 'm5', expediteur: 'ShadowFan_42 👤', texte: "Est-ce qu'on peut te soutenir quelque part ? Patreon ou autre ?", date: new Date(Date.now() - 1800000).toISOString() }
                         ],
-                        nonLus: 0,
-                        derniereActivite: new Date(Date.now() - 3600000).toISOString()
+                        nonLus: 2,
+                        derniereActivite: new Date(Date.now() - 1800000).toISOString()
+                    },
+                    {
+                        id: 'conv-3',
+                        interlocuteur: 'NightOwlReader 🦉',
+                        avatar: 'https://api.dicebear.com/7.x/pixel-art/svg?seed=NightOwl99',
+                        badge: 'nouveau',
+                        messages: [
+                            { id: 'm6', expediteur: 'NightOwlReader 🦉', texte: "Hey ! je viens de découvrir la plateforme, je suis fan de webtoon depuis toujours !", date: new Date(Date.now() - 300000).toISOString() }
+                        ],
+                        nonLus: 1,
+                        derniereActivite: new Date(Date.now() - 300000).toISOString()
                     }
+
                 ]
             };
             localStorage.setItem('messages_db', JSON.stringify(welcomeData));

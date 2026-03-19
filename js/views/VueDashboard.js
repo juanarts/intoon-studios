@@ -1,3 +1,5 @@
+import Badges from '../models/Badges.js';
+
 export default class VueDashboard {
     /**
      * Rendu principal du Dashboard (Espace VIP) de l'utilisateur.
@@ -27,13 +29,26 @@ export default class VueDashboard {
             <div class="dashboard-page" style="padding: 40px 4%; animation: fadeIn 0.5s ease-out; min-height: 80vh;">
                 
                 <!-- En-tête personnalisé -->
-                <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 40px;">
-                    <div>
-                        <h1 style="font-size: 3rem; margin-bottom: 5px;">Votre Espace <span style="color:var(--primary);">VIP</span></h1>
-                        <p style="color:var(--text-muted); font-size:1.1rem; font-weight:300;">Bienvenue sur INTOON STUDIOS, <strong style="color:white;">${utilisateur.pseudo}</strong>.</p>
+                <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom: 1px solid #222; padding-bottom: 30px; margin-bottom: 40px; gap:30px; flex-wrap:wrap;">
+                    <!-- Avatar + Pseudo + Badges -->
+                    <div style="display:flex; gap:25px; align-items:center;">
+                        <div style="position:relative;">
+                            <img src="https://api.dicebear.com/7.x/identicon/svg?seed=${utilisateur.pseudo}&backgroundColor=0a0a0d" 
+                                style="width:90px; height:90px; border-radius:50%; border:3px solid ${utilisateur.role === 'admin' ? '#FFD700' : 'var(--primary)'}; box-shadow:0 0 20px ${utilisateur.role === 'admin' ? 'rgba(255,215,0,0.4)' : 'rgba(229,9,20,0.3)'}; background:#111;">
+                            ${utilisateur.role === 'admin' ? '<div style="position:absolute; bottom:-5px; right:-5px; background:#FFD700; color:#000; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:bold;">👑</div>' : ''}
+                        </div>
+                        <div>
+                            <h1 style="font-size: 2rem; margin-bottom: 4px;">${utilisateur.pseudo} ${utilisateur.role === 'admin' ? '<span style="font-size:1.2rem;">👑</span>' : ''}</h1>
+                            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:12px;">@${utilisateur.pseudo.toLowerCase()} &bull; ${utilisateur.role.toUpperCase()}</p>
+                            <!-- BADGES GAMIFICATION -->
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+                                ${Badges.getBadgesUtilisateur(utilisateur).map(b => Badges.renderBadge(b, 52)).join('')}
+                            </div>
+                        </div>
                     </div>
-                    <div style="text-align:right;">
-                        <span class="badge" style="background:var(--primary); color:white; padding:8px 15px; border-radius:3px; font-weight:bold; font-size:0.9rem;">Statut ${utilisateur.statut} Sécurisé</span>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <a href="/inbox" data-link class="btn-secondary" style="display:flex; align-items:center; gap:6px; font-size:0.9rem;"><span class="material-symbols-outlined" style="font-size:1.1rem;">mail</span> Messages</a>
+                        ${utilisateur.role === 'admin' ? '<a href="/admin" data-link class="btn-primary" style="display:flex; align-items:center; gap:6px; font-size:0.9rem;"><span class="material-symbols-outlined" style="font-size:1.1rem;">admin_panel_settings</span> Admin</a>' : ''}
                     </div>
                 </div>
                 
