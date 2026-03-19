@@ -27,7 +27,6 @@ export default class VueLecteur {
                     class="webtoon-page-horizontal" 
                     src="${url}" 
                     alt="Planche ${index + 1}"
-                    data-parallax="true"
                     style="
                         max-width: 1400px;
                         width: 100%;
@@ -36,9 +35,6 @@ export default class VueLecteur {
                         display: block;
                         user-select: none;
                         -webkit-user-drag: none;
-                        transform: scale(1.05);
-                        transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-                        will-change: transform;
                     "
                     loading="${index < 2 ? 'eager' : 'lazy'}"
                 >

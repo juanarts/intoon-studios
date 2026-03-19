@@ -8,8 +8,9 @@ export default class LecteurController {
     // Moteur d'auto-scroll cinématique
     static scrollEngine = {
         active: false,
-        speed: 1,          // px par frame — ultra-lent par défaut (1-10)
+        speed: 1,          // Vitesse (1-10)
         rafId: null,
+        accumulator: 0,    // Accumulation pixels fractionnaires (fix bug v=1)
         hidden: false,
         hideTimer: null
     };
@@ -31,7 +32,6 @@ export default class LecteurController {
                 app.innerHTML = VueLecteur.rendreLecteur(projet, chapitre, userConnecte);
 
                 LecteurController.initialiserControlesNetflix();
-                LecteurController.initialiserParallaxZoom();
                 LecteurController.initialiserCommentairesImmersifs();
                 LecteurController.initialiserAutoHide();
             } else {
@@ -59,12 +59,20 @@ export default class LecteurController {
         // Lecture au RAF (requestAnimationFrame) pour un scroll fluide 60fps
         const scrollLoop = () => {
             if (!engine.active) return;
-            window.scrollBy(0, engine.speed * 0.3); // 0.3 = très cinématique
+
+            // Accumulation des pixels fractionnaires pour éviter que scrollBy(0,0.3) = 0
+            engine.accumulator += engine.speed * 0.4;
+            const pixelsToScroll = Math.floor(engine.accumulator);
+            if (pixelsToScroll >= 1) {
+                window.scrollBy(0, pixelsToScroll);
+                engine.accumulator -= pixelsToScroll;
+            }
 
             // Fin naturelle de la page → pause automatique
             const distanceRestante = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
             if (distanceRestante <= 2) {
                 engine.active = false;
+                engine.accumulator = 0;
                 if (playIcon) playIcon.textContent = 'play_arrow';
                 return;
             }
