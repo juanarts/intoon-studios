@@ -93,10 +93,10 @@ export default class VueMessagerie {
                     <span class="material-symbols-outlined" style="font-size:2.5rem; color:var(--primary);">mail</span> Messagerie Privée
                 </h1>
                 
-                <div style="display:flex; height:70vh; min-height:600px; border:1px solid #333; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+                <div class="split-layout" style="display:flex; height:70vh; min-height:600px; border:1px solid #333; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
                     
                     <!-- Sidebar Conversations -->
-                    <div style="width:350px; background:#0f0f11; border-right:1px solid #222; display:flex; flex-direction:column;">
+                    <div class="split-sidebar" style="width:350px; background:#0f0f11; border-right:1px solid #222; display:flex; flex-direction:column;">
                         <div style="padding:20px; border-bottom:1px solid #222;">
                             <div style="display:flex; align-items:center; background:#1a1a20; border-radius:8px; padding:10px 15px; border:1px solid #333;">
                                 <span class="material-symbols-outlined" style="color:#666; margin-right:10px;">search</span>
@@ -109,7 +109,7 @@ export default class VueMessagerie {
                     </div>
 
                     <!-- Main Chat Area -->
-                    <div style="flex:1; background:#0a0a0c; position:relative;" id="chat-area">
+                    <div class="split-content" style="flex:1; background:#0a0a0c; position:relative; display:flex; flex-direction:column;" id="chat-area">
                         ${chatHtml}
                     </div>
                     

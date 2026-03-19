@@ -54,8 +54,8 @@ export default class VueDashboard {
                 </div>
                 
                 <!-- Corps... -->
-                <div class="dashboard-content" style="display:flex; gap: 50px; flex-wrap:wrap;">
-                    <div class="dashboard-main" style="flex: 2; min-width:300px;">
+                <div class="dashboard-content split-layout" style="display:flex; gap: 50px; flex-wrap:wrap;">
+                    <div class="dashboard-main split-content" style="flex: 2; min-width:300px;">
                         ${mesProjets.length > 0 ? `
                         <div class="dashboard-section" style="margin-bottom: 50px; background:rgba(255,255,255,0.02); padding:30px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
                             <h2 style="font-size: 1.5rem; margin-bottom: 25px; color: var(--primary); display:flex; align-items:center; gap:10px;"><span class="material-symbols-outlined">movie_creation</span> Fiches de Production (Mes Œuvres)</h2>
@@ -77,7 +77,7 @@ export default class VueDashboard {
                         ${historiqueHtml}
                     </div>
 
-                    <div class="dashboard-sidebar" style="flex:1; min-width:250px; display:flex; flex-direction:column; gap:20px;">
+                    <div class="dashboard-sidebar split-sidebar" style="flex:1; min-width:250px; display:flex; flex-direction:column; gap:20px;">
 
                         <!-- Édition du profil -->
                         ${VueProfil.rendreEditProfil({ ...utilisateur, id: utilisateur.id })}

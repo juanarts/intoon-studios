@@ -95,11 +95,11 @@ export default class VueProfil {
 
                 <!-- Contenu Profil -->
                 <div style="padding:0 30px 30px; margin-top:-50px; position:relative;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:15px; margin-bottom:20px;">
-                        <div style="display:flex; align-items:flex-end; gap:20px;">
+                    <div class="profil-header-wrap" style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:15px; margin-bottom:20px;">
+                        <div class="profil-header-wrap" style="display:flex; align-items:flex-end; gap:20px;">
                             <!-- Avatar -->
                             <div style="position:relative; flex-shrink:0;">
-                                <img src="${avatarSrc}" alt="${pseudo}"
+                                <img src="${avatarSrc}" alt="${pseudo}" class="profil-avatar-img"
                                     style="width:100px;height:100px;border-radius:50%;border:4px solid ${roleColor};box-shadow:0 0 25px ${roleColor}55;background:#111;object-fit:cover;">
                                 ${role === 'admin' ? '<div style="position:absolute;bottom:0;right:0;background:#FFD700;color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;">👑</div>' : ''}
                             </div>
@@ -108,7 +108,7 @@ export default class VueProfil {
                                 <span style="background:${roleColor}22;color:${roleColor};border:1px solid ${roleColor}55;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;font-family:'Outfit',sans-serif;">${roleLabel}</span>
                             </div>
                         </div>
-                        <div style="display:flex;gap:10px;flex-wrap:wrap;padding-bottom:8px;">
+                        <div class="profil-actions-wrap" style="display:flex;gap:10px;flex-wrap:wrap;padding-bottom:8px;">
                             <a href="/inbox" data-link style="background:rgba(255,255,255,0.08);border:1px solid #333;color:white;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:0.85rem;display:flex;align-items:center;gap:6px;">
                                 <span class="material-symbols-outlined" style="font-size:1rem;">mail</span> Message
                             </a>

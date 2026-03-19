@@ -58,24 +58,24 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const couronne = user?.role === 'admin' ? '👑 ' : '';
 
                 navLinks.innerHTML = `
-                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> Accueil</a>
-                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> Le Studio</a>
-                    <a href="/favoris" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">bookmark</span> Ma Liste</a>
+                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">Accueil</span></a>
+                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">Le Studio</span></a>
+                    <a href="/favoris" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">bookmark</span> <span class="nav-text">Ma Liste</span></a>
                     <a href="/inbox" data-link style="position:relative; display:flex; align-items:center; margin:0 10px;" title="Messagerie Privée">
                         <span class="material-symbols-outlined" style="font-size:1.3rem;">mail</span>
                         ${badgeHtml}
                     </a>
                     <a href="/dashboard" data-link class="btn-secondary" style="display:flex; align-items:center; gap:8px; padding:6px 16px; border-radius:20px;">
                         <img src="${avatar}" alt="Profil" style="width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid #333;">
-                        <span style="font-weight:bold; font-size:0.9rem;">${couronne}${pseudo}</span>
+                        <span style="font-weight:bold; font-size:0.9rem;" class="nav-text">${couronne}${pseudo}</span>
                     </a>
                 `;
             } else {
                 navLinks.innerHTML = `
-                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> Accueil</a>
-                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> Le Studio</a>
-                    <a href="/connexion" data-link style="display:flex; align-items:center; gap:6px; color:var(--text-muted);">S'identifier</a>
-                    <a href="/inscription" data-link class="btn-primary" style="display:flex; align-items:center; gap:6px; padding:8px 20px;">S'inscrire</a>
+                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">Accueil</span></a>
+                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">Le Studio</span></a>
+                    <a href="/connexion" data-link style="display:flex; align-items:center; gap:6px; color:var(--text-muted);"><span class="nav-text">S'identifier</span></a>
+                    <a href="/inscription" data-link class="btn-primary" style="display:flex; align-items:center; gap:6px; padding:8px 20px;"><span class="nav-text">S'inscrire</span></a>
                 `;
             }
         }
