@@ -1,4 +1,5 @@
 import Badges from '../models/Badges.js';
+import VueProfil from './VueProfil.js';
 
 export default class VueDashboard {
     /**
@@ -76,23 +77,23 @@ export default class VueDashboard {
                         ${historiqueHtml}
                     </div>
 
-                    <div class="dashboard-sidebar" style="flex: 1; min-width:250px; background: rgba(15,16,20,0.8); border: 1px solid #333; padding:30px; border-radius:8px;">
-                        <h3 style="margin-bottom: 25px; border-bottom:1px solid #333; padding-bottom:15px; font-size:1.2rem;">Paramètres du Compte</h3>
-                        
-                        ${utilisateur.role === 'admin' ? `
-                        <div style="background:rgba(229,9,20,0.1); border:1px solid var(--primary); padding:18px; border-radius:8px; margin-bottom:25px;">
-                            <h4 style="color:var(--primary); margin-bottom:10px; font-size:1.1rem; text-transform:uppercase; letter-spacing:1px;">⚡ Accès Super Admin</h4>
-                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px; line-height:1.4;">Vous avez les droits de modification étendus sur le catalogue global.</p>
-                            <a href="/admin" data-link class="btn-primary" style="display:block; text-align:center; padding:12px; border-radius:4px; font-weight:bold;">Ouvrir le Back-Office Edge</a>
-                        </div>
-                        ` : ''}
+                    <div class="dashboard-sidebar" style="flex:1; min-width:250px; display:flex; flex-direction:column; gap:20px;">
 
-                        <ul style="list-style:none; display:flex; flex-direction:column; gap:18px;">
-                            <li><a href="/favoris" data-link style="color:white; text-decoration:none; display:flex; justify-content:space-between;"><span>⭐ Ma Liste (Favoris)</span> <span style="color:#666;">›</span></a></li>
-                            <li><hr style="border-color:#333; margin: 15px 0;"></li>
-                            <!-- Bouton déconnexion écouté par app.js -->
-                            <li><a href="#" class="btn-logout" style="color:var(--primary); text-decoration:none; font-weight:bold; font-size:1.1rem;">Se déconnecter (Simulation)</a></li>
-                        </ul>
+                        <!-- Édition du profil -->
+                        ${VueProfil.rendreEditProfil({ ...utilisateur, id: utilisateur.id })}
+
+                        <!-- Liens rapides -->
+                        <div style="background:rgba(15,16,20,0.8);border:1px solid #333;padding:25px;border-radius:8px;">
+                            <h3 style="margin-bottom:20px;border-bottom:1px solid #333;padding-bottom:12px;font-size:1rem;">Liens rapides</h3>
+                            <ul style="list-style:none;display:flex;flex-direction:column;gap:14px;">
+                                <li><a href="/profil/${utilisateur.id}" data-link style="color:white;text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>👤 Mon Profil Public</span><span style="color:#666;">›</span></a></li>
+                                <li><a href="/inbox" data-link style="color:white;text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>✉️ Messagerie</span><span style="color:#666;">›</span></a></li>
+                                <li><a href="/favoris" data-link style="color:white;text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>⭐ Ma Liste</span><span style="color:#666;">›</span></a></li>
+                                ${utilisateur.role === 'admin' ? '<li><a href="/admin" data-link style="color:var(--primary);text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>⚡ Back-Office</span><span style="color:#666;">›</span></a></li>' : ''}
+                                <li><hr style="border-color:#333;"></li>
+                                <li><a href="#" class="btn-logout" style="color:#666;text-decoration:none;font-size:0.9rem;">Se déconnecter</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -3,6 +3,7 @@ import Favoris from '../models/Favoris.js';
 import Projet from '../models/Projet.js';
 import Auth from '../models/Auth.js';
 import SupabaseService from '../services/SupabaseService.js';
+import ProfilController from './ProfilController.js';
 
 export default class DashboardController {
     static async afficher() {
@@ -32,7 +33,12 @@ export default class DashboardController {
             const mesProjets = dbProjets ? dbProjets.map(p => new Projet(p)) : [];
             
             app.innerHTML = VueDashboard.rendre(projetsFavoris, utilisateur, mesProjets);
-            
+
+            // FORMULAIRE ÉDITION PROFIL
+            document.addEventListener('submit', (e) => {
+                if (e.target.id === 'form-edit-profil') ProfilController.sauvegarderProfil(e);
+            }, { once: true });
+
             // GESTION FICHE DE PRODUCTION (CAST & CREW)
             app.onclick = async (e) => {
                 const btnCrew = e.target.closest('.btn-edit-crew');
