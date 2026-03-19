@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         { path: '/admin', controller: AdminController.afficher },
         { path: '/vip', controller: VipController.afficher },
         { path: '/checkout', controller: CheckoutController.afficher },
-        { path: '/inbox', controller: MessagerieController.afficher }
+        { path: '/inbox', controller: () => MessagerieController.afficher() }
     ];
 
     // Gestion Dynamique de la Navbar (Simulation Authentification)
