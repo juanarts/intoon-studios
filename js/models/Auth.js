@@ -15,10 +15,14 @@ export default class Auth {
         
         if (session) {
             this.currentUser = session.user;
-            const { data: profil } = await client.from('profils').select('role, pseudo').eq('id', session.user.id).single();
+            const { data: profil } = await client.from('profils').select('role, pseudo, avatar_url, bio, genres_preferes, style_musique').eq('id', session.user.id).single();
             if (profil) {
                 this.currentRole = profil.role;
                 this.currentUser.pseudo = profil.pseudo;
+                this.currentUser.avatar_url = profil.avatar_url;
+                this.currentUser.bio = profil.bio;
+                this.currentUser.genres_preferes = profil.genres_preferes;
+                this.currentUser.style_musique = profil.style_musique;
             }
         }
 
@@ -26,10 +30,14 @@ export default class Auth {
         client.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN') {
                 this.currentUser = session.user;
-                const { data: profil } = await client.from('profils').select('role, pseudo').eq('id', session.user.id).single();
+                const { data: profil } = await client.from('profils').select('role, pseudo, avatar_url, bio, genres_preferes, style_musique').eq('id', session.user.id).single();
                 if (profil) {
                     this.currentRole = profil.role;
                     this.currentUser.pseudo = profil.pseudo;
+                    this.currentUser.avatar_url = profil.avatar_url;
+                    this.currentUser.bio = profil.bio;
+                    this.currentUser.genres_preferes = profil.genres_preferes;
+                    this.currentUser.style_musique = profil.style_musique;
                 }
                 window.dispatchEvent(new Event('authStateChanged'));
             } else if (event === 'SIGNED_OUT') {
@@ -85,6 +93,10 @@ export default class Auth {
             id: this.currentUser.id, 
             email: this.currentUser.email,
             pseudo: this.currentUser.pseudo || 'Utilisateur',
+            avatar_url: this.currentUser.avatar_url,
+            bio: this.currentUser.bio,
+            genres_preferes: this.currentUser.genres_preferes,
+            style_musique: this.currentUser.style_musique,
             statut: 'Membre', 
             role: this.currentRole 
         } : null;

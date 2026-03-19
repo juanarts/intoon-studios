@@ -52,6 +52,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ? `<span id="nav-inbox-badge" style="position:absolute; top:-5px; right:-8px; background:var(--primary); color:white; border-radius:10px; width:18px; height:18px; font-size:0.7rem; display:flex; justify-content:center; align-items:center; font-weight:bold;">${unreadCount}</span>`
                     : `<span id="nav-inbox-badge" style="display:none; position:absolute; top:-5px; right:-8px; background:var(--primary); color:white; border-radius:10px; width:18px; height:18px; font-size:0.7rem; justify-content:center; align-items:center; font-weight:bold;">0</span>`;
 
+                const user = Auth.getUtilisateur();
+                const avatar = user?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user?.pseudo || 'User'}&backgroundColor=0a0a0d`;
+                const pseudo = user?.pseudo || 'Mon Compte';
+                const couronne = user?.role === 'admin' ? '👑 ' : '';
+
                 navLinks.innerHTML = `
                     <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> Accueil</a>
                     <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> Le Studio</a>
@@ -60,8 +65,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <span class="material-symbols-outlined" style="font-size:1.3rem;">mail</span>
                         ${badgeHtml}
                     </a>
-                    <a href="/dashboard" data-link class="btn-secondary" style="display:flex; align-items:center; gap:6px; padding:8px 20px;">
-                        <span class="material-symbols-outlined" style="font-size:1.2rem;">person</span> Mon Compte
+                    <a href="/dashboard" data-link class="btn-secondary" style="display:flex; align-items:center; gap:8px; padding:6px 16px; border-radius:20px;">
+                        <img src="${avatar}" alt="Profil" style="width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid #333;">
+                        <span style="font-weight:bold; font-size:0.9rem;">${couronne}${pseudo}</span>
                     </a>
                 `;
             } else {
