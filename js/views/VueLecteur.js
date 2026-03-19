@@ -12,32 +12,27 @@ export default class VueLecteur {
         const pagesVisibles = chapitre.pages.slice(0, imagesAPrelever).map((url, index) => `
             <div class="reader-slide" data-index="${index}" style="
                 width: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
                 background: #000;
-                min-height: 90vh;
                 position: relative;
                 flex-shrink: 0;
                 margin: 0;
                 padding: 0;
-                overflow: hidden;
+                line-height: 0;
             ">
                 <img 
                     class="webtoon-page-horizontal" 
                     src="${url}" 
                     alt="Planche ${index + 1}"
                     style="
-                        max-width: 1400px;
                         width: 100%;
                         height: auto;
-                        object-fit: contain;
                         display: block;
                         user-select: none;
                         -webkit-user-drag: none;
                     "
                     loading="${index < 2 ? 'eager' : 'lazy'}"
                 >
+
                 <div class="slide-number" style="
                     position: absolute;
                     bottom: 18px;
