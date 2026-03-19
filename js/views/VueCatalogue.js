@@ -27,9 +27,30 @@ export default class VueCatalogue {
                         btnLireHero = `<span style="color:var(--text-muted); padding:12px 0; margin-right:15px; font-weight:bold;">Prochainement...</span>`;
                     }
                     
-                    const mediaHtml = projet.videoPromoUrl 
-                        ? `<video class="projet-trailer hero-video" playsinline muted style="width:100%; height:100%; object-fit:cover;" data-index="${idx}"><source src="${projet.videoPromoUrl}" type="video/mp4"></video>`
-                        : `<img class="projet-trailer-fallback" src="${projet.couverture}" alt="${projet.titre}" style="width:100%; height:100%; object-fit:cover; animation: slowZoom 12s alternate infinite;">`;
+                    // Génération intelligente selon le type de média
+                    let mediaHtml;
+                    if (!projet.videoPromoUrl) {
+                        mediaHtml = `<img class="projet-trailer-fallback" src="${projet.couverture}" alt="${projet.titre}" style="width:100%; height:100%; object-fit:cover; animation: slowZoom 12s alternate infinite;">`;
+                    } else if (projet.videoPromoUrl.includes('youtube.com') || projet.videoPromoUrl.includes('youtu.be')) {
+                        const ytId = projet.videoPromoUrl.includes('youtu.be')
+                            ? projet.videoPromoUrl.split('youtu.be/')[1].split('?')[0]
+                            : (projet.videoPromoUrl.split('v=')[1] || '').split('&')[0];
+                        mediaHtml = `<div style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;">
+                            <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&modestbranding=1&playsinline=1&rel=0"
+                                frameborder="0" allow="autoplay; encrypted-media"
+                                style="width:100%;height:140%;object-fit:cover;transform:translateY(-12%);pointer-events:none;">
+                            </iframe></div>`;
+                    } else if (projet.videoPromoUrl.includes('vimeo.com')) {
+                        const vimeoId = projet.videoPromoUrl.split('vimeo.com/')[1].split('?')[0];
+                        mediaHtml = `<div style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;">
+                            <iframe src="https://player.vimeo.com/video/${vimeoId}?background=1&autoplay=1&loop=1&byline=0&title=0"
+                                frameborder="0" allow="autoplay; fullscreen"
+                                style="width:100%;height:100%;object-fit:cover;pointer-events:none;">
+                            </iframe></div>`;
+                    } else {
+                        mediaHtml = `<video class="projet-trailer hero-video" playsinline muted loop autoplay style="width:100%;height:100%;object-fit:cover;" data-index="${idx}"><source src="${projet.videoPromoUrl}" type="video/mp4"></video>`;
+                    }
+
 
                     return `
                         <div class="hero-slide" data-index="${idx}" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:${idx===0?1:0}; transition:opacity 1s cubic-bezier(0.19, 1, 0.22, 1); z-index:${idx===0?5:1};">
