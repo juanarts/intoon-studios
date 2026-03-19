@@ -12,7 +12,7 @@ export default class AccueilController {
         app.innerHTML = '<div class="loader" style="color:white;">Chargement du catalogue de Webtoons...</div>';
         try {
             const projetsBruts = await Projet.chargerTous();
-            const projets = projetsBruts.filter(p => p.statut === 'publié');
+            const projets = projetsBruts.filter(p => p.statut === 'publie');
             const projetsLab = projetsBruts.filter(p => p.statut === 'brouillon');
             
             const dataHisto = Historique.getDernier();
@@ -139,7 +139,7 @@ export default class AccueilController {
         app.innerHTML = `<div class="loader">Chargement des détails...</div>`;
         try {
             const projet = await Projet.chargerParId(id);
-            if (projet && (projet.statut === 'publié' || projet.statut === 'brouillon')) {
+            if (projet && (projet.statut === 'publie' || projet.statut === 'brouillon')) {
                 const estFavori = Favoris.estFavori(id);
                 const aLikeLocal = Likes.aLike(id);
                 

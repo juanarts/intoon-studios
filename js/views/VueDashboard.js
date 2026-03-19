@@ -49,7 +49,7 @@ export default class VueDashboard {
                                         <img class="projet-cover" src="${p.couverture}" alt="${p.titre}">
                                         <div class="projet-info" style="transform:none; opacity:1; background:linear-gradient(to top, rgba(0,0,0,0.95), transparent); padding:10px;">
                                             <h3 style="font-size:1rem; margin-bottom:5px;">${p.titre}</h3>
-                                            <p style="color:${p.statut === 'publié' ? '#22c55e' : p.statut === 'banni' ? '#ef4444' : '#f59e0b'}; font-weight:bold; font-size:0.75rem; text-transform:uppercase; margin-bottom:10px;">${p.statut}</p>
+                                            <p style="color:${p.statut === 'publie' ? '#22c55e' : p.statut === 'banni' ? '#ef4444' : '#f59e0b'}; font-weight:bold; font-size:0.75rem; text-transform:uppercase; margin-bottom:10px;">${p.statut}</p>
                                             <button class="btn-primary btn-edit-crew" data-id="${p.id}" style="padding:6px 0; font-size:0.8rem; width:100%; border-radius:4px; margin-bottom:5px;">Gérer le Cast & Crew</button>
                                         </div>
                                     </div>

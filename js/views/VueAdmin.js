@@ -1,7 +1,7 @@
 export default class VueAdmin {
     
     static templateLigneProjet(p) {
-        const estActif = p.statut === 'publié';
+        const estActif = p.statut === 'publie';
         const isBanni = p.statut === 'banni';
         const isBrouillon = p.statut === 'brouillon';
         
@@ -41,7 +41,7 @@ export default class VueAdmin {
     static rendreDashboard(projets) {
         let btnNewSerie = `<button id="btn-create-serie" class="btn-primary" style="margin-bottom:20px;"><span class="material-symbols-outlined">add_circle</span> Ajouter une Série</button>`;
         
-        const projetsActifs = projets.filter(p => p.statut === 'publié');
+        const projetsActifs = projets.filter(p => p.statut === 'publie');
         const projetsModeration = projets.filter(p => p.statut === 'banni' || p.statut === 'brouillon');
 
         return `
@@ -83,7 +83,7 @@ export default class VueAdmin {
 
     static rendreModaleEdition(projet = null) {
         const isNew = !projet;
-        if (!projet) projet = { id:'', titre:'', description:'', couverture:'', chapitres:[], statut:'publié', pegi:'TP', langues:['fr'] };
+        if (!projet) projet = { id:'', titre:'', description:'', couverture:'', chapitres:[], statut:'publie', pegi:'TP', langues:['fr'] };
         return `
             <div id="modal-overlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:100; display:flex; justify-content:center; align-items:center; animation:fadeIn 0.2s; backdrop-filter:blur(10px);">
                 <div style="background:#111; padding:40px; border-radius:var(--radius-card); border:1px solid #333; max-width:600px; width:100%; box-shadow:0 0 30px rgba(0,0,0,0.9); max-height:90vh; overflow-y:auto;">
@@ -109,7 +109,7 @@ export default class VueAdmin {
                             <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
                                 <label style="color:#aaa; font-size:0.9rem;">Statut de Publication</label>
                                 <select id="edit-statut" style="padding:15px; border-radius:4px; border:1px solid #444; background:#222; color:white; font-size:1rem;">
-                                    <option value="publié" ${!isNew && projet.statut === 'publié' ? 'selected' : ''}>Publié (Catalogue)</option>
+                                    <option value="publie" ${!isNew && projet.statut === 'publie' ? 'selected' : ''}>Publié (Catalogue)</option>
                                     <option value="brouillon" ${!isNew && projet.statut === 'brouillon' ? 'selected' : ''}>Brouillon (Intoon Lab)</option>
                                     <option value="banni" ${!isNew && projet.statut === 'banni' ? 'selected' : ''}>Banni (Quarantaine)</option>
                                 </select>
