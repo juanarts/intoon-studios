@@ -86,34 +86,41 @@ export default class DashboardController {
                         submitBtn.disabled = true;
 
                         try {
+                            const projetId = document.getElementById('crew-projet-id').value;
                             const scenar = document.getElementById('crew-scenariste').value.trim();
                             const dessin = document.getElementById('crew-dessinateur').value.trim();
                             const trailer = document.getElementById('crew-trailer').value.trim();
+
+                            if (!projetId) throw new Error('ID du projet manquant');
                             
-                            // On injecte discrètement l'équipe dans la description pour un affichage immédiat
-                            // sans altérer le schéma SQL (Progressive Enhancement)
+                            // On injecte discrètement l'équipe dans la description
                             let newDesc = projetActuel.description || "";
-                            // Nettoyage éventuel d'une ancienne fiche
-                            if(newDesc.includes('🎬 **Fiche de Production :**')) {
-                                newDesc = newDesc.split('🎬 **Fiche de Production :**')[0].trim();
+                            if(newDesc.includes('\uD83C\uDFAC **Fiche de Production :**')) {
+                                newDesc = newDesc.split('\uD83C\uDFAC **Fiche de Production :**')[0].trim();
                             }
                             
                             if (scenar || dessin) {
-                                newDesc += `\n\n🎬 **Fiche de Production :**\n`;
-                                if (scenar) newDesc += `• Scénario : ${scenar}\n`;
-                                if (dessin) newDesc += `• Illustration : ${dessin}\n`;
+                                newDesc += `\n\n\uD83C\uDFAC **Fiche de Production :**\n`;
+                                if (scenar) newDesc += `\u2022 Sc\u00e9nario : ${scenar}\n`;
+                                if (dessin) newDesc += `\u2022 Illustration : ${dessin}\n`;
                             }
 
-                            await client.from('projets').update({
+                            console.log('[Crew Update] Projet ID:', projetId, '| Trailer:', trailer);
+
+                            const { error: updateErr } = await client.from('projets').update({
                                 description: newDesc,
                                 video_promo_url: trailer || null
-                            }).eq('id', projetActuel.id);
+                            }).eq('id', projetId);
+
+                            if (updateErr) throw updateErr;
 
                             modale.remove();
-                            DashboardController.afficher(); // Rafraichissement
+                            alert('\u2705 Fiche de production mise \u00e0 jour avec succ\u00e8s !');
+                            DashboardController.afficher();
                         } catch(errUpdate) {
-                            alert("Erreur de mise à jour : " + errUpdate.message);
-                            submitBtn.innerHTML = 'Mettre à jour la Fiche';
+                            console.error('[Crew Update Error]', errUpdate);
+                            alert("Erreur de mise \u00e0 jour : " + (errUpdate.message || JSON.stringify(errUpdate)));
+                            submitBtn.innerHTML = 'Mettre \u00e0 jour la Fiche';
                             submitBtn.disabled = false;
                         }
                     };

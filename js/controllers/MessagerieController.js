@@ -7,6 +7,9 @@ export default class MessagerieController {
     };
 
     static afficher() {
+        // Guard : réinitialiser le state si undefined (navigation rapide SPA)
+        if (!this.state) this.state = { activeConvId: null };
+        
         const conversations = Messagerie.getConversations();
         
         // Par défaut, activer la première config non-lue ou la première tout court
