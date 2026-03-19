@@ -8,7 +8,7 @@ export default class LecteurController {
     // Moteur d'auto-scroll cinématique
     static scrollEngine = {
         active: false,
-        speed: 3,          // px par frame (1-10)
+        speed: 1,          // px par frame — ultra-lent par défaut (1-10)
         rafId: null,
         hidden: false,
         hideTimer: null
@@ -31,6 +31,7 @@ export default class LecteurController {
                 app.innerHTML = VueLecteur.rendreLecteur(projet, chapitre, userConnecte);
 
                 LecteurController.initialiserControlesNetflix();
+                LecteurController.initialiserParallaxZoom();
                 LecteurController.initialiserCommentairesImmersifs();
                 LecteurController.initialiserAutoHide();
             } else {
@@ -58,7 +59,7 @@ export default class LecteurController {
         // Lecture au RAF (requestAnimationFrame) pour un scroll fluide 60fps
         const scrollLoop = () => {
             if (!engine.active) return;
-            window.scrollBy(0, engine.speed * 0.5);
+            window.scrollBy(0, engine.speed * 0.3); // 0.3 = très cinématique
 
             // Fin naturelle de la page → pause automatique
             const distanceRestante = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
@@ -124,6 +125,58 @@ export default class LecteurController {
             if (e.code === 'ArrowDown') { slider.value = Math.max(1,  parseInt(slider.value) - 1); engine.speed = parseInt(slider.value); }
         };
     }
+
+    // ────────────────────────────────────────────────────────────
+    // PARALLAX ZOOM CINÉMATIQUE (style Netflix Ken Burns per slide)
+    // ────────────────────────────────────────────────────────────
+    static initialiserParallaxZoom() {
+        const images = document.querySelectorAll('[data-parallax="true"]');
+        if (!images.length) return;
+
+        // 1. IntersectionObserver : dézoom doux à l'entrée dans la vue
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const img = entry.target;
+                if (entry.isIntersecting) {
+                    // Entre dans la vue → démarre le dézoom Netflix
+                    img.style.transform = 'scale(1.0)';
+                } else {
+                    // Sort de la vue → re-zoom pour le prochain scroll
+                    img.style.transform = 'scale(1.06)';
+                }
+            });
+        }, {
+            threshold: [0.05, 0.3, 0.6, 1.0],
+            rootMargin: '0px'
+        });
+
+        images.forEach(img => observer.observe(img));
+
+        // 2. Scroll listener : parallax dynamique continu (profondeur cinéma)
+        const onScroll = () => {
+            images.forEach(img => {
+                const rect = img.closest('.reader-slide')?.getBoundingClientRect();
+                if (!rect) return;
+                const centerOffset = (rect.top + rect.height / 2 - window.innerHeight / 2) / window.innerHeight;
+                // centerOffset = 0 quand centré à l'écran, ±1 quand hors vue
+                const scale = 1.0 + Math.abs(centerOffset) * 0.06;
+                const clampedScale = Math.min(1.06, Math.max(1.0, scale));
+                img.style.transition = 'transform 0.1s linear';
+                img.style.transform = `scale(${clampedScale})`;
+            });
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Nettoyage à la sortie du lecteur (navigation SPA)
+        const cleanup = () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('popstate', cleanup);
+        };
+        window.addEventListener('popstate', cleanup);
+    }
+
 
     // ────────────────────────────────────────────────────────────
     // AUTO-HIDE : Les contrôles disparaissent après 3s d'inactivité
