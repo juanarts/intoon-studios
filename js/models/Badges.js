@@ -159,13 +159,22 @@ export default class Badges {
             color: '#22d3ee',
             glow: '0 0 12px rgba(34,211,238,0.6)',
         },
+        beta_testeur: {
+            id: 'beta_testeur',
+            label: 'BETA TESTEUR 🧪',
+            description: 'Membre privilégié aidant à l\'amélioration du Studio.',
+            image: '/assets/badges/badge_early_access.png', // Réutilisation temporaire ou logo dédié
+            rarity: 'rare',
+            color: '#60a5fa',
+            glow: '0 0 12px rgba(96,165,250,0.6)',
+        },
     };
 
     /** Tous les badges de l'admin (sauf vues/likes) */
     static BADGES_ADMIN = [
         'the_king','fondateur','pionnier','early_access',
         'createur','artiste','realisateur','scenariste','saga','producteur',
-        'vip','moderateur'
+        'vip','moderateur','beta_testeur'
     ];
 
     static getBadgesUtilisateur(user) {
@@ -194,7 +203,10 @@ export default class Badges {
         if (user.is_vip && user.role !== 'createur') {
             badges.push(this.CATALOGUE.vip);
         }
-        if (user.role === 'lecteur') {
+        if (user.is_beta_tester) {
+            badges.push(this.CATALOGUE.beta_testeur);
+        }
+        if (user.role === 'lecteur' && !user.is_beta_tester) {
             badges.push(this.CATALOGUE.lecteur);
         }
         if (badges.length === 0) {

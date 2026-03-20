@@ -15,14 +15,55 @@ export default class AdminController {
         app.innerHTML = '<div class="loader" style="color:white;">Synchronisation Master Control Panel...</div>';
         
         try {
-            let projets = await Projet.chargerTous();
-            app.innerHTML = VueAdmin.rendreDashboard(projets);
+            const client = SupabaseService.getClient();
+            const [projets, rProfils] = await Promise.all([
+                Projet.chargerTous(),
+                client.from('profils').select('*').order('created_at', { ascending: false })
+            ]);
+            
+            const profils = rProfils.data || [];
+            app.innerHTML = VueAdmin.rendreDashboard(projets, profils);
 
             // GESTION DES CLICS STANDARDS
             app.onclick = async (e) => {
                 const target = e.target;
                 const modalRoot = document.getElementById('admin-modal-root');
+
+                // 1. SWITCH D'ONGLETS
+                if (target.classList.contains('admin-tab-btn')) {
+                    const tabName = target.getAttribute('data-tab');
+                    document.querySelectorAll('.admin-tab-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.style.borderBottom = 'none';
+                        b.style.color = '#777';
+                    });
+                    target.classList.add('active');
+                    target.style.borderBottom = '3px solid var(--primary)';
+                    target.style.color = 'white';
+
+                    document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
+                    document.getElementById(`tab-${tabName}`).style.display = 'block';
+                    return;
+                }
+
                 if(!modalRoot) return;
+
+                // 2. ACTIONS MODÉRATION (PROFIL)
+                if (target.classList.contains('btn-role-update')) {
+                    const userId = target.getAttribute('data-id');
+                    const newRole = target.getAttribute('data-role');
+                    if (confirm(`MODÉRATION : Changer le rôle de ce membre en [${newRole.toUpperCase()}] ?`)) {
+                        await client.from('profils').update({ role: newRole }).eq('id', userId);
+                        AdminController.afficher();
+                    }
+                } else if (target.classList.contains('btn-badge-beta')) {
+                    const userId = target.getAttribute('data-id');
+                    if (confirm("MODÉRATION : Attribuer le badge Privilège [BETA TESTEUR] à ce membre ?")) {
+                        await client.from('profils').update({ is_beta_tester: true }).eq('id', userId);
+                        alert("Badge Bêta attribué avec succès ! ✨");
+                        AdminController.afficher();
+                    }
+                }
 
                 if (target.closest('.btn-close-modal')) {
                     modalRoot.innerHTML = '';

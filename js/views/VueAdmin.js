@@ -40,45 +40,73 @@ export default class VueAdmin {
         `;
     }
 
-    static rendreDashboard(projets) {
-        let btnNewSerie = `<button id="btn-create-serie" class="btn-primary" style="margin-bottom:20px;"><span class="material-symbols-outlined">add_circle</span> Ajouter une Série</button>`;
-        
+    static rendreDashboard(projets, profils = []) {
         const projetsActifs = projets.filter(p => p.statut === 'publie');
         const projetsModeration = projets.filter(p => p.statut === 'banni' || p.statut === 'brouillon');
 
         return `
-            <div style="max-width:1000px; margin:0 auto; padding:40px 4%;">
-                <h1 style="margin-bottom:30px; border-bottom:1px solid #333; padding-bottom:10px; font-size:2.5rem;"><span class="material-symbols-outlined" style="font-size:2.5rem; color:var(--primary);">admin_panel_settings</span> Master Control Panel</h1>
-                
-                ${btnNewSerie}
+            <div style="max-width:1100px; margin:0 auto; padding:40px 4%;">
+                <h1 style="margin-bottom:30px; border-bottom:1px solid #333; padding-bottom:10px; font-size:2.5rem; display:flex; align-items:center; gap:15px;">
+                    <span class="material-symbols-outlined" style="font-size:2.5rem; color:var(--primary);">admin_panel_settings</span> 
+                    Master Control Panel
+                </h1>
 
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:40px;">
-                    <div style="background:rgba(255,255,255,0.02); pading:20px; border-radius:var(--radius-card); border:1px solid rgba(255,255,255,0.05); padding:20px; text-align:center;">
-                        <span class="material-symbols-outlined" style="font-size:2.5rem; color:#aaa;">library_books</span>
-                        <h3 style="font-size:2rem; margin:10px 0; color:white; font-family:'Outfit', sans-serif;">${projets.length}</h3>
-                        <p style="color:#aaa;">Séries Existantes</p>
+                <!-- Onglets Admin -->
+                <div style="display:flex; gap:10px; margin-bottom:30px; border-bottom:1px solid #222;">
+                    <button class="admin-tab-btn active" data-tab="series" style="padding:12px 25px; background:none; border:none; color:white; font-family:'Outfit',sans-serif; font-weight:bold; cursor:pointer; border-bottom:3px solid var(--primary); font-size:1.1rem;">Séries & Contenus</button>
+                    <button class="admin-tab-btn" data-tab="commu" style="padding:12px 25px; background:none; border:none; color:#777; font-family:'Outfit',sans-serif; font-weight:bold; cursor:pointer; font-size:1.1rem;">Communauté (${profils.length})</button>
+                </div>
+
+                <!-- SECTION SÉRIES -->
+                <div id="tab-series" class="admin-tab-content">
+                    <button id="btn-create-serie" class="btn-primary" style="margin-bottom:20px;"><span class="material-symbols-outlined">add_circle</span> Ajouter une Série</button>
+                    
+                    <h2 style="margin-top:20px; margin-bottom:20px; font-family:'Outfit', sans-serif;"><span class="material-symbols-outlined" style="color:var(--primary);">check_circle</span> Séries Actives</h2>
+                    <div id="admin-liste-projets">
+                        ${projetsActifs.map(p => this.templateLigneProjet(p)).join('')}
+                        ${projetsActifs.length === 0 ? '<p style="color:#777;">Aucune série publiée.</p>' : ''}
                     </div>
-                    <div style="background:rgba(229,9,20,0.05); pading:20px; border-radius:var(--radius-card); border:1px dashed var(--primary); padding:20px; text-align:center;">
-                        <span class="material-symbols-outlined" style="font-size:2.5rem; color:var(--primary);">trending_up</span>
-                        <h3 style="font-size:2rem; margin:10px 0; color:white; font-family:'Outfit', sans-serif;">+124%</h3>
-                        <p style="color:#aaa;">Trafic Simulé Aujourd'hui</p>
+
+                    <h2 style="margin-top:50px; margin-bottom:20px; font-family:'Outfit', sans-serif; color:orange;"><span class="material-symbols-outlined">warning</span> Zone de Modération</h2>
+                    <div id="admin-liste-moderation">
+                        ${projetsModeration.map(p => this.templateLigneProjet(p)).join('')}
+                        ${projetsModeration.length === 0 ? '<p style="color:#777;">Zone sécurisée.</p>' : ''}
                     </div>
                 </div>
 
-                <h2 style="margin-top:40px; margin-bottom:20px; font-family:'Outfit', sans-serif;"><span class="material-symbols-outlined" style="color:var(--primary);">check_circle</span> Séries Actives (Publiées)</h2>
-                <div id="admin-liste-projets">
-                    ${projetsActifs.map(p => this.templateLigneProjet(p)).join('')}
-                    ${projetsActifs.length === 0 ? '<p style="color:#777;">Aucune série publiée.</p>' : ''}
-                </div>
-
-                <h2 style="margin-top:50px; margin-bottom:20px; font-family:'Outfit', sans-serif; color:orange;"><span class="material-symbols-outlined">warning</span> Zone de Modération (Brouillons & Bannis)</h2>
-                <div id="admin-liste-moderation">
-                    ${projetsModeration.map(p => this.templateLigneProjet(p)).join('')}
-                    ${projetsModeration.length === 0 ? '<p style="color:#777;">Zone sécurisée. Aucune série en quarantaine ou en création.</p>' : ''}
+                <!-- SECTION COMMUNAUTÉ -->
+                <div id="tab-commu" class="admin-tab-content" style="display:none;">
+                    <h2 style="margin-bottom:20px; font-family:'Outfit', sans-serif;"><span class="material-symbols-outlined" style="color:#60a5fa;">groups</span> Gestion des Membres</h2>
+                    <div style="background:rgba(255,255,255,0.02); border:1px solid #222; border-radius:12px; overflow:hidden;">
+                        <table style="width:100%; border-collapse:collapse; text-align:left;">
+                            <tr style="background:rgba(0,0,0,0.4); border-bottom:1px solid #333;">
+                                <th style="padding:15px; color:#aaa; font-size:0.8rem; text-transform:uppercase;">Membre</th>
+                                <th style="padding:15px; color:#aaa; font-size:0.8rem; text-transform:uppercase;">Rôle</th>
+                                <th style="padding:15px; color:#aaa; font-size:0.8rem; text-transform:uppercase;">Actions</th>
+                            </tr>
+                            ${profils.map(user => `
+                                <tr style="border-bottom:1px solid #222;">
+                                    <td style="padding:15px; display:flex; align-items:center; gap:12px;">
+                                        <img src="${user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`}" style="width:36px; height:36px; border-radius:50%;">
+                                        <span style="font-weight:700; color:white;">${Security.escapeHTML(user.pseudo)}</span>
+                                    </td>
+                                    <td style="padding:15px;">
+                                        <span style="background:${user.role==='admin' ? 'red' : user.role==='moderateur' ? '#6366f1' : user.role==='createur' ? '#a855f7' : '#444'}; padding:4px 10px; border-radius:var(--radius-badge); font-size:0.75rem; font-weight:900; color:white; text-transform:uppercase;">${user.role}</span>
+                                    </td>
+                                    <td style="padding:15px;">
+                                        <div style="display:flex; gap:8px;">
+                                            <button class="btn-role-update" data-id="${user.id}" data-role="moderateur" style="background:none; color:#6366f1; border:1px solid #6366f1; padding:5px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">MODO</button>
+                                            <button class="btn-role-update" data-id="${user.id}" data-role="createur" style="background:none; color:#a855f7; border:1px solid #a855f7; padding:5px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">CRÉATEUR</button>
+                                            <button class="btn-badge-beta" data-id="${user.id}" style="background:none; color:#60a5fa; border:1px solid #60a5fa; padding:5px 8px; border-radius:4px; font-size:0.7rem; cursor:pointer;">+ BADGE BÊTA</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
                 </div>
             </div>
             
-            <!-- DOM Root pour les popups d'édition/création du Panel -->
             <div id="admin-modal-root"></div>
         `;
     }
@@ -99,12 +127,12 @@ export default class VueAdmin {
                         
                         <div style="display:flex; flex-direction:column; gap:5px;">
                             <label style="color:#aaa; font-size:0.9rem;">Titre de l'œuvre</label>
-                            <input type="text" id="edit-titre" value="${Security.escapeHTML(p.titre)}" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1.1rem; font-family:'Outfit', sans-serif; font-weight:600;" required>
+                            <input type="text" id="edit-titre" value="${Security.escapeHTML(projet.titre)}" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1.1rem; font-family:'Outfit', sans-serif; font-weight:600;" required>
                         </div>
                         
                         <div style="display:flex; flex-direction:column; gap:5px;">
                             <label style="color:#aaa; font-size:0.9rem;">Synopsis Complet</label>
-                            <textarea id="edit-desc" rows="4" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1rem; font-family:'Inter', sans-serif;" required>${Security.escapeHTML(p.description || '')}</textarea>
+                            <textarea id="edit-desc" rows="4" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1rem; font-family:'Inter', sans-serif;" required>${Security.escapeHTML(projet.description || '')}</textarea>
                         </div>
 
                         <div style="display:flex; gap:15px;">

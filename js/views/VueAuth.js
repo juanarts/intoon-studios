@@ -28,8 +28,8 @@ export default class VueAuth {
                     <p style="color:var(--text-muted); margin-bottom:40px;">Ravi de vous revoir. Poursuivez votre lecture.</p>
                     
                     <form id="form-connexion" style="display:flex; flex-direction:column; gap:15px;">
-                        <input type="email" id="log-email" placeholder="E-mail (Essayez : superadmin@intoon.com)" style="padding:16px; border-radius:6px; border:none; background:#222; color:white; font-size:1rem; outline:none;" required>
-                        <input type="password" id="log-pass" placeholder="Mot de passe (Essayez : admin123)" style="padding:16px; border-radius:6px; border:none; background:#222; color:white; font-size:1rem; outline:none;" required>
+                        <input type="email" id="log-email" placeholder="Adresse e-mail" style="padding:16px; border-radius:6px; border:none; background:#222; color:white; font-size:1rem; outline:none;" required>
+                        <input type="password" id="log-pass" placeholder="Mot de passe" style="padding:16px; border-radius:6px; border:none; background:#222; color:white; font-size:1rem; outline:none;" required>
                         
                         <button type="submit" class="btn-primary" style="padding:16px; font-size:1.1rem; border:none; cursor:pointer; margin-top:20px; text-transform:uppercase; font-weight:800; border-radius:6px;">Entrer</button>
                     </form>
