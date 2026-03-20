@@ -66,7 +66,7 @@ export default class VueProfil {
         const statBadgesHtml = this.getStatBadges(stats);
 
         const projetsHtml = projets.length > 0 ? projets.map(p => `
-            <a href="/projet/${p.id}" data-link style="
+            <a href="/projet/${p.slug}" data-link style="
                 display:flex; gap:12px; align-items:center; padding:12px;
                 background:rgba(255,255,255,0.03); border:1px solid #222;
                 border-radius:8px; text-decoration:none; transition:background 0.2s;

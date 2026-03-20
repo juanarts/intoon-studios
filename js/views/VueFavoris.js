@@ -21,7 +21,7 @@ export default class VueFavoris {
         
         const grille = projets.map(projet => `
             <div class="projet-card">
-                <a href="/projet/${projet.id}" data-link class="projet-link">
+                <a href="/projet/${projet.slug}" data-link class="projet-link">
                     <img class="projet-cover" src="${projet.couverture}" alt="${projet.titre}">
                     <div class="projet-info">
                         <h3>${projet.titre}</h3>

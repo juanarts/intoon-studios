@@ -75,7 +75,7 @@ export default class VueLecteur {
                         ? `<a href="/lire/${projet.id}/${chapSuivant.id}" data-link class="btn-primary" style="font-size:1.1rem; display:flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">skip_next</span> Chapitre ${chapSuivant.ordre}</a>`
                         : `<span style="color:#666; font-style:italic;">Dernier chapitre disponible — revenez bientôt !</span>`
                     }
-                    <a href="/projet/${projet.id}" data-link class="btn-secondary" style="font-size:1.1rem;">Retour à la série</a>
+                    <a href="/projet/${projet.slug}" data-link class="btn-secondary" style="font-size:1.1rem;">Retour à la série</a>
                 </div>
             </div>
         `;
@@ -95,7 +95,7 @@ export default class VueLecteur {
 
                 <!-- BARRE NETFLIX COLLANTE (haut) -->
                 <div class="reader-toolbar" style="position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%); z-index:100; transition:opacity 0.4s;" id="reader-topbar">
-                    <a href="/projet/${projet.id}" data-link style="color:white; text-decoration:none; display:flex; align-items:center; gap:6px; opacity:0.7; hover:opacity:1; font-size:0.9rem;">
+                    <a href="/projet/${projet.slug}" data-link style="color:white; text-decoration:none; display:flex; align-items:center; gap:6px; opacity:0.7; hover:opacity:1; font-size:0.9rem;">
                         <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_back</span>
                     </a>
                     <span style="font-size:0.9rem; color:rgba(255,255,255,0.7); font-family:'Outfit',sans-serif; letter-spacing:1px;">

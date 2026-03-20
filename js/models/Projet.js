@@ -17,6 +17,12 @@ export default class Projet {
         this.statut = data.statut || "publie";
         this.langues = ["fr"]; 
         
+        // Génération du Slug SEO (ex: "Mon Titre" -> "mon-titre")
+        this.slug = this.titre ? this.titre.toLowerCase().trim()
+            .replace(/[^\w\s-]/g, '') // Retire spéciaux
+            .replace(/[\s_-]+/g, '-') // Remplace espaces/soulignés par tiret
+            .replace(/^-+|-+$/g, '') : this.id;
+        
         const chaps = data.chapitres || [];
         chaps.sort((a,b) => a.ordre - b.ordre);
         
@@ -98,6 +104,18 @@ export default class Projet {
 
             if (error || !data) return null;
             return new Projet(data);
+        } catch (e) {
+            return null;
+        }
+    }
+
+    /**
+     * Recherche un projet par son Slug SEO (nom lisible)
+     */
+    static async chargerParSlug(slug) {
+        try {
+            const projets = await this.chargerTous();
+            return projets.find(p => p.slug === slug) || null;
         } catch (e) {
             return null;
         }

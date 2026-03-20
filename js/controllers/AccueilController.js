@@ -138,7 +138,11 @@ export default class AccueilController {
         const app = document.getElementById('app');
         app.innerHTML = `<div class="loader">Chargement des détails...</div>`;
         try {
-            const projet = await Projet.chargerParId(id);
+            // Recherche par ID (UUID) ou par Slug (SEO)
+            let projet = await Projet.chargerParId(id);
+            if (!projet) {
+                projet = await Projet.chargerParSlug(id);
+            }
             if (projet && (projet.statut === 'publie' || projet.statut === 'brouillon')) {
                 const estFavori = Favoris.estFavori(id);
                 const aLikeLocal = Likes.aLike(id);

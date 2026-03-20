@@ -1,4 +1,5 @@
 import Reviews from '../models/Reviews.js';
+import Auth from '../models/Auth.js';
 
 export default class VueCatalogue {
     
@@ -65,7 +66,7 @@ export default class VueCatalogue {
                                 <p class="description">${projet.description}</p>
                                 <div class="hero-actions">
                                     ${btnLireHero}
-                                    <a href="/projet/${projet.id}" data-link class="btn-secondary" style="font-size:1.1rem; border:none;"><span class="material-symbols-outlined">info</span> Plus d'infos</a>
+                                    <a href="/projet/${projet.slug}" data-link class="btn-secondary" style="font-size:1.1rem; border:none;"><span class="material-symbols-outlined">info</span> Plus d'infos</a>
                                     <button class="btn-secondary btn-cast-tv" style="font-size:1.1rem; border:none; background:rgba(255,255,255,0.1); margin-left:10px;"><span class="material-symbols-outlined">cast</span> TV</button>
                                 </div>
                             </div>
@@ -83,7 +84,7 @@ export default class VueCatalogue {
         // Ranking added to grid ! (Stitch inspiration)
         const grille = autresProjets.map((projet, index) => `
             <div class="projet-card group">
-                <a href="/projet/${projet.id}" data-link class="projet-link">
+                <a href="/projet/${projet.slug}" data-link class="projet-link">
                     <img class="projet-cover" src="${projet.couverture}" alt="Couverture de ${projet.titre}">
                     <div class="badge-ranking">#${index + 1}</div>
                     <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.8); border:1px solid ${projet.pegi==='18+' ? 'red' : projet.pegi==='16+' ? 'orange' : '#555'}; color:white; padding:3px 6px; border-radius:var(--radius-badge); font-weight:bold; font-size:0.75rem; z-index:5;">${projet.pegi || 'TP'}</div>
@@ -137,7 +138,7 @@ export default class VueCatalogue {
                 <div class="catalogue-grid" style="padding:0;">
                     ${projetsLab.map((projet, idx) => `
                         <div class="projet-card" style="border:1px dashed #555;">
-                            <a href="/projet/${projet.id}" data-link class="projet-link">
+                            <a href="/projet/${projet.slug}" data-link class="projet-link">
                                 <img class="projet-cover" src="${projet.couverture}" alt="${projet.titre}" style="filter:grayscale(0.6) brightness(0.7);">
                                 <div style="position:absolute; top:8px; left:8px; background:rgba(255,255,255,0.9); color:black; font-weight:800; font-size:0.65rem; padding:4px 8px; border-radius:var(--radius-badge); text-transform:uppercase; letter-spacing:1px; z-index:5;">🎨 Concept / En Dév</div>
                                 <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.8); border:1px solid ${projet.pegi==='18+' ? 'red' : projet.pegi==='16+' ? 'orange' : '#555'}; color:white; padding:3px 6px; border-radius:var(--radius-badge); font-weight:bold; font-size:0.75rem; z-index:5;">${projet.pegi || 'TP'}</div>
