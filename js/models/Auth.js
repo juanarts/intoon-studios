@@ -21,8 +21,8 @@ export default class Auth {
                 this.currentUser.pseudo = profil.pseudo;
                 this.currentUser.avatar_url = profil.avatar_url;
                 this.currentUser.bio = profil.bio;
-                this.currentUser.genres_preferes = profil.genres_preferes;
-                this.currentUser.style_musique = profil.style_musique;
+                this.currentUser.genres_preferes = Array.isArray(profil.genres_preferes) ? profil.genres_preferes : [];
+                this.currentUser.style_musique = Array.isArray(profil.style_musique) ? profil.style_musique : [];
             }
         }
 
@@ -36,8 +36,8 @@ export default class Auth {
                     this.currentUser.pseudo = profil.pseudo;
                     this.currentUser.avatar_url = profil.avatar_url;
                     this.currentUser.bio = profil.bio;
-                    this.currentUser.genres_preferes = profil.genres_preferes;
-                    this.currentUser.style_musique = profil.style_musique;
+                    this.currentUser.genres_preferes = Array.isArray(profil.genres_preferes) ? profil.genres_preferes : [];
+                    this.currentUser.style_musique = Array.isArray(profil.style_musique) ? profil.style_musique : [];
                 }
                 window.dispatchEvent(new Event('authStateChanged'));
             } else if (event === 'SIGNED_OUT') {

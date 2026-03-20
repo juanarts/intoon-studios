@@ -168,17 +168,20 @@ export default class VueProfil {
         };
         const musiques = ['Hip-Hop', 'Lo-fi', 'Jazz', 'Électro', 'Rock', 'Classique', 'R&B', 'Afrobeat', 'Nu Metal', 'Métal Industriel', 'Trash Metal', 'Synthwave', 'Trap'];
         
-        const prefGenres = profil?.genres_preferes || [];
-        const prefMusique = profil?.style_musique || [];
+        const prefGenres = Array.isArray(profil?.genres_preferes) ? profil.genres_preferes : (typeof profil?.genres_preferes === 'string' ? profil.genres_preferes.split(',') : []);
+        const prefMusique = Array.isArray(profil?.style_musique) ? profil.style_musique : (typeof profil?.style_musique === 'string' ? profil.style_musique.split(',') : []);
 
-        const renderTags = (items, name, checkedArray, color, bgColor) => items.map(g => `
-            <label style="cursor:pointer;">
-                <input type="checkbox" name="${name}" value="${g}" ${checkedArray.includes(g) ? 'checked' : ''} style="display:none;">
-                <span class="tag-check" style="padding:5px 12px;border:1px solid ${checkedArray.includes(g) ? color : '#333'};border-radius:20px;font-size:0.8rem;color:${checkedArray.includes(g) ? color : '#888'};background:${checkedArray.includes(g) ? bgColor : 'transparent'};transition:all 0.2s;"
-                onclick="const input=this.previousElementSibling; input.checked=!input.checked; this.style.borderColor=input.checked?'${color}':'#333'; this.style.color=input.checked?'${color}':'#888'; this.style.background=input.checked?'${bgColor}':'transparent';"
-                >${g}</span>
-            </label>
-        `).join('');
+        const renderTags = (items, name, checkedArray, color, bgColor) => items.map(g => {
+            const isChecked = checkedArray.includes(g);
+            return `
+                <label style="cursor:pointer; display:inline-block;">
+                    <input type="checkbox" name="${name}" value="${g}" ${isChecked ? 'checked' : ''} style="display:none;">
+                    <span class="tag-check" style="display:inline-block; padding:5px 14px; border:1px solid ${isChecked ? color : '#333'}; border-radius:20px; font-size:0.8rem; color:${isChecked ? 'white' : '#888'}; background:${isChecked ? bgColor : 'rgba(255,255,255,0.01)'}; transition:all 0.2s; font-weight:${isChecked ? 'bold' : 'normal'};"
+                    onclick="const input=this.previousElementSibling; input.checked=!input.checked; this.style.borderColor=input.checked?'${color}':'#333'; this.style.color=input.checked?'white':'#888'; this.style.background=input.checked?'${bgColor}':'rgba(255,255,255,0.01)'; this.style.fontWeight=input.checked?'bold':'normal';"
+                    >${g}</span>
+                </label>
+            `;
+        }).join('');
 
         return `
         <div style="background:rgba(255,255,255,0.03);border:1px solid #222;border-radius:12px;padding:25px;margin-bottom:30px;">
