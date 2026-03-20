@@ -1,5 +1,6 @@
 import Reviews from '../models/Reviews.js';
 import Auth from '../models/Auth.js';
+import Security from '../utils/Security.js';
 
 export default class VueCatalogue {
     
@@ -226,7 +227,7 @@ export default class VueCatalogue {
         const listeAvisHtml = listeReviews.length > 0 
             ? listeReviews.map(r => {
                 const avatar = r.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${r.pseudo || 'User'}`;
-                const pseudo = r.pseudo || (r.role === 'admin' ? 'Intoon Creator' : 'Abonné');
+                const pseudo = Security.escapeHTML(r.pseudo || (r.role === 'admin' ? 'Intoon Creator' : 'Abonné'));
                 const isLiked = currentUser && r.likes && r.likes.includes(currentUser.id);
                 const likeCount = r.likes ? r.likes.length : 0;
                 const isOwner = currentUser && r.authorId === currentUser.id;
@@ -238,8 +239,8 @@ export default class VueCatalogue {
                             <div style="display:flex; gap:10px; margin-bottom:12px; font-size:0.85rem;">
                                 <img src="${rep.avatar}" style="width:24px; height:24px; border-radius:50%;">
                                 <div>
-                                    <span style="font-weight:700; color:white; margin-right:5px;">${rep.pseudo}</span>
-                                    <span style="color:#efefef;">${rep.texte}</span>
+                                    <span style="font-weight:700; color:white; margin-right:5px;">${Security.escapeHTML(rep.pseudo)}</span>
+                                    <span style="color:#efefef;">${Security.escapeHTML(rep.texte)}</span>
                                     <div style="font-size:0.7rem; color:#666; margin-top:2px;">${rep.date}</div>
                                 </div>
                             </div>
@@ -255,7 +256,7 @@ export default class VueCatalogue {
                             <div style="font-size:0.95rem; line-height:1.4;">
                                 <span style="font-weight:700; color:white; margin-right:6px;">${pseudo}</span>
                                 ${r.role === 'admin' ? '<span class="material-symbols-outlined" style="font-size:0.85rem; color:#e50914; vertical-align:middle; margin-right:4px;">verified</span>' : ''}
-                                <span style="color:#efefef;" class="review-comment-text">${r.commentaire}</span>
+                                <span style="color:#efefef;" class="review-comment-text">${Security.escapeHTML(r.commentaire)}</span>
                                 ${r.modifie ? '<span style="font-size:0.7rem; color:#555; margin-left:5px;">(modifié)</span>' : ''}
                             </div>
                             <div style="display:flex; align-items:center; gap:15px; margin-top:8px; font-size:0.75rem; color:#8e8e8e; font-weight:600;">

@@ -1,3 +1,5 @@
+import Security from '../utils/Security.js';
+
 export default class VueAdmin {
     
     static templateLigneProjet(p) {
@@ -16,11 +18,11 @@ export default class VueAdmin {
                 <img src="${p.couverture}" style="width:70px; height:100px; object-fit:cover; border-radius:6px;">
                 <div style="flex:1;">
                     <h3 style="font-size:1.3rem; margin-bottom:5px; font-family:'Outfit', sans-serif;">
-                        ${p.titre} 
+                        ${Security.escapeHTML(p.titre)} 
                         ${statusBadge}
                         <span style="font-size:0.8rem; border:1px solid #666; padding:2px 5px; border-radius:var(--radius-badge);">${p.pegi || 'TP'}</span>
                     </h3>
-                    <p style="color:#aaa; font-size:0.9rem; line-height:1.4;">${(p.description || 'Description non renseignée...').substring(0, 100)}...</p>
+                    <p style="color:#aaa; font-size:0.9rem; line-height:1.4;">${Security.escapeHTML(p.description || 'Description non renseignée...').substring(0, 100)}...</p>
                     <div style="margin-top:10px; font-size:0.85rem; color:var(--text-muted);">
                         <strong>${p.chapitres ? p.chapitres.length : 0}</strong> chapitres | <strong>${p.likes || 0}</strong> likes
                     </div>
@@ -97,12 +99,12 @@ export default class VueAdmin {
                         
                         <div style="display:flex; flex-direction:column; gap:5px;">
                             <label style="color:#aaa; font-size:0.9rem;">Titre de l'œuvre</label>
-                            <input type="text" id="edit-titre" value="${projet.titre}" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1.1rem; font-family:'Outfit', sans-serif; font-weight:600;" required>
+                            <input type="text" id="edit-titre" value="${Security.escapeHTML(p.titre)}" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1.1rem; font-family:'Outfit', sans-serif; font-weight:600;" required>
                         </div>
                         
                         <div style="display:flex; flex-direction:column; gap:5px;">
                             <label style="color:#aaa; font-size:0.9rem;">Synopsis Complet</label>
-                            <textarea id="edit-desc" rows="4" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1rem; font-family:'Inter', sans-serif;" required>${projet.description}</textarea>
+                            <textarea id="edit-desc" rows="4" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1rem; font-family:'Inter', sans-serif;" required>${Security.escapeHTML(p.description || '')}</textarea>
                         </div>
 
                         <div style="display:flex; gap:15px;">

@@ -1,4 +1,5 @@
 import Badges from '../models/Badges.js';
+import Security from '../utils/Security.js';
 
 export default class VueProfil {
 
@@ -55,7 +56,8 @@ export default class VueProfil {
     static rendreProfil(profil, projets = [], estMoi = false) {
         const { id, pseudo, role, avatar_url, bio, genres_preferes, stats = {} } = profil;
 
-        const avatarSrc = avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${pseudo}&backgroundColor=0a0a0d`;
+        const safePseudo = Security.escapeHTML(pseudo);
+        const avatarSrc = avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${safePseudo}&backgroundColor=0a0a0d`;
 
         const genresArr = genres_preferes ? (Array.isArray(genres_preferes) ? genres_preferes : [genres_preferes]) : [];
 
@@ -104,7 +106,7 @@ export default class VueProfil {
                                 ${role === 'admin' ? '<div style="position:absolute;bottom:0;right:0;background:#FFD700;color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;">👑</div>' : ''}
                             </div>
                             <div style="padding-bottom:8px;">
-                                <h1 style="font-size:1.8rem;color:white;font-family:'Outfit',sans-serif;margin:0 0 4px;">${pseudo}</h1>
+                                <h1 style="font-size:1.8rem;color:white;font-family:'Outfit',sans-serif;margin:0 0 4px;">${safePseudo}</h1>
                                 <span style="background:${roleColor}22;color:${roleColor};border:1px solid ${roleColor}55;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;font-family:'Outfit',sans-serif;">${roleLabel}</span>
                             </div>
                         </div>
@@ -117,12 +119,12 @@ export default class VueProfil {
                     </div>
 
                     <!-- Bio -->
-                    ${bio ? `<p style="color:#aaa;font-size:0.95rem;line-height:1.6;margin-bottom:20px;max-width:600px;">${bio}</p>` : ''}
+                    ${bio ? `<p style="color:#aaa;font-size:0.95rem;line-height:1.6;margin-bottom:20px;max-width:600px;">${Security.escapeHTML(bio)}</p>` : ''}
 
                     <!-- Genres / Style musique -->
                     ${genresArr.length > 0 ? `
                     <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap;">
-                        ${genresArr.map(g => `<span style="background:rgba(255,255,255,0.06);border:1px solid #333;color:#bbb;padding:4px 12px;border-radius:20px;font-size:0.8rem;">🎵 ${g}</span>`).join('')}
+                        ${genresArr.map(g => `<span style="background:rgba(255,255,255,0.06);border:1px solid #333;color:#bbb;padding:4px 12px;border-radius:20px;font-size:0.8rem;">🎵 ${Security.escapeHTML(g)}</span>`).join('')}
                     </div>` : ''}
 
                     <!-- Badges principaux -->

@@ -1,4 +1,5 @@
 import Auth from './Auth.js';
+import Security from '../utils/Security.js';
 
 export default class Reviews {
     static dbKey = 'intoon_reviews';
@@ -15,12 +16,13 @@ export default class Reviews {
         const reviews = data ? JSON.parse(data) : [];
         
         const user = Auth.getUtilisateur();
+        const cleanComment = Security.sanitizeInput(commentaire, 500);
 
         reviews.unshift({
             id: 'rev-' + Date.now(),
             idProjet,
             note: parseInt(note, 10),
-            commentaire: commentaire,
+            commentaire: cleanComment,
             role: roleUtilisateur,
             pseudo: user ? user.pseudo : "Anonyme",
             avatar: user ? (user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`) : "https://api.dicebear.com/7.x/avataaars/svg?seed=Guest",

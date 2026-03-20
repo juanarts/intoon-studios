@@ -1,5 +1,6 @@
 import Badges from '../models/Badges.js';
 import VueProfil from './VueProfil.js';
+import Security from '../utils/Security.js';
 
 export default class VueDashboard {
     /**
@@ -18,7 +19,7 @@ export default class VueDashboard {
                         <img class="projet-cover" src="${projetsFavoris[0].couverture}" alt="${projetsFavoris[0].titre}">
                         <div class="projet-info">
                             <h3 style="color:var(--primary); font-size: 1.2rem; font-weight:800;">▶ Continuer - Chapitre 1</h3>
-                            <p style="font-size:0.9rem; color:#d0d0d0; margin-top:5px;">${projetsFavoris[0].titre}</p>
+                            <p style="font-size:0.9rem; color:#d0d0d0; margin-top:5px;">${Security.escapeHTML(projetsFavoris[0].titre)}</p>
                         </div>
                     </a>
                 </div>
@@ -39,8 +40,8 @@ export default class VueDashboard {
                             ${utilisateur.role === 'admin' ? '<div style="position:absolute; bottom:-5px; right:-5px; background:#FFD700; color:#000; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:bold;">👑</div>' : ''}
                         </div>
                         <div>
-                            <h1 style="font-size: 2rem; margin-bottom: 4px;">${utilisateur.pseudo} ${utilisateur.role === 'admin' ? '<span style="font-size:1.2rem;">👑</span>' : ''}</h1>
-                            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:12px;">@${utilisateur.pseudo.toLowerCase()} &bull; ${utilisateur.role.toUpperCase()}</p>
+                            <h1 style="font-size: 2rem; margin-bottom: 4px;">${Security.escapeHTML(utilisateur.pseudo)} ${utilisateur.role === 'admin' ? '<span style="font-size:1.2rem;">👑</span>' : ''}</h1>
+                            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:12px;">@${Security.escapeHTML(utilisateur.pseudo).toLowerCase()} &bull; ${utilisateur.role.toUpperCase()}</p>
                             <!-- BADGES GAMIFICATION -->
                             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
                                 ${Badges.getBadgesUtilisateur(utilisateur).map(b => Badges.renderBadge(b, 52)).join('')}
@@ -64,7 +65,7 @@ export default class VueDashboard {
                                     <div class="projet-card" style="box-shadow:0 4px 15px rgba(0,0,0,0.5);">
                                         <img class="projet-cover" src="${p.couverture}" alt="${p.titre}">
                                         <div class="projet-info" style="transform:none; opacity:1; background:linear-gradient(to top, rgba(0,0,0,0.95), transparent); padding:10px;">
-                                            <h3 style="font-size:1rem; margin-bottom:5px;">${p.titre}</h3>
+                                            <h3 style="font-size:1rem; margin-bottom:5px;">${Security.escapeHTML(p.titre)}</h3>
                                             <p style="color:${p.statut === 'publie' ? '#22c55e' : p.statut === 'banni' ? '#ef4444' : '#f59e0b'}; font-weight:bold; font-size:0.75rem; text-transform:uppercase; margin-bottom:10px;">${p.statut}</p>
                                             <button class="btn-primary btn-edit-crew" data-id="${p.id}" style="padding:6px 0; font-size:0.8rem; width:100%; border-radius:4px; margin-bottom:5px;">Gérer le Cast & Crew</button>
                                         </div>
