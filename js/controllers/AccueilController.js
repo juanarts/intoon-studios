@@ -148,27 +148,134 @@ export default class AccueilController {
                 const estConnecte = Auth.estConnecte();
                 const userRole = estConnecte ? Auth.getUtilisateur().role : null;
 
-                app.innerHTML = VueCatalogue.rendreDetailProjet(projet, estFavori, aLikeLocal, statsReviews, listeReviews, estConnecte);
+            app.innerHTML = VueCatalogue.rendreDetailProjet(projet, estFavori, aLikeLocal, statsReviews, listeReviews, estConnecte);
 
-                const formReview = document.getElementById('form-add-review');
-                if (formReview) {
-                    formReview.onsubmit = (e) => {
-                        e.preventDefault();
-                        const note = document.getElementById('review-note').value;
-                        const text = document.getElementById('review-text').value;
-                        
-                        // Sauvegarde de la Review (StarRating local)
-                        Reviews.ajouter(id, note, text, userRole);
-                        
-                        // Rechargement immédiat de la vue sans recharger le navigateur ! (SPA fluide)
-                        AccueilController.afficherDetailProjet(id);
+            // 1. EFFET NICONICO : Commentaires flottants sur la page projet
+            AccueilController.lancerCommentairesFlottants(listeReviews);
+
+            // 2. Gestion du Formulaire Principal
+            const formReview = document.getElementById('form-add-review');
+            if (formReview) {
+                formReview.onsubmit = (e) => {
+                    e.preventDefault();
+                    const note = document.getElementById('review-note').value;
+                    const text = document.getElementById('review-text').value;
+                    Reviews.ajouter(id, note, text, userRole);
+                    AccueilController.afficherDetailProjet(id);
+                };
+            }
+
+            // 3. Délégation d'Événements pour les Actions Sociales (Likes, Réponses, Édition)
+            app.onclick = (e) => {
+                const reviewBlock = e.target.closest('.review-block');
+                if (!reviewBlock) return;
+                const reviewId = reviewBlock.dataset.id;
+                const user = Auth.getUtilisateur();
+
+                // LIKE
+                if (e.target.classList.contains('btn-review-like')) {
+                    if (!user) return alert("Connectez-vous pour liker !");
+                    Reviews.liker(reviewId, user.id);
+                    AccueilController.afficherDetailProjet(id);
+                }
+
+                // REPONDRE (Affiche un petit champ de réponse)
+                if (e.target.classList.contains('btn-review-repondre')) {
+                    if (!user) return alert("Connectez-vous pour répondre !");
+                    const existingInput = reviewBlock.querySelector('.reply-input-wrap');
+                    if (existingInput) return existingInput.remove();
+
+                    const replyWrap = document.createElement('div');
+                    replyWrap.className = 'reply-input-wrap';
+                    replyWrap.style = "margin-top:10px; margin-left:45px; display:flex; gap:10px;";
+                    replyWrap.innerHTML = `
+                        <input type="text" placeholder="Votre réponse..." style="flex:1; background:#000; border:1px solid #333; color:white; padding:8px 12px; border-radius:15px; font-size:0.85rem;">
+                        <button class="btn-primary btn-send-reply" style="padding:5px 15px; border-radius:15px; font-size:0.8rem;">Envoyer</button>
+                    `;
+                    reviewBlock.appendChild(replyWrap);
+                    
+                    replyWrap.querySelector('.btn-send-reply').onclick = () => {
+                        const val = replyWrap.querySelector('input').value;
+                        if (val.trim()) {
+                            Reviews.repondre(reviewId, val, user);
+                            AccueilController.afficherDetailProjet(id);
+                        }
                     };
                 }
+
+                // MODIFIER (Affiche un champ d'édition)
+                if (e.target.classList.contains('btn-review-edit')) {
+                    const textSpan = reviewBlock.querySelector('.review-comment-text');
+                    const originalText = textSpan.innerText;
+                    textSpan.outerHTML = `<input type="text" class="edit-review-input" value="${originalText}" style="background:#111; border:1px solid var(--primary); color:white; width:100%; padding:5px; border-radius:4px; margin-top:5px;">`;
+                    
+                    const editInput = reviewBlock.querySelector('.edit-review-input');
+                    editInput.focus();
+                    editInput.onkeydown = (ev) => {
+                        if (ev.key === 'Enter') {
+                            Reviews.modifier(reviewId, editInput.value, user.id);
+                            AccueilController.afficherDetailProjet(id);
+                        }
+                    };
+                }
+            };
+
             } else {
                 app.innerHTML = '<div class="error">Projet introuvable ou retiré. <a href="/" data-link class="btn-primary">Retour à l\'accueil</a></div>';
             }
         } catch (err) {
+            console.error(err);
             app.innerHTML = `<div class="error">Erreur de chargement pour la page du projet.</div>`;
         }
+    }
+
+    static lancerCommentairesFlottants(reviews) {
+        const overlay = document.getElementById('project-comments-overlay');
+        if (!overlay) return;
+
+        // On mélange de vrais avis et des messages génériques du studio
+        const messages = reviews.length > 0 ? reviews.map(r => r.commentaire) : [
+            "Incroyable !", "Vraiment captivant.", "Le dessin est au top.", "J'attends la suite avec impatience !",
+            "InToon Rocks 🚀", "Quelle ambiance !", "Sublime !", "❤️"
+        ];
+
+        const createComment = () => {
+            if (!document.getElementById('project-comments-overlay')) return; // Sécurité si on change de page
+            
+            const text = messages[Math.floor(Math.random() * messages.length)];
+            const span = document.createElement('span');
+            span.innerText = text;
+            span.style = `
+                position: absolute;
+                white-space: nowrap;
+                color: rgba(255,255,255,0.8);
+                font-family: 'Inter', sans-serif;
+                font-weight: 700;
+                font-size: ${Math.random() * 0.5 + 0.9}rem;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+                left: ${Math.random() * 80 + 5}%;
+                top: 100%;
+                opacity: 0;
+                transition: top 12s linear, opacity 1s;
+                pointer-events: none;
+                z-index: 100;
+            `;
+            
+            overlay.appendChild(span);
+            // Animation : Monte du bas vers le haut
+            setTimeout(() => {
+                span.style.opacity = '1';
+                span.style.top = '-20%';
+            }, 100);
+
+            // Nettoyage
+            setTimeout(() => span.remove(), 13000);
+            
+            // Prochain commentaire entre 1.5s et 4s
+            setTimeout(createComment, 1500 + Math.random() * 2500);
+        };
+
+        // Lancement progressif des 3 premiers
+        for(let i=0; i<3; i++) setTimeout(createComment, i * 1500);
     }
 }

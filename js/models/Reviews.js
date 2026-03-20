@@ -24,11 +24,56 @@ export default class Reviews {
             role: roleUtilisateur,
             pseudo: user ? user.pseudo : "Anonyme",
             avatar: user ? (user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`) : "https://api.dicebear.com/7.x/avataaars/svg?seed=Guest",
-            date: new Date().toLocaleDateString('fr-FR')
+            authorId: user ? user.id : null,
+            date: new Date().toLocaleDateString('fr-FR'),
+            likes: [], // IDs des utilisateurs qui aiment
+            reponses: [], // Tableau de {id, pseudo, avatar, texte, date}
+            modifie: false
         });
 
         localStorage.setItem(this.dbKey, JSON.stringify(reviews));
         return reviews.filter(r => r.projetId === projetId);
+    }
+
+    static liker(reviewId, userId) {
+        const data = JSON.parse(localStorage.getItem(this.dbKey) || '[]');
+        const rev = data.find(r => r.id === reviewId);
+        if (rev && userId) {
+            if (!rev.likes) rev.likes = [];
+            const idx = rev.likes.indexOf(userId);
+            if (idx === -1) rev.likes.push(userId);
+            else rev.likes.splice(idx, 1);
+            localStorage.setItem(this.dbKey, JSON.stringify(data));
+        }
+        return data;
+    }
+
+    static repondre(reviewId, texte, user) {
+        const data = JSON.parse(localStorage.getItem(this.dbKey) || '[]');
+        const rev = data.find(r => r.id === reviewId);
+        if (rev && user) {
+            if (!rev.reponses) rev.reponses = [];
+            rev.reponses.push({
+                id: 'rep-' + Date.now(),
+                pseudo: user.pseudo,
+                avatar: user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`,
+                texte: texte,
+                date: 'À l\'instant'
+            });
+            localStorage.setItem(this.dbKey, JSON.stringify(data));
+        }
+        return data;
+    }
+
+    static modifier(reviewId, nouveauTexte, userId) {
+        const data = JSON.parse(localStorage.getItem(this.dbKey) || '[]');
+        const rev = data.find(r => r.id === reviewId);
+        if (rev && rev.authorId === userId) {
+            rev.commentaire = nouveauTexte;
+            rev.modifie = true;
+            localStorage.setItem(this.dbKey, JSON.stringify(data));
+        }
+        return data;
     }
 
     static getMoyenne(projetId) {

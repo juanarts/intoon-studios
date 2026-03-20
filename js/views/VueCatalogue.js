@@ -177,11 +177,16 @@ export default class VueCatalogue {
         let trailerHtml = `<img class="projet-trailer-fallback" src="${projet.couverture}" alt="Cover">`;
         if (projet.videoPromoUrl) {
             if (projet.videoPromoUrl.includes('youtube.com') || projet.videoPromoUrl.includes('youtu.be')) {
-                // Extraction magique ID Youtube
                 const ytId = projet.videoPromoUrl.includes('youtu.be') 
                     ? projet.videoPromoUrl.split('youtu.be/')[1].split('?')[0] 
                     : projet.videoPromoUrl.split('v=')[1].split('&')[0];
-                trailerHtml = `<div class="projet-trailer" style="position:absolute; top:0; left:0; width:100%; height:100%;"><iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&modestbranding=1" frameborder="0" allow="autoplay; encrypted-media" style="width:100%; height:150%; object-fit:cover; pointer-events:none; transform:scale(1.3) translateY(-10%);"></iframe></div>`;
+                // FIX VIDEO FULL : On réduit la hauteur et le scale pour ne pas couper le contenu
+                trailerHtml = `<div class="projet-trailer" style="position:absolute; top:0; left:0; width:100%; height:100%;">
+                    <iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&modestbranding=1&rel=0" 
+                        frameborder="0" allow="autoplay; encrypted-media" 
+                        style="width:100%; height:100%; object-fit:cover; pointer-events:none;">
+                    </iframe>
+                </div>`;
             } else if (projet.videoPromoUrl.includes('vimeo.com')) {
                 const vimeoId = projet.videoPromoUrl.split('vimeo.com/')[1].split('?')[0];
                 trailerHtml = `<div class="projet-trailer" style="position:absolute; top:0; left:0; width:100%; height:100%;"><iframe src="https://player.vimeo.com/video/${vimeoId}?background=1&autoplay=1&loop=1&byline=0&title=0" frameborder="0" allow="autoplay; fullscreen" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></iframe></div>`;
@@ -191,6 +196,7 @@ export default class VueCatalogue {
         }
 
         const etoilesHtml = Reviews.genererEtoilesHTML(statsReviews.moyenne);
+        const currentUser = Auth.getUtilisateur();
 
         let formAvisHtml = estConnecte ? `
             <div style="background:rgba(16,25,34,0.4); padding:25px; border-radius:var(--radius-card); border:1px solid rgba(255,255,255,0.05); margin-bottom:30px;">
@@ -221,26 +227,46 @@ export default class VueCatalogue {
             ? listeReviews.map(r => {
                 const avatar = r.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${r.pseudo || 'User'}`;
                 const pseudo = r.pseudo || (r.role === 'admin' ? 'Intoon Creator' : 'Abonné');
-                const badgeStyle = r.role === 'admin' ? 'color:#e50914;' : 'color:#258cf4;';
+                const isLiked = currentUser && r.likes && r.likes.includes(currentUser.id);
+                const likeCount = r.likes ? r.likes.length : 0;
+                const isOwner = currentUser && r.authorId === currentUser.id;
                 
+                let reponsesHtml = "";
+                if (r.reponses && r.reponses.length > 0) {
+                    reponsesHtml = `<div style="margin-left:45px; margin-top:10px; border-left:2px solid #333; padding-left:15px;">
+                        ${r.reponses.map(rep => `
+                            <div style="display:flex; gap:10px; margin-bottom:12px; font-size:0.85rem;">
+                                <img src="${rep.avatar}" style="width:24px; height:24px; border-radius:50%;">
+                                <div>
+                                    <span style="font-weight:700; color:white; margin-right:5px;">${rep.pseudo}</span>
+                                    <span style="color:#efefef;">${rep.texte}</span>
+                                    <div style="font-size:0.7rem; color:#666; margin-top:2px;">${rep.date}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>`;
+                }
+
                 return `
-                <div class="comment-insta" style="display:flex; gap:12px; margin-bottom:20px; animation: fadeIn 0.4s ease;">
-                    <img src="${avatar}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
-                    <div style="flex:1;">
-                        <div style="font-size:0.95rem; line-height:1.4;">
-                            <span style="font-weight:700; color:white; margin-right:6px;">${pseudo}</span>
-                            ${r.role === 'admin' ? '<span class="material-symbols-outlined" style="font-size:0.85rem; color:#e50914; vertical-align:middle; margin-right:4px;">verified</span>' : ''}
-                            <span style="color:#efefef;">${r.commentaire}</span>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:15px; margin-top:6px; font-size:0.75rem; color:#8e8e8e; font-weight:600;">
-                            <span>${r.date}</span>
-                            <span style="cursor:pointer;">Répondre</span>
-                            <span class="material-symbols-outlined" style="font-size:0.8rem; cursor:pointer;">more_horiz</span>
+                <div class="review-block" data-id="${r.id}" style="margin-bottom:25px; animation: fadeIn 0.4s ease;">
+                    <div class="comment-insta" style="display:flex; gap:12px;">
+                        <img src="${avatar}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
+                        <div style="flex:1;">
+                            <div style="font-size:0.95rem; line-height:1.4;">
+                                <span style="font-weight:700; color:white; margin-right:6px;">${pseudo}</span>
+                                ${r.role === 'admin' ? '<span class="material-symbols-outlined" style="font-size:0.85rem; color:#e50914; vertical-align:middle; margin-right:4px;">verified</span>' : ''}
+                                <span style="color:#efefef;" class="review-comment-text">${r.commentaire}</span>
+                                ${r.modifie ? '<span style="font-size:0.7rem; color:#555; margin-left:5px;">(modifié)</span>' : ''}
+                            </div>
+                            <div style="display:flex; align-items:center; gap:15px; margin-top:8px; font-size:0.75rem; color:#8e8e8e; font-weight:600;">
+                                <span>${r.date}</span>
+                                <span class="btn-review-like" style="cursor:pointer; color:${isLiked ? '#e50914' : '#8e8e8e'};">${likeCount > 0 ? likeCount + ' ' : ''}${isLiked ? 'Aimé' : 'J\'aime'}</span>
+                                <span class="btn-review-repondre" style="cursor:pointer;">Répondre</span>
+                                ${isOwner ? '<span class="btn-review-edit" style="cursor:pointer; color:var(--primary);">Modifier</span>' : ''}
+                            </div>
                         </div>
                     </div>
-                    <div style="padding-top:5px;">
-                        <span class="material-symbols-outlined" style="font-size:1.1rem; color:#8e8e8e; cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='#e50914'" onmouseout="this.style.color='#8e8e8e'">favorite</span>
-                    </div>
+                    ${reponsesHtml}
                 </div>
               `}).join('')
             : '<p style="color:#666; font-style:italic; text-align:center; padding:20px;">Aucun avis pour le moment. Soyez le premier à commenter !</p>';
@@ -249,6 +275,9 @@ export default class VueCatalogue {
             <div class="projet-detail">
                 <div class="projet-hero">
                     ${trailerHtml}
+                    <!-- OVERLAY COMMENTAIRES FLOTTANTS NICONICO -->
+                    <div id="project-comments-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10; overflow:hidden;"></div>
+                    
                     <div class="hero-overlay"></div>
                     <div class="hero-content">
                         ${isBrouillon ? '<span style="background:rgba(255,255,255,0.9); color:black; font-weight:900; font-size:0.8rem; padding:4px 10px; border-radius:var(--radius-badge); text-transform:uppercase; letter-spacing:1px; margin-bottom:15px; display:inline-block;">🎨 Concept en cours / Lab</span>' : ''}
