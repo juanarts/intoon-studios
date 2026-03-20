@@ -7,13 +7,25 @@ import Auth from '../models/Auth.js';
 import VueCatalogue from '../views/VueCatalogue.js';
 
 export default class AccueilController {
-    static async afficherCatalogue() {
+    static async afficherCatalogue(query = null) {
         const app = document.getElementById('app');
         app.innerHTML = '<div class="loader" style="color:white;">Chargement du catalogue de Webtoons...</div>';
         try {
             const projetsBruts = await Projet.chargerTous();
-            const projets = projetsBruts.filter(p => p.statut === 'publie');
-            const projetsLab = projetsBruts.filter(p => p.statut === 'brouillon');
+            let projets = projetsBruts.filter(p => p.statut === 'publie');
+            let projetsLab = projetsBruts.filter(p => p.statut === 'brouillon');
+
+            if (query) {
+                const q = query.toLowerCase();
+                projets = projets.filter(p => 
+                    p.titre.toLowerCase().includes(q) || 
+                    (p.description && p.description.toLowerCase().includes(q)) ||
+                    (p.genres && p.genres.some(g => g.toLowerCase().includes(q))) ||
+                    (p.auteurs && p.auteurs.some(a => a.toLowerCase().includes(q)))
+                );
+                // On ne filtre pas les projets Lab pour l'instant ou on les masque
+                projetsLab = []; 
+            }
             
             const dataHisto = Historique.getDernier();
             let projetEnCours = null;

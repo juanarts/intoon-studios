@@ -121,6 +121,63 @@ h1, h2, h3, h4, .logo {
     100% { transform: scale(1.4); opacity: 1; }
 }
 
+/* SEARCH BAR (Style Netflix) */
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: 25px;
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    width: 42px;
+    height: 42px;
+    overflow: hidden;
+    cursor: pointer;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.search-wrapper.active {
+    width: 280px;
+    background: rgba(0, 0, 0, 0.9);
+    border-color: var(--primary);
+    box-shadow: 0 0 25px rgba(229, 9, 20, 0.25);
+}
+
+.search-icon {
+    font-size: 1.4rem;
+    color: white;
+    margin-right: 15px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.search-wrapper:hover .search-icon {
+    transform: scale(1.1);
+}
+
+#global-search-input {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 0.95rem;
+    width: 100%;
+    outline: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-family: 'Outfit', sans-serif;
+    pointer-events: none;
+}
+
+.search-wrapper.active #global-search-input {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .nav-links { display: flex; align-items: center; gap: 30px; }
 .nav-links a {
     color: var(--text-muted);

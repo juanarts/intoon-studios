@@ -135,6 +135,66 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    // ── GESTION DE LA RECHERCHE (STyle NETFLIX) ──
+    const initialiserRecherche = () => {
+        const searchWrapper = document.getElementById('search-bar-container');
+        const searchInput = document.getElementById('global-search-input');
+        const searchTrigger = document.getElementById('search-trigger');
+
+        if (!searchWrapper || !searchInput) return;
+
+        // Ouvrir au clic
+        searchWrapper.onclick = (e) => {
+            if (!searchWrapper.classList.contains('active')) {
+                searchWrapper.classList.add('active');
+                searchInput.focus();
+                e.stopPropagation();
+            }
+        };
+
+        // Fermer si clic à l'extérieur
+        document.addEventListener('click', (e) => {
+            if (!searchWrapper.contains(e.target) && searchInput.value.trim() === "") {
+                searchWrapper.classList.remove('active');
+            }
+        });
+
+        // Logique de recherche "LIVE"
+        let searchTimeout = null;
+        searchInput.oninput = () => {
+            const query = searchInput.value.trim();
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(async () => {
+                // Si on n'est pas sur l'accueil, on y va d'abord
+                if (window.location.pathname !== '/' && window.location.hash !== '#/') {
+                    // Si on utilise un router avec pushState
+                    if (window.appRouter) {
+                        await window.appRouter.navigate('/');
+                    }
+                }
+                
+                // On appelle le filtre de l'accueil
+                if (query.length >= 2) {
+                    AccueilController.afficherCatalogue(query);
+                } else if (query.length === 0) {
+                    AccueilController.afficherCatalogue(); // Reset
+                }
+            }, 300); // Debounce de 300ms
+        };
+
+        // Touche Echap pour fermer
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && searchWrapper.classList.contains('active')) {
+                searchInput.value = "";
+                searchWrapper.classList.remove('active');
+                if (window.location.pathname === '/') AccueilController.afficherCatalogue();
+            }
+        });
+    };
+
+    initialiserRecherche();
+
     // Initialisation du Routeur
     window.appRouter = new Router(routes);
     
