@@ -181,11 +181,10 @@ export default class VueCatalogue {
                 const ytId = projet.videoPromoUrl.includes('youtu.be') 
                     ? projet.videoPromoUrl.split('youtu.be/')[1].split('?')[0] 
                     : projet.videoPromoUrl.split('v=')[1].split('&')[0];
-                // FIX VIDEO FULL : On réduit la hauteur et le scale pour ne pas couper le contenu
-                trailerHtml = `<div class="projet-trailer" style="position:absolute; top:0; left:0; width:100%; height:100%;">
+                // FIX VIDEO FULL : La logique est maintenant dans style.css (.projet-trailer iframe)
+                trailerHtml = `<div class="projet-trailer">
                     <iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&modestbranding=1&rel=0" 
-                        frameborder="0" allow="autoplay; encrypted-media" 
-                        style="width:100%; height:100%; object-fit:cover; pointer-events:none;">
+                        frameborder="0" allow="autoplay; encrypted-media">
                     </iframe>
                 </div>`;
             } else if (projet.videoPromoUrl.includes('vimeo.com')) {
@@ -277,7 +276,7 @@ export default class VueCatalogue {
                 <div class="projet-hero">
                     ${trailerHtml}
                     <!-- OVERLAY COMMENTAIRES FLOTTANTS NICONICO -->
-                    <div id="project-comments-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10; overflow:hidden;"></div>
+                    <div id="project-comments-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:3; overflow:hidden;"></div>
                     
                     <div class="hero-overlay"></div>
                     <div class="hero-content">

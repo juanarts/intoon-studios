@@ -307,14 +307,26 @@ h1, h2, h3, h4, .logo {
 .projet-trailer, .projet-trailer-fallback {
     position: absolute;
     top: 50%; left: 50%;
-    min-width: 100%; min-height: 100%;
-    width: auto; height: auto;
+    width: 100%; height: 100%;
     transform: translate(-50%, -50%);
     object-fit: cover;
     z-index: 1;
-    filter: brightness(0.75) contrast(1.05);
-    animation: netflixKenBurns 20s ease-in-out infinite alternate;
-    will-change: transform;
+    filter: brightness(0.7) contrast(1.1);
+    overflow: hidden;
+}
+
+/* Force l'iframe à couvrir l'écran (Technique 16:9) */
+.projet-trailer iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 56.25vw; /* 100 * 9 / 16 */
+    min-height: 100vh;
+    min-width: 177.77vh; /* 100 * 16 / 9 */
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    border: none;
 }
 
 /* Zoom cinematique Netflix sur les iframes YouTube/Vimeo */
