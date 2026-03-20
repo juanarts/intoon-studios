@@ -16,6 +16,7 @@ export default class Projet {
         this.pegi = data.pegi_rating || data.pegi || "TP";
         this.statut = data.statut || "publie";
         this.langues = ["fr"]; 
+        this.authorPseudo = data.profils?.pseudo || "Studio InToon";
         
         // Génération du Slug SEO (ex: "Mon Titre" -> "mon-titre")
         this.slug = this.titre ? this.titre.toLowerCase().trim()
@@ -41,6 +42,9 @@ export default class Projet {
                     *,
                     chapitres (
                         id, titre, pages_urls, is_premium, ordre
+                    ),
+                    profils (
+                        pseudo
                     )
                 `)
                 .order('created_at', { ascending: false });
@@ -70,6 +74,9 @@ export default class Projet {
                     *,
                     chapitres (
                         id, titre, pages_urls, is_premium, ordre
+                    ),
+                    profils (
+                        pseudo
                     )
                 `)
                 .in('id', ids);
@@ -97,6 +104,9 @@ export default class Projet {
                     *,
                     chapitres (
                         id, titre, pages_urls, is_premium, ordre
+                    ),
+                    profils (
+                        pseudo
                     )
                 `)
                 .eq('id', id)

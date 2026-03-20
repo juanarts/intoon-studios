@@ -87,7 +87,7 @@ export default class VueDashboard {
                         <div style="background:rgba(15,16,20,0.8);border:1px solid #333;padding:25px;border-radius:8px;">
                             <h3 style="margin-bottom:20px;border-bottom:1px solid #333;padding-bottom:12px;font-size:1rem;">Liens rapides</h3>
                             <ul style="list-style:none;display:flex;flex-direction:column;gap:14px;">
-                                <li><a href="/profil/${utilisateur.id}" data-link style="color:white;text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>👤 Mon Profil Public</span><span style="color:#666;">›</span></a></li>
+                                <li><a href="/profil/${utilisateur.pseudo}" data-link style="color:white;text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>👤 Mon Profil Public</span><span style="color:#666;">›</span></a></li>
                                 <li><a href="/inbox" data-link style="color:white;text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>✉️ Messagerie</span><span style="color:#666;">›</span></a></li>
                                 <li><a href="/favoris" data-link style="color:white;text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>⭐ Ma Liste</span><span style="color:#666;">›</span></a></li>
                                 ${utilisateur.role === 'admin' ? '<li><a href="/admin" data-link style="color:var(--primary);text-decoration:none;display:flex;justify-content:space-between;align-items:center;"><span>⚡ Back-Office</span><span style="color:#666;">›</span></a></li>' : ''}

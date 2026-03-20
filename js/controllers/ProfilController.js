@@ -7,34 +7,48 @@ import BOT_PROFILS from '../data/BotProfils.js';
 export default class ProfilController {
 
     // ── Afficher un profil public ─────────────────────────────
-    static async afficher(userId) {
+    static async afficher(identifiant) {
         const app = document.getElementById('app');
         app.innerHTML = '<div class="loader">Chargement du profil...</div>';
 
         try {
-            // ── Profils bots statiques (pas de Supabase) ──────────
-            if (BOT_PROFILS[userId]) {
-                app.innerHTML = VueProfil.rendreProfil(BOT_PROFILS[userId], [], false);
+            // ── Profils bots statiques ──────────────────────────
+            if (BOT_PROFILS[identifiant]) {
+                app.innerHTML = VueProfil.rendreProfil(BOT_PROFILS[identifiant], [], false);
                 return;
             }
 
             const client = SupabaseService.getClient();
+            let query = client.from('profils').select('id, pseudo, role, avatar_url, bio, genres_preferes, style_musique');
 
-            // Charger les données du profil depuis Supabase
-            const { data: profil, error } = await client
-                .from('profils')
-                .select('id, pseudo, role, avatar_url, bio, genres_preferes, style_musique')
-                .eq('id', userId)
-                .single();
+            // Déterminer si l'identifiant est un UUID ou un pseudo
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifiant);
+            
+            if (isUUID) {
+                query = query.eq('id', identifiant);
+            } else {
+                query = query.eq('pseudo', identifiant);
+            }
+
+            const { data: profil, error } = await query.single();
 
             if (error || !profil) {
                 app.innerHTML = `<div style="text-align:center;padding:100px;color:#666;">Profil introuvable.</div>`;
                 return;
             }
 
+            // [SEO] Si l'URL contient un UUID, on le remplace proprement par le pseudo
+            if (isUUID && profil.pseudo) {
+                const newPath = `/profil/${profil.pseudo}`;
+                if (window.location.pathname !== newPath) {
+                    window.history.replaceState(null, '', newPath);
+                    console.debug(`[SEO] URL remplacée par le pseudo : ${newPath}`);
+                }
+            }
+
             // Charger les projets de cet utilisateur
             const tousLesProjets = await Projet.chargerTous();
-            const mesProjets = tousLesProjets.filter(p => p.author_id === userId && p.statut !== 'banni');
+            const mesProjets = tousLesProjets.filter(p => p.authorId === profil.id && p.statut !== 'banni');
 
             // Simuler des stats (à brancher sur de vraies données plus tard)
             profil.stats = {
@@ -45,7 +59,7 @@ export default class ProfilController {
             };
 
             const userConnecte = Auth.getUtilisateur();
-            const estMoi = userConnecte && userConnecte.id === userId;
+            const estMoi = userConnecte && userConnecte.id === profil.id;
 
             app.innerHTML = VueProfil.rendreProfil(profil, mesProjets, estMoi);
 

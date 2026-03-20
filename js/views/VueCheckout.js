@@ -15,16 +15,16 @@ export default class VueCheckout {
 
                     <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:1.1rem; color:#ccc;">
                         <span>Sous-total</span>
-                        <span>15.00 €</span>
+                        <span>4.17 €</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:1.1rem; color:#ccc;">
                         <span>Taxes (TVA 20%)</span>
-                        <span>3.00 €</span>
+                        <span>0.83 €</span>
                     </div>
 
                     <div style="display:flex; justify-content:space-between; margin-top:20px; padding-top:20px; border-top:1px dashed #444; font-size:1.5rem; color:white; font-weight:bold; font-family:'Outfit', sans-serif;">
                         <span>TOTAL</span>
-                        <span>18.00 €<span style="font-size:0.9rem; color:#888;">/mois</span></span>
+                        <span>5.00 €<span style="font-size:0.9rem; color:#888;">/mois</span></span>
                     </div>
                 </div>
 
@@ -68,7 +68,7 @@ export default class VueCheckout {
                         </div>
                         
                         <button type="submit" class="btn-primary" style="width:100%; padding:18px; font-size:1.2rem; background:var(--primary); margin-top:10px; border-radius:6px; font-weight:bold; letter-spacing:1px; display:flex; justify-content:center; align-items:center; gap:10px;">
-                            <span class="material-symbols-outlined">lock</span> Payer 18.00 €
+                            <span class="material-symbols-outlined">lock</span> Payer 5.00 €
                         </button>
                         
                         <p style="text-align:center; color:#555; font-size:0.8rem; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:5px;">

@@ -98,8 +98,9 @@ export default class VueLecteur {
                     <a href="/projet/${projet.slug}" data-link style="color:white; text-decoration:none; display:flex; align-items:center; gap:6px; opacity:0.7; hover:opacity:1; font-size:0.9rem;">
                         <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_back</span>
                     </a>
-                    <span style="font-size:0.9rem; color:rgba(255,255,255,0.7); font-family:'Outfit',sans-serif; letter-spacing:1px;">
+                    <span style="font-size:0.9rem; color:rgba(255,255,255,0.7); font-family:'Outfit',sans-serif; letter-spacing:1px; text-align:center;">
                         Ch.<strong>${chapitre.ordre}</strong> — ${projet.titre}
+                        <div style="font-size:0.75rem; margin-top:2px;"><a href="/profil/${projet.authorPseudo}" data-link style="color:var(--primary); text-decoration:none; opacity:0.8; hover:opacity:1;">par ${projet.authorPseudo}</a></div>
                     </span>
                     <div style="display:flex; align-items:center; gap:10px;">
                         ${formComment}

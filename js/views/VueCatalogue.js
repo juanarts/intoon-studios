@@ -92,7 +92,10 @@ export default class VueCatalogue {
                     <div style="position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,0.8); padding:3px 6px; border-radius:var(--radius-badge); font-size:0.9rem; z-index:5;">${VueCatalogue.genererDrapeaux(projet.langues)}</div>
                     <div class="projet-info">
                         <h3>${projet.titre}</h3>
-                        <p>Studio Original • Nouveaux Chapitres</p>
+                        <p style="display:flex; align-items:center; gap:5px; margin-top:5px;">
+                            <span class="material-symbols-outlined" style="font-size:14px; color:#eab308;">auto_awesome</span>
+                            <a href="/profil/${projet.authorPseudo}" data-link style="color:#aaa; text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#aaa'">${projet.authorPseudo}</a>
+                        </p>
                     </div>
                 </a>
             </div>
@@ -251,10 +254,12 @@ export default class VueCatalogue {
                 return `
                 <div class="review-block" data-id="${r.id}" style="margin-bottom:25px; animation: fadeIn 0.4s ease;">
                     <div class="comment-insta" style="display:flex; gap:12px;">
-                        <img src="${avatar}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
+                        <a href="/profil/${r.pseudo}" data-link style="flex-shrink:0;">
+                            <img src="${avatar}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid rgba(255,255,255,0.1); transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                        </a>
                         <div style="flex:1;">
                             <div style="font-size:0.95rem; line-height:1.4;">
-                                <span style="font-weight:700; color:white; margin-right:6px;">${pseudo}</span>
+                                <a href="/profil/${r.pseudo}" data-link style="font-weight:700; color:white; margin-right:6px; text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='white'">${pseudo}</a>
                                 ${r.role === 'admin' ? '<span class="material-symbols-outlined" style="font-size:0.85rem; color:#e50914; vertical-align:middle; margin-right:4px;">verified</span>' : ''}
                                 <span style="color:#efefef;" class="review-comment-text">${Security.escapeHTML(r.commentaire)}</span>
                                 ${r.modifie ? '<span style="font-size:0.7rem; color:#555; margin-left:5px;">(modifié)</span>' : ''}

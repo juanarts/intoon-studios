@@ -28,35 +28,36 @@ export default class VueVip {
                     </div>
 
                     <!-- TIER 2 -->
-                    <div style="flex:1; min-width:300px; max-width:380px; background:linear-gradient(135deg, rgba(234,179,8,0.1) 0%, rgba(229,9,20,0.2) 100%); padding:40px; border-radius:12px; border:2px solid #eab308; box-shadow:0 0 30px rgba(234,179,8,0.2); display:flex; flex-direction:column; position:relative; transform:scale(1.05); z-index:10;">
-                        <div style="position:absolute; top:-15px; left:50%; transform:translateX(-50%); background:#eab308; color:black; font-weight:900; padding:5px 15px; border-radius:30px; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px; white-space:nowrap;">Le Choix Héroïque</div>
-                        <h2 style="font-size:1.8rem; color:white; margin-bottom:10px; margin-top:10px;">👑 Mécène VIP</h2>
-                        <div style="font-size:2.5rem; font-weight:800; color:#eab308; font-family:'Outfit', sans-serif; margin-bottom:20px;">15€<span style="font-size:1rem; color:#aaa; font-weight:normal;">/mois</span></div>
-                        <p style="color:#aaa; font-size:1rem; margin-bottom:30px;">Financez l'écriture et le dessin de futurs Webtoons.</p>
+                    <div style="flex:1; min-width:300px; max-width:380px; background:rgba(25,25,30,0.3); padding:40px; border-radius:12px; border:1px solid #222; display:flex; flex-direction:column; position:relative; opacity:0.8;">
+                        <div style="position:absolute; top:-15px; left:50%; transform:translateX(-50%); background:#555; color:white; font-weight:900; padding:5px 15px; border-radius:30px; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; white-space:nowrap;">Prochainement 🚀</div>
+                        <h2 style="font-size:1.8rem; color:#888; margin-bottom:10px; margin-top:10px;">👑 Mécène VIP</h2>
+                        <div style="font-size:2.5rem; font-weight:800; color:#555; font-family:'Outfit', sans-serif; margin-bottom:20px;">15€<span style="font-size:1rem; color:#444; font-weight:normal;">/mois</span></div>
+                        <p style="color:#666; font-size:1rem; margin-bottom:30px;">Financez l'écriture et le dessin de futurs Webtoons.</p>
                         
-                        <ul style="list-style:none; padding:0; margin:0 0 40px 0; color:white; font-size:1.1rem; flex:1;">
-                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">auto_awesome</span> <b>Tous les avantages Précédents</b></li>
-                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">auto_awesome</span> Le "Fast-Pass" (Accès anticipé aux chapitres)</li>
-                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">auto_awesome</span> Typographie Or "Mécène" dans l'UI</li>
-                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">auto_awesome</span> Votre nom aux crédits de fin</li>
+                        <ul style="list-style:none; padding:0; margin:0 0 40px 0; color:#666; font-size:1.1rem; flex:1;">
+                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#444;">auto_awesome</span> <b>Tous les avantages Précédents</b></li>
+                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#444;">auto_awesome</span> Le "Fast-Pass" (Accès anticipé aux chapitres)</li>
+                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#444;">auto_awesome</span> Typographie Or "Mécène" dans l'UI</li>
+                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#444;">auto_awesome</span> Votre nom aux crédits de fin</li>
                         </ul>
                         
-                        <a href="/checkout" data-link class="btn-primary" style="background:#eab308; color:black!important; width:100%; border:none; padding:15px; font-size:1.1rem; font-weight:bold; text-align:center; display:block; box-sizing:border-box;">Devenir VIP (Patreon)</a>
+                        <button disabled style="width:100%; background:#222; color:#555; border:none; padding:15px; font-size:1.1rem; font-weight:bold; text-align:center; border-radius:4px; cursor:not-allowed;">Indisponible</button>
                     </div>
 
                     <!-- TIER 3 -->
-                    <div style="flex:1; min-width:300px; max-width:380px; background:rgba(25,25,30,0.5); padding:40px; border-radius:12px; border:1px solid #333; display:flex; flex-direction:column; position:relative;">
-                        <h2 style="font-size:1.8rem; color:white; margin-bottom:10px;">🔥 Investisseur</h2>
-                        <div style="font-size:2.5rem; font-weight:800; color:white; font-family:'Outfit', sans-serif; margin-bottom:20px;">50€<span style="font-size:1rem; color:#aaa; font-weight:normal;">/mois</span></div>
-                        <p style="color:#aaa; font-size:1rem; margin-bottom:30px;">Vous agissez comme véritable sponsor du studio.</p>
+                    <div style="flex:1; min-width:300px; max-width:380px; background:rgba(25,25,30,0.3); padding:40px; border-radius:12px; border:1px solid #222; display:flex; flex-direction:column; position:relative; opacity:0.8;">
+                        <div style="position:absolute; top:-15px; left:50%; transform:translateX(-50%); background:#555; color:white; font-weight:900; padding:5px 15px; border-radius:30px; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; white-space:nowrap;">Prochainement 🚀</div>
+                        <h2 style="font-size:1.8rem; color:#888; margin-bottom:10px; margin-top:10px;">🔥 Investisseur</h2>
+                        <div style="font-size:2.5rem; font-weight:800; color:#555; font-family:'Outfit', sans-serif; margin-bottom:20px;">50€<span style="font-size:1rem; color:#444; font-weight:normal;">/mois</span></div>
+                        <p style="color:#666; font-size:1rem; margin-bottom:30px;">Vous agissez comme véritable sponsor du studio.</p>
                         
-                        <ul style="list-style:none; padding:0; margin:0 0 40px 0; color:white; font-size:1.1rem; flex:1;">
-                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#e50914;">local_fire_department</span> <b>Tous les avantages VIP</b></li>
-                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#e50914;">local_fire_department</span> Artwork Exclusif HD mensuel</li>
-                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#e50914;">local_fire_department</span> Droit de vote sur les Scénarios</li>
+                        <ul style="list-style:none; padding:0; margin:0 0 40px 0; color:#666; font-size:1.1rem; flex:1;">
+                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#444;">local_fire_department</span> <b>Tous les avantages VIP</b></li>
+                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#444;">local_fire_department</span> Artwork Exclusif HD mensuel</li>
+                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#444;">local_fire_department</span> Droit de vote sur les Scénarios</li>
                         </ul>
                         
-                        <a href="/checkout" data-link class="btn-secondary" style="width:100%; border:1px solid white; padding:15px; font-size:1.1rem; text-align:center; display:block; box-sizing:border-box;">Contacter l'Équipe</a>
+                        <button disabled style="width:100%; background:#222; color:#555; border:none; padding:15px; font-size:1.1rem; font-weight:bold; text-align:center; border-radius:4px; cursor:not-allowed;">Indisponible</button>
                     </div>
 
                 </div>

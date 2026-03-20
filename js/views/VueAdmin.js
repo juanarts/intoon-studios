@@ -87,8 +87,10 @@ export default class VueAdmin {
                             ${profils.map(user => `
                                 <tr style="border-bottom:1px solid #222;">
                                     <td style="padding:15px; display:flex; align-items:center; gap:12px;">
-                                        <img src="${user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`}" style="width:36px; height:36px; border-radius:50%;">
-                                        <span style="font-weight:700; color:white;">${Security.escapeHTML(user.pseudo)}</span>
+                                        <a href="/profil/${user.pseudo}" data-link style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+                                            <img src="${user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`}" style="width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,0.1);">
+                                            <span style="font-weight:700; color:white;">${Security.escapeHTML(user.pseudo)}</span>
+                                        </a>
                                     </td>
                                     <td style="padding:15px;">
                                         <span style="background:${user.role==='admin' ? 'red' : user.role==='moderateur' ? '#6366f1' : user.role==='createur' ? '#a855f7' : '#444'}; padding:4px 10px; border-radius:var(--radius-badge); font-size:0.75rem; font-weight:900; color:white; text-transform:uppercase;">${user.role}</span>
