@@ -126,7 +126,9 @@ export default class LecteurController {
 
         // Raccourcis clavier (Space = Play/Pause, Esc = Stop, +/- = vitesse)
         document.onkeydown = (e) => {
-            if (e.target.tagName === 'INPUT') return;
+            const forbiddenTags = ['INPUT', 'TEXTAREA', 'SELECT'];
+            if (forbiddenTags.includes(e.target.tagName)) return;
+            
             if (e.code === 'Space') { e.preventDefault(); btnPlay.click(); }
             if (e.code === 'KeyS' || e.key === 'Escape') { btnStop.click(); }
             if (e.code === 'ArrowUp')   { slider.value = Math.min(10, parseInt(slider.value) + 1); engine.speed = parseInt(slider.value); }

@@ -47,8 +47,18 @@ export default class Router {
             const regex = new RegExp(regexStr);
             const params = path.match(regex).slice(1);
             
-            // Appeler la méthode du contrôleur correspondant
-            await match.controller(...params);
+            try {
+                // Appeler la méthode du contrôleur correspondant
+                console.debug(`[Router] Navigation vers : ${path}`);
+                await match.controller(...params);
+            } catch (err) {
+                console.error(`[Router Error] Échec du contrôleur pour ${path}:`, err);
+                this.appDiv.innerHTML = `<div class="error" style="padding:100px; text-align:center;">
+                    <h2>Une erreur de navigation est survenue.</h2>
+                    <p style="color:#888;">${err.message || 'Erreur inconnue'}</p>
+                    <button onclick="location.reload()" class="btn-primary" style="margin-top:20px;">Recharger l'application</button>
+                </div>`;
+            }
         } else {
             // Redirection vers l'accueil si route inconnue (404 par défaut vers l'accueil)
             if (path !== '/') {

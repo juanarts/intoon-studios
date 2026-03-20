@@ -52,6 +52,34 @@ export default class Projet {
     }
 
     /**
+     * Fetch uniquement une liste d'IDs spécifiques (Optimisation Favoris)
+     */
+    static async chargerPlusieurs(ids) {
+        if (!ids || ids.length === 0) return [];
+        try {
+            const client = SupabaseService.getClient();
+            const { data, error } = await client
+                .from('projets')
+                .select(`
+                    *,
+                    chapitres (
+                        id, titre, pages_urls, is_premium, ordre
+                    )
+                `)
+                .in('id', ids);
+
+            if (error) {
+                console.error("Erreur Supabase (Projets multiples):", error);
+                return [];
+            }
+            return data.map(p => new Projet(p));
+        } catch (erreur) {
+            console.error("Erreur système chargement multiple projets:", erreur);
+            return [];
+        }
+    }
+
+    /**
      * Recherche un projet spécifique par son identifiant
      */
     static async chargerParId(id) {

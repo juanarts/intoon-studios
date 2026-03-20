@@ -1,3 +1,5 @@
+import Auth from './Auth.js';
+
 export default class Reviews {
     static dbKey = 'intoon_reviews';
 
@@ -11,12 +13,17 @@ export default class Reviews {
         const data = localStorage.getItem(this.dbKey);
         const reviews = data ? JSON.parse(data) : [];
         
+        // Récupérer les infos de l'utilisateur actuel via le modèle Auth importé
+        const user = Auth.getUtilisateur();
+
         reviews.unshift({
             id: 'rev-' + Date.now(),
             projetId,
             note: parseInt(note, 10),
-            commentaire: commentaire.toLowerCase(), // Contrainte: tout en minuscule
-            role: roleUtilisateur, // Permet l'affichage VIP
+            commentaire: commentaire, // Liberté totale sur la casse
+            role: roleUtilisateur,
+            pseudo: user ? user.pseudo : "Anonyme",
+            avatar: user ? (user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`) : "https://api.dicebear.com/7.x/avataaars/svg?seed=Guest",
             date: new Date().toLocaleDateString('fr-FR')
         });
 

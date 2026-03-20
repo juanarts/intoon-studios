@@ -206,31 +206,44 @@ export default class VueCatalogue {
                             <option value="1">⭐ Déception (1/5)</option>
                         </select>
                     </div>
-                    <textarea id="review-text" rows="3" placeholder="Écrivez votre avis (tout en minuscules comme demandé)..." style="padding:15px; border-radius:6px; border:1px solid #444; background:#111; color:white; font-size:0.95rem; resize:vertical; text-transform:lowercase; font-family:'Inter', sans-serif;" required></textarea>
-                    <button type="submit" class="btn-primary" style="align-self:flex-start;"><span class="material-symbols-outlined">send</span> Publier l'avis</button>
+                    <textarea id="review-text" rows="3" placeholder="Qu'avez-vous pensé de cette œuvre ?" style="padding:15px; border-radius:12px; border:1px solid #333; background:#0a0a0d; color:white; font-size:0.95rem; resize:none; font-family:'Inter', sans-serif;" required></textarea>
+                    <button type="submit" class="btn-primary" style="align-self:flex-end; border-radius:20px; padding:10px 25px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">send</span> Publier</button>
                 </form>
             </div>
         ` : `
             <div style="background:rgba(229,9,20,0.05); padding:20px; border-radius:var(--radius-card); border:1px dashed rgba(229,9,20,0.5); margin-bottom:30px; color:#aaa; text-align:center;">
-                <p style="margin-bottom:15px;">⚠️ L'Abonnement "INTOON" est requis pour publier un avis officiel de cette série et soutenir publiquement le projet.</p>
-                <a href="/connexion" data-link class="btn-primary" style="display:inline-flex;"><span class="material-symbols-outlined">lock_open</span> Continuer vers l'accès Premium</a>
+                <p style="margin-bottom:15px;">⚠️ Connectez-vous pour publier un avis et soutenir le projet.</p>
+                <a href="/connexion" data-link class="btn-primary" style="display:inline-flex;"><span class="material-symbols-outlined">lock_open</span> Me connecter</a>
             </div>
         `;
 
         const listeAvisHtml = listeReviews.length > 0 
-            ? listeReviews.map(r => `
-                <div style="background:rgba(255,255,255,0.02); padding:20px; border-radius:var(--radius-card); margin-bottom:15px; border-left:4px solid ${r.role === 'admin' ? '#e50914' : '#258cf4'}; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.9rem;">
-                        <div>
-                            <span style="font-weight:700; color:white; font-family:'Be Vietnam Pro', sans-serif;">${r.role === 'admin' ? '<span class="material-symbols-outlined" style="font-size:1rem; color:#e50914;">verified</span> Intoon Creator' : '<span class="material-symbols-outlined" style="font-size:1rem; color:#258cf4;">diamond</span> Abonné Premium'}</span>
-                            <span style="color:#666; margin-left:10px;">Le ${r.date}</span>
+            ? listeReviews.map(r => {
+                const avatar = r.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${r.pseudo || 'User'}`;
+                const pseudo = r.pseudo || (r.role === 'admin' ? 'Intoon Creator' : 'Abonné');
+                const badgeStyle = r.role === 'admin' ? 'color:#e50914;' : 'color:#258cf4;';
+                
+                return `
+                <div class="comment-insta" style="display:flex; gap:12px; margin-bottom:20px; animation: fadeIn 0.4s ease;">
+                    <img src="${avatar}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid rgba(255,255,255,0.1);">
+                    <div style="flex:1;">
+                        <div style="font-size:0.95rem; line-height:1.4;">
+                            <span style="font-weight:700; color:white; margin-right:6px;">${pseudo}</span>
+                            ${r.role === 'admin' ? '<span class="material-symbols-outlined" style="font-size:0.85rem; color:#e50914; vertical-align:middle; margin-right:4px;">verified</span>' : ''}
+                            <span style="color:#efefef;">${r.commentaire}</span>
                         </div>
-                        <div style="font-size:1.1rem;">${Reviews.genererEtoilesHTML(r.note)}</div>
+                        <div style="display:flex; align-items:center; gap:15px; margin-top:6px; font-size:0.75rem; color:#8e8e8e; font-weight:600;">
+                            <span>${r.date}</span>
+                            <span style="cursor:pointer;">Répondre</span>
+                            <span class="material-symbols-outlined" style="font-size:0.8rem; cursor:pointer;">more_horiz</span>
+                        </div>
                     </div>
-                    <p style="color:#ccc; font-size:1.05rem; line-height:1.6; font-weight:300; font-style:italic;">"${r.commentaire}"</p>
+                    <div style="padding-top:5px;">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem; color:#8e8e8e; cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='#e50914'" onmouseout="this.style.color='#8e8e8e'">favorite</span>
+                    </div>
                 </div>
-              `).join('')
-            : '<p style="color:#666; font-style:italic;">Aucun avis pour le moment. Soyez le premier à donner votre vote de soutien !</p>';
+              `}).join('')
+            : '<p style="color:#666; font-style:italic; text-align:center; padding:20px;">Aucun avis pour le moment. Soyez le premier à commenter !</p>';
 
         return `
             <div class="projet-detail">

@@ -476,3 +476,8 @@ footer a:hover { color: white; }
     .reader-toolbar { padding: 10px 4%; font-size: 0.8rem; }
     .reader-title { font-size: 0.85rem; }
 }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
