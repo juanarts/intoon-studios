@@ -110,25 +110,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // Écouteur global pour le système de Cœurs (Likes)
-    document.body.addEventListener('click', e => {
+    document.body.addEventListener('click', async e => {
         const btnLike = e.target.closest('.btn-like');
         if (btnLike) {
             e.preventDefault();
             const id = btnLike.getAttribute('data-id');
-            const estMaintenantLike = Likes.basculerLike(id);
+            const estMaintenantLike = await Likes.basculerLike(id);
+            const nouveauTotal = await Likes.getTotalLikes(id);
             
             const iconSpan = btnLike.querySelector('.like-icon');
             const countSpan = btnLike.querySelector('.like-count');
-            let count = parseInt(countSpan.textContent);
             
             if (estMaintenantLike) {
                 iconSpan.textContent = '❤️';
-                countSpan.textContent = count + 1;
+                countSpan.textContent = nouveauTotal;
                 btnLike.style.borderColor = 'var(--primary)';
                 btnLike.style.color = 'var(--primary)';
             } else {
                 iconSpan.textContent = '🤍';
-                countSpan.textContent = count - 1;
+                countSpan.textContent = nouveauTotal;
                 btnLike.style.borderColor = '#555';
                 btnLike.style.color = 'white';
             }

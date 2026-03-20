@@ -157,10 +157,10 @@ export default class AccueilController {
             }
             if (projet && (projet.statut === 'publie' || projet.statut === 'brouillon')) {
                 const estFavori = Favoris.estFavori(projet.id);
-                const aLikeLocal = Likes.aLike(projet.id);
+                const aLikeLocal = await Likes.aLike(projet.id);
                 
-                const statsReviews = Reviews.getMoyenne(projet.id);
-                const listeReviews = Reviews.obtenirTous(projet.id);
+                const statsReviews = await Reviews.getMoyenne(projet.id);
+                const listeReviews = await Reviews.obtenirTous(projet.id);
                 const estConnecte = Auth.estConnecte();
                 const userRole = estConnecte ? Auth.getUtilisateur().role : null;
 
@@ -172,11 +172,11 @@ export default class AccueilController {
             // 2. Gestion du Formulaire Principal
             const formReview = document.getElementById('form-add-review');
             if (formReview) {
-                formReview.onsubmit = (e) => {
+                formReview.onsubmit = async (e) => {
                     e.preventDefault();
                     const note = document.getElementById('review-note').value;
                     const text = document.getElementById('review-text').value;
-                    Reviews.ajouter(projet.id, note, text, userRole);
+                    await Reviews.ajouter(projet.id, note, text);
                     // On recharge par slug ou id actuel
                     AccueilController.afficherDetailProjet(id);
                 };

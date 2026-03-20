@@ -1,27 +1,57 @@
+import SupabaseService from '../services/SupabaseService.js';
+import Auth from './Auth.js';
+
 export default class Likes {
     /**
-     * @returns {Boolean} Vrai si le visiteur a liké(coeur) ce webtoon
+     * @returns {Promise<Boolean>} Vrai si l'utilisateur connecté a liké ce webtoon
      */
-    static aLike(idProjet) {
-        const likes = JSON.parse(localStorage.getItem('intoon_likes') || '[]');
-        return likes.includes(idProjet);
+    static async aLike(idProjet) {
+        const user = Auth.getUtilisateur();
+        if (!user) return false;
+
+        const client = SupabaseService.getClient();
+        const { data, error } = await client
+            .from('likes')
+            .select('id')
+            .eq('projet_id', idProjet)
+            .eq('user_id', user.id)
+            .single();
+
+        return !!data;
     }
 
     /**
-     * @returns {Boolean} Le nouvel état (true si liké, false si enlevé)
+     * @returns {Promise<Boolean>} Le nouvel état (true si liké, false si enlevé)
      */
-    static basculerLike(idProjet) {
-        let likes = JSON.parse(localStorage.getItem('intoon_likes') || '[]');
-        const index = likes.indexOf(idProjet);
-        
-        if (index > -1) {
-            likes.splice(index, 1);
-            localStorage.setItem('intoon_likes', JSON.stringify(likes));
+    static async basculerLike(idProjet) {
+        const user = Auth.getUtilisateur();
+        if (!user) {
+            alert("Connectez-vous pour liker !");
+            return false;
+        }
+
+        const client = SupabaseService.getClient();
+        const estDejaLike = await this.aLike(idProjet);
+
+        if (estDejaLike) {
+            await client.from('likes').delete().eq('projet_id', idProjet).eq('user_id', user.id);
             return false;
         } else {
-            likes.push(idProjet);
-            localStorage.setItem('intoon_likes', JSON.stringify(likes));
+            await client.from('likes').insert([{ projet_id: idProjet, user_id: user.id }]);
             return true;
         }
+    }
+
+    /**
+     * Récupère le NOMBRE TOTAL de likes pour un projet précis (Global)
+     */
+    static async getTotalLikes(idProjet) {
+        const client = SupabaseService.getClient();
+        const { count, error } = await client
+            .from('likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('projet_id', idProjet);
+        
+        return count || 0;
     }
 }

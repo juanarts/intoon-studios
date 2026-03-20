@@ -1,100 +1,101 @@
+import SupabaseService from '../services/SupabaseService.js';
 import Auth from './Auth.js';
 import Security from '../utils/Security.js';
 
 export default class Reviews {
-    static dbKey = 'intoon_reviews';
+    /**
+     * Récupère tous les avis pour un projet avec les données du profil incluses
+     */
+    static async obtenirTous(idProjet) {
+        const client = SupabaseService.getClient();
+        const { data, error } = await client
+            .from('reviews')
+            .select(`
+                *,
+                profils (
+                    pseudo,
+                    avatar_url,
+                    role
+                )
+            `)
+            .eq('projet_id', idProjet)
+            .order('created_at', { ascending: false });
 
-    static obtenirTous(idProjet) {
-        const data = localStorage.getItem(this.dbKey);
-        const reviews = data ? JSON.parse(data) : [];
-        // Supporte idProjet (standard) et projetId (mon erreur passée)
-        return reviews.filter(r => r.idProjet === idProjet || r.projetId === idProjet);
-    }
+        if (error) {
+            console.error("Erreur chargement avis:", error);
+            return [];
+        }
 
-    static ajouter(idProjet, note, commentaire, roleUtilisateur) {
-        const data = localStorage.getItem(this.dbKey);
-        const reviews = data ? JSON.parse(data) : [];
-        
-        const user = Auth.getUtilisateur();
-        const cleanComment = Security.sanitizeInput(commentaire, 500);
-
-        reviews.unshift({
-            id: 'rev-' + Date.now(),
-            idProjet,
-            note: parseInt(note, 10),
-            commentaire: cleanComment,
-            role: roleUtilisateur,
-            pseudo: user ? user.pseudo : "Anonyme",
-            avatar: user ? (user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`) : "https://api.dicebear.com/7.x/avataaars/svg?seed=Guest",
-            authorId: user ? user.id : null,
-            date: new Date().toLocaleDateString('fr-FR'),
-            likes: [],
-            reponses: [],
+        // Mapping pour compatibilité avec la vue existante
+        return data.map(r => ({
+            id: r.id,
+            idProjet: r.projet_id,
+            note: r.note,
+            commentaire: r.commentaire,
+            pseudo: r.profils?.pseudo || "Anonyme",
+            avatar: r.profils?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${r.profils?.pseudo || 'User'}`,
+            role: r.profils?.role || 'lecteur',
+            authorId: r.user_id,
+            date: new Date(r.created_at).toLocaleDateString('fr-FR'),
+            likes: [], // À implémenter si besoin de persistance des likes sur avis
+            reponses: [], // À implémenter (simulé ou via table dédiée)
             modifie: false
-        });
-
-        localStorage.setItem(this.dbKey, JSON.stringify(reviews));
-        return this.obtenirTous(idProjet);
+        }));
     }
 
-    static liker(reviewId, userId) {
-        const data = JSON.parse(localStorage.getItem(this.dbKey) || '[]');
-        const rev = data.find(r => r.id === reviewId);
-        if (rev && userId) {
-            if (!rev.likes) rev.likes = [];
-            const idx = rev.likes.indexOf(userId);
-            if (idx === -1) rev.likes.push(userId);
-            else rev.likes.splice(idx, 1);
-            localStorage.setItem(this.dbKey, JSON.stringify(data));
-        }
+    /**
+     * Ajoute un avis dans Supabase
+     */
+    static async ajouter(idProjet, note, commentaire) {
+        const user = Auth.getUtilisateur();
+        if (!user) return null;
+
+        const cleanComment = Security.sanitizeInput(commentaire, 500);
+        const client = SupabaseService.getClient();
+
+        const { data, error } = await client
+            .from('reviews')
+            .insert([{
+                projet_id: idProjet,
+                user_id: user.id,
+                note: parseInt(note, 10),
+                commentaire: cleanComment
+            }])
+            .select()
+            .single();
+
+        if (error) throw error;
         return data;
     }
 
-    static repondre(reviewId, texte, user) {
-        const data = JSON.parse(localStorage.getItem(this.dbKey) || '[]');
-        const rev = data.find(r => r.id === reviewId);
-        if (rev && user) {
-            if (!rev.reponses) rev.reponses = [];
-            rev.reponses.push({
-                id: 'rep-' + Date.now(),
-                pseudo: user.pseudo,
-                avatar: user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`,
-                texte: texte,
-                date: 'À l\'instant'
-            });
-            localStorage.setItem(this.dbKey, JSON.stringify(data));
-        }
-        return data;
-    }
-
-    static modifier(reviewId, nouveauTexte, userId) {
-        const data = JSON.parse(localStorage.getItem(this.dbKey) || '[]');
-        const rev = data.find(r => r.id === reviewId);
-        if (rev && rev.authorId === userId) {
-            rev.commentaire = nouveauTexte;
-            rev.modifie = true;
-            localStorage.setItem(this.dbKey, JSON.stringify(data));
-        }
-        return data;
-    }
-
-    static getMoyenne(projetId) {
-        const reviews = this.obtenirTous(projetId);
-        if (reviews.length === 0) return { moyenne: 0, total: 0 };
-        const sum = reviews.reduce((acc, r) => acc + r.note, 0);
-        return { moyenne: (sum / reviews.length).toFixed(1), total: reviews.length };
+    /**
+     * Calcule la moyenne des notes pour un projet
+     */
+    static async getMoyenne(idProjet) {
+        const client = SupabaseService.getClient();
+        const { data, error } = await client
+            .from('reviews')
+            .select('note')
+            .eq('projet_id', idProjet);
+        
+        if (error || !data || data.length === 0) return { moyenne: 0, total: 0 };
+        
+        const sum = data.reduce((acc, r) => acc + r.note, 0);
+        const moyenne = (sum / data.length).toFixed(1);
+        return { moyenne, total: data.length };
     }
 
     static genererEtoilesHTML(noteMoyenne) {
-        const note = Math.round(noteMoyenne); // Arrondi pour l'affichage visuel
+        const note = Math.round(parseFloat(noteMoyenne));
         let html = '';
         for(let i = 1; i <= 5; i++) {
-            if (i <= note) {
-                html += '<span style="color:#e50914;">★</span>'; // Etoile pleine rouge Netflix
-            } else {
-                html += '<span style="color:#444;">★</span>'; // Etoile vide grise
-            }
+            html += `<span style="color:${i <= note ? '#e50914' : '#444'};">★</span>`;
         }
         return html;
     }
+
+    // -- Méthodes simulées pour l'instant (à migrer si nécessaire) --
+    static async liker(reviewId, userId) { return []; }
+    static async repondre(reviewId, texte, user) { return []; }
+    static async modifier(reviewId, nouveauTexte, userId) { return []; }
 }

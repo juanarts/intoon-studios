@@ -88,6 +88,23 @@ export default class Auth {
         await client.auth.signOut();
     }
 
+    /**
+     * MÉTHODE DE TEST : Simule la connexion d'un bot (ShadowFan, NightOwl, etc.)
+     * Ne nécessite pas de mot de passe réel car bypass Supabase Auth (Front-only Mock)
+     */
+    static simulerConnexionBot(botId, pseudo, role = 'lecteur') {
+        this.currentUser = {
+            id: botId,
+            email: `${botId}@intoon-test.com`,
+            pseudo: pseudo,
+            avatar_url: `https://api.dicebear.com/7.x/identicon/svg?seed=${pseudo}`,
+            role: role
+        };
+        this.currentRole = role;
+        window.dispatchEvent(new Event('authStateChanged'));
+        console.log(`🤖 Connecté en tant que ${pseudo} (${role})`);
+    }
+
     static getUtilisateur() {
         return this.currentUser ? { 
             id: this.currentUser.id, 
