@@ -550,3 +550,38 @@ footer a:hover { color: white; }
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* PROFILE TAGS (Genres / Musique) */
+.tag-check {
+    display: inline-block;
+    padding: 6px 15px;
+    border: 1px solid #333;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #888;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    user-select: none;
+}
+
+.tag-check:hover {
+    border-color: #555;
+    background: rgba(255, 255, 255, 0.05);
+    color: #ccc;
+}
+
+input[type="checkbox"]:checked + .tag-check {
+    border-color: var(--primary);
+    background: rgba(229, 9, 20, 0.1);
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(229, 9, 20, 0.2);
+}
+
+/* Variantes de couleur (Musique) */
+input[name="musique"]:checked + .tag-check {
+    border-color: #a855f7;
+    background: rgba(168, 85, 247, 0.1);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+}

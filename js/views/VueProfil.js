@@ -168,20 +168,15 @@ export default class VueProfil {
         };
         const musiques = ['Hip-Hop', 'Lo-fi', 'Jazz', 'Électro', 'Rock', 'Classique', 'R&B', 'Afrobeat', 'Nu Metal', 'Métal Industriel', 'Trash Metal', 'Synthwave', 'Trap'];
         
-        const prefGenres = Array.isArray(profil?.genres_preferes) ? profil.genres_preferes : (typeof profil?.genres_preferes === 'string' ? profil.genres_preferes.split(',') : []);
-        const prefMusique = Array.isArray(profil?.style_musique) ? profil.style_musique : (typeof profil?.style_musique === 'string' ? profil.style_musique.split(',') : []);
+        const prefGenres = Array.isArray(profil?.genres_preferes) ? profil.genres_preferes : [];
+        const prefMusique = Array.isArray(profil?.style_musique) ? profil.style_musique : [];
 
-        const renderTags = (items, name, checkedArray, color, bgColor) => items.map(g => {
-            const isChecked = checkedArray.includes(g);
-            return `
-                <label style="cursor:pointer; display:inline-block;">
-                    <input type="checkbox" name="${name}" value="${g}" ${isChecked ? 'checked' : ''} style="display:none;">
-                    <span class="tag-check" style="display:inline-block; padding:5px 14px; border:1px solid ${isChecked ? color : '#333'}; border-radius:20px; font-size:0.8rem; color:${isChecked ? 'white' : '#888'}; background:${isChecked ? bgColor : 'rgba(255,255,255,0.01)'}; transition:all 0.2s; font-weight:${isChecked ? 'bold' : 'normal'};"
-                    onclick="const input=this.previousElementSibling; input.checked=!input.checked; this.style.borderColor=input.checked?'${color}':'#333'; this.style.color=input.checked?'white':'#888'; this.style.background=input.checked?'${bgColor}':'rgba(255,255,255,0.01)'; this.style.fontWeight=input.checked?'bold':'normal';"
-                    >${g}</span>
-                </label>
-            `;
-        }).join('');
+        const renderTags = (items, name, checkedArray) => items.map(g => `
+            <label style="cursor:pointer; display:inline-block;">
+                <input type="checkbox" name="${name}" value="${g}" ${checkedArray.includes(g) ? 'checked' : ''} style="display:none;">
+                <span class="tag-check">${g}</span>
+            </label>
+        `).join('');
 
         return `
         <div style="background:rgba(255,255,255,0.03);border:1px solid #222;border-radius:12px;padding:25px;margin-bottom:30px;">
@@ -222,7 +217,7 @@ export default class VueProfil {
                         <div style="margin-bottom:12px;">
                             <div style="font-size:0.75rem; color:#888; text-transform:uppercase; margin-bottom:6px; letter-spacing:1px;">${titre}</div>
                             <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                                ${renderTags(genres, 'genres', prefGenres, 'var(--primary)', 'rgba(229,9,20,0.1)')}
+                                ${renderTags(genres, 'genres', prefGenres)}
                             </div>
                         </div>
                     `).join('')}
@@ -232,7 +227,7 @@ export default class VueProfil {
                 <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; border:1px solid #222;">
                     <label style="color:white;font-size:0.95rem;display:block;margin-bottom:10px; font-weight:bold;">🎵 C'est quoi ton style de son ?</label>
                     <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                        ${renderTags(musiques, 'musique', prefMusique, '#a855f7', 'rgba(168,85,247,0.1)')}
+                        ${renderTags(musiques, 'musique', prefMusique)}
                     </div>
                 </div>
 
