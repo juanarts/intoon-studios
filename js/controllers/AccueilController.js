@@ -144,11 +144,11 @@ export default class AccueilController {
                 projet = await Projet.chargerParSlug(id);
             }
             if (projet && (projet.statut === 'publie' || projet.statut === 'brouillon')) {
-                const estFavori = Favoris.estFavori(id);
-                const aLikeLocal = Likes.aLike(id);
+                const estFavori = Favoris.estFavori(projet.id);
+                const aLikeLocal = Likes.aLike(projet.id);
                 
-                const statsReviews = Reviews.getMoyenne(id);
-                const listeReviews = Reviews.obtenirTous(id);
+                const statsReviews = Reviews.getMoyenne(projet.id);
+                const listeReviews = Reviews.obtenirTous(projet.id);
                 const estConnecte = Auth.estConnecte();
                 const userRole = estConnecte ? Auth.getUtilisateur().role : null;
 
@@ -164,7 +164,8 @@ export default class AccueilController {
                     e.preventDefault();
                     const note = document.getElementById('review-note').value;
                     const text = document.getElementById('review-text').value;
-                    Reviews.ajouter(id, note, text, userRole);
+                    Reviews.ajouter(projet.id, note, text, userRole);
+                    // On recharge par slug ou id actuel
                     AccueilController.afficherDetailProjet(id);
                 };
             }

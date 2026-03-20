@@ -3,36 +3,36 @@ import Auth from './Auth.js';
 export default class Reviews {
     static dbKey = 'intoon_reviews';
 
-    static obtenirTous(projetId) {
+    static obtenirTous(idProjet) {
         const data = localStorage.getItem(this.dbKey);
         const reviews = data ? JSON.parse(data) : [];
-        return reviews.filter(r => r.projetId === projetId);
+        // Supporte idProjet (standard) et projetId (mon erreur passée)
+        return reviews.filter(r => r.idProjet === idProjet || r.projetId === idProjet);
     }
 
-    static ajouter(projetId, note, commentaire, roleUtilisateur) {
+    static ajouter(idProjet, note, commentaire, roleUtilisateur) {
         const data = localStorage.getItem(this.dbKey);
         const reviews = data ? JSON.parse(data) : [];
         
-        // Récupérer les infos de l'utilisateur actuel via le modèle Auth importé
         const user = Auth.getUtilisateur();
 
         reviews.unshift({
             id: 'rev-' + Date.now(),
-            projetId,
+            idProjet,
             note: parseInt(note, 10),
-            commentaire: commentaire, // Liberté totale sur la casse
+            commentaire: commentaire,
             role: roleUtilisateur,
             pseudo: user ? user.pseudo : "Anonyme",
             avatar: user ? (user.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.pseudo}`) : "https://api.dicebear.com/7.x/avataaars/svg?seed=Guest",
             authorId: user ? user.id : null,
             date: new Date().toLocaleDateString('fr-FR'),
-            likes: [], // IDs des utilisateurs qui aiment
-            reponses: [], // Tableau de {id, pseudo, avatar, texte, date}
+            likes: [],
+            reponses: [],
             modifie: false
         });
 
         localStorage.setItem(this.dbKey, JSON.stringify(reviews));
-        return reviews.filter(r => r.projetId === projetId);
+        return this.obtenirTous(idProjet);
     }
 
     static liker(reviewId, userId) {
