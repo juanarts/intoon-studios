@@ -585,3 +585,27 @@ input[name="musique"]:checked + .tag-check {
     background: rgba(168, 85, 247, 0.1);
     box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
 }
+
+/* EFFET NICONICO : COMMENTAIRES FLOTTANTS */
+.comment-flottant {
+    position: absolute;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 800;
+    font-size: 1.2rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    pointer-events: none;
+    z-index: 50;
+    font-family: 'Outfit', sans-serif;
+    animation: flyText 8s linear forwards;
+    will-change: transform;
+}
+
+@keyframes flyText {
+    from { transform: translateX(100vw); }
+    to { transform: translateX(-100%); }
+}
+
+#project-comments-overlay {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}

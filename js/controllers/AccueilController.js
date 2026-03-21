@@ -15,6 +15,12 @@ export default class AccueilController {
             let projets = projetsBruts.filter(p => p.statut === 'publie');
             let projetsLab = projetsBruts.filter(p => p.statut === 'brouillon');
 
+            // Pré-charger les stats pour les 3 premiers projets du Hero
+            const heroSlides = projets.slice(0, 3);
+            for (const p of heroSlides) {
+                p.statsReviews = await Reviews.getMoyenne(p.id);
+            }
+
             if (query) {
                 const q = query.toLowerCase();
                 projets = projets.filter(p => 
