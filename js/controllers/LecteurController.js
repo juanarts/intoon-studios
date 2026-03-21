@@ -26,8 +26,12 @@ export default class LecteurController {
         try {
             const projet = await Projet.chargerParId(idProjet) || await Projet.chargerParSlug(idProjet);
             if (projet) {
-                // Recherche par ID ou par Slug
-                const chapitre = projet.chapitres.find(c => c.id === idChapitre || c.slug === idChapitre);
+                // Recherche par ID ou par Slug (insensible à la casse)
+                const target = idChapitre.toLowerCase();
+                const chapitre = projet.chapitres.find(c => 
+                    c.id.toLowerCase() === target || 
+                    (c.slug && c.slug.toLowerCase() === target)
+                );
                 
                 if (!chapitre) {
                     console.error("[Lecteur] Chapitre introuvable pour ID/Slug:", idChapitre);
