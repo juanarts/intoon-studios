@@ -107,7 +107,10 @@ export default class AdminController {
                     const cid = target.closest('.btn-edit-chap-content').getAttribute('data-chap-id');
                     const proj = projets.find(p => p.id === pid);
                     const chap = proj.chapitres.find(c => c.id === cid);
-                    if (proj && chap) modalRoot.innerHTML = VueAdmin.rendreModaleEditionChapitre(proj, chap);
+                    if (proj && chap) {
+                        modalRoot.innerHTML = VueAdmin.rendreModaleEditionChapitre(proj, chap);
+                        AdminController.initialiserStudioChapitre(proj, chap);
+                    }
                 } else if (target.closest('.btn-del-chap')) {
                     if (confirm("Attention : Supprimer ce chapitre est définitif. Confirmer ?")) {
                         const cid = target.closest('.btn-del-chap').getAttribute('data-chap-id');
@@ -382,13 +385,11 @@ export default class AdminController {
                     }
                 }
 
-                // [NEW] MISE À JOUR CHAPITRE EXISTANT
                 if (formId === 'form-update-chap') {
                     const chapId = document.getElementById('up-chap-id').value;
                     const projetId = document.getElementById('up-chap-projet-id').value;
                     const titre = document.getElementById('up-chap-titre').value;
-                    const addFilesInput = document.getElementById('up-chap-add-pages');
-
+                    
                     const btn = e.target.querySelector('button[type="submit"]');
                     btn.innerHTML = 'Synchronisation Cloud...';
                     btn.disabled = true;
@@ -396,29 +397,45 @@ export default class AdminController {
                     try {
                         const client = SupabaseService.getClient();
                         
-                        // 1. Récupérer les URLs conservées
-                        const remainingUrls = [...document.querySelectorAll('.edit-chap-thumb')].map(t => t.dataset.url);
+                        // 1. Récupérer l'ordre final depuis la grille
+                        const sortedThumbs = [...document.querySelectorAll('.edit-chap-thumb')];
+                        const finalPages = [];
+                        const filesToUpload = [];
+
+                        for (const thumb of sortedThumbs) {
+                            if (thumb.dataset.type === 'url') {
+                                finalPages.push(thumb.dataset.content);
+                            } else if (thumb.dataset.type === 'file') {
+                                // On stocke l'index pour le remplacement ultérieur
+                                finalPages.push(null); 
+                                filesToUpload.push({
+                                    index: finalPages.length - 1,
+                                    file: AdminController._tempStudioFiles[parseInt(thumb.dataset.contentIdx)]
+                                });
+                            }
+                        }
                         
-                        // 2. Uploader les nouvelles pages si besoin
-                        const newUrls = [];
-                        if (addFilesInput && addFilesInput.files.length > 0) {
-                            for(let i=0; i<addFilesInput.files.length; i++) {
-                                const file = addFilesInput.files[i];
+                        // 2. Uploader les nouveaux fichiers
+                        if (filesToUpload.length > 0) {
+                            for (let i = 0; i < filesToUpload.length; i++) {
+                                const { index, file } = filesToUpload[i];
+                                btn.innerHTML = `Cloud Sync... (${i+1}/${filesToUpload.length})`;
                                 const ext = file.name.split('.').pop();
                                 const filename = `${projetId}_update_${Date.now()}_${i}.${ext}`;
                                 await client.storage.from('pages').upload(filename, file);
                                 const { data: { publicUrl } } = client.storage.from('pages').getPublicUrl(filename);
-                                newUrls.push(publicUrl);
+                                finalPages[index] = publicUrl;
                             }
                         }
 
-                        // 3. Fusionner et Update BDD
-                        const finalPages = [...remainingUrls, ...newUrls];
+                        // 3. Update BDD
                         await client.from('chapitres').update({
                             titre: titre,
                             pages_urls: finalPages
                         }).eq('id', chapId);
 
+                        // Cleanup temp state
+                        AdminController._tempStudioFiles = [];
                         document.getElementById('admin-modal-root').innerHTML = '';
                         AdminController.afficher();
                     } catch(errUp) {
@@ -437,5 +454,118 @@ export default class AdminController {
                 <b>Stack:</b><br><pre style="white-space:pre-wrap; font-size:12px; margin-top:10px;">${err.stack}</pre>
             </div>`;
         }
+    }
+
+    /**
+     * MOTEUR DU STUDIO DE PRODUCTION (Drag & Drop + Tri)
+     */
+    static _tempStudioFiles = [];
+
+    static initialiserStudioChapitre(projet, chapitre) {
+        const grid = document.getElementById('edit-thumb-grid');
+        const container = document.getElementById('drop-zone-container');
+        const indicator = document.getElementById('drop-indicator');
+        const fileInput = document.getElementById('up-chap-add-pages-hidden');
+        const btnTrigger = document.getElementById('btn-trigger-add-pages');
+        
+        // État local des planches : { type: 'url'|'file', content: string|index }
+        let currentPlanches = (chapitre.pages || []).map(url => ({ type: 'url', content: url }));
+        AdminController._tempStudioFiles = [];
+
+        const renderGrid = () => {
+            grid.innerHTML = '';
+            document.getElementById('up-chap-count').textContent = currentPlanches.length;
+
+            currentPlanches.forEach((p, idx) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'edit-chap-thumb';
+                thumb.draggable = true;
+                thumb.dataset.type = p.type;
+                thumb.dataset.content = p.type === 'url' ? p.content : '';
+                thumb.dataset.contentIdx = p.type === 'file' ? p.content : '';
+
+                const src = p.type === 'url' ? p.content : URL.createObjectURL(AdminController._tempStudioFiles[p.content]);
+                
+                thumb.style.cssText = `
+                    position:relative; border-radius:6px; overflow:hidden; border:2px solid #222; 
+                    aspect-ratio:3/2; background:#000; cursor:grab; transition: transform 0.2s, border-color 0.2s;
+                `;
+                
+                thumb.innerHTML = `
+                    <img src="${src}" style="width:100%; height:100%; object-fit:cover; opacity:0.8; pointer-events:none;">
+                    <div style="position:absolute; bottom:0; left:0; background:rgba(0,0,0,0.8); color:white; padding:2px 6px; font-size:0.7rem; font-weight:bold;">#${idx+1}</div>
+                    ${p.type === 'file' ? `<div style="position:absolute; top:5px; left:5px; background:var(--primary); color:white; padding:2px 4px; border-radius:3px; font-size:0.6rem; font-weight:bold;">NOUVEAU</div>` : ''}
+                    <button type="button" class="btn-remove-p" style="position:absolute; top:5px; right:5px; background:rgba(239,68,68,0.9); color:white; border:none; width:22px; height:22px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">✕</button>
+                `;
+
+                // Suppression individuelle
+                thumb.querySelector('.btn-remove-p').onclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm("Supprimer cette planche ?")) {
+                        currentPlanches.splice(idx, 1);
+                        renderGrid();
+                    }
+                };
+
+                // DRAG & DROP INTERNE (TRI)
+                thumb.ondragstart = (e) => {
+                    e.dataTransfer.setData('index', idx);
+                    thumb.style.opacity = '0.5';
+                    thumb.style.transform = 'scale(0.9)';
+                };
+                thumb.ondragend = () => { thumb.style.opacity = '1'; thumb.style.transform = 'none'; };
+                thumb.ondragover = (e) => { e.preventDefault(); thumb.style.borderColor = 'var(--primary)'; };
+                thumb.ondragleave = () => { thumb.style.borderColor = '#222'; };
+                thumb.ondrop = (e) => {
+                    e.preventDefault();
+                    const fromIdx = parseInt(e.dataTransfer.getData('index'));
+                    if(!isNaN(fromIdx) && fromIdx !== idx) {
+                        const moved = currentPlanches.splice(fromIdx, 1)[0];
+                        currentPlanches.splice(idx, 0, moved);
+                        renderGrid();
+                    }
+                };
+
+                grid.appendChild(thumb);
+            });
+        };
+
+        // DRAG & DROP EXTERNE (FICHIERS)
+        container.ondragover = (e) => {
+            e.preventDefault();
+            indicator.style.display = 'flex';
+        };
+        container.ondragleave = () => {
+            indicator.style.display = 'none';
+        };
+        container.ondrop = (e) => {
+            e.preventDefault();
+            indicator.style.display = 'none';
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                Array.from(files).forEach(f => {
+                    if (f.type.startsWith('image/')) {
+                        const newIdx = AdminController._tempStudioFiles.push(f) - 1;
+                        currentPlanches.push({ type: 'file', content: newIdx });
+                    }
+                });
+                renderGrid();
+            }
+        };
+
+        // CLICK TRIGGER ADD
+        btnTrigger.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => {
+            const files = e.target.files;
+            if (files) {
+                Array.from(files).forEach(f => {
+                    const newIdx = AdminController._tempStudioFiles.push(f) - 1;
+                    currentPlanches.push({ type: 'file', content: newIdx });
+                });
+                renderGrid();
+            }
+        };
+
+        renderGrid();
     }
 }

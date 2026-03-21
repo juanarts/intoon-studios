@@ -301,27 +301,26 @@ export default class VueAdmin {
                             <input type="text" id="up-chap-titre" value="${Security.escapeHTML(chapitre.titre)}" style="padding:15px; border-radius:6px; border:1px solid #444; background:#111; color:white; font-size:1.2rem; font-weight:bold;">
                         </div>
 
-                        <div style="background:#111; padding:25px; border-radius:10px; border:1px solid #222;">
+                        <div style="background:#111; padding:25px; border-radius:10px; border:1px solid #222; position:relative;" id="drop-zone-container">
                             <h3 style="color:white; font-size:1rem; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
-                                <span>📚 Planches du Chapitre (${chapitre.pages_urls ? chapitre.pages_urls.length : 0})</span>
-                                <span style="font-size:0.8rem; color:#555;">Glissez pour réorganiser (À Venir) • Cliquez [X] pour supprimer</span>
+                                <span>📚 Planches du Chapitre (<span id="up-chap-count">${chapitre.pages ? chapitre.pages.length : 0}</span>)</span>
+                                <span style="font-size:0.85rem; color:var(--primary); font-weight:bold;">✨ Glissez vos fichiers ici ou triez à la souris</span>
                             </h3>
                             
-                            <div id="edit-thumb-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:15px;">
-                                ${(chapitre.pages_urls || []).map((url, idx) => `
-                                    <div class="edit-chap-thumb" data-url="${url}" style="position:relative; border-radius:6px; overflow:hidden; border:2px solid #222; aspect-ratio:16/9; background:#000;">
-                                        <img src="${url}" style="width:100%; height:100%; object-fit:cover; opacity:0.8;">
-                                        <div style="position:absolute; bottom:0; left:0; background:rgba(0,0,0,0.8); color:white; padding:2px 6px; font-size:0.7rem; font-weight:bold;">#${idx+1}</div>
-                                        <button type="button" class="btn-remove-thumb" style="position:absolute; top:5px; right:5px; background:rgba(239,68,68,0.9); color:white; border:none; width:22px; height:22px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">✕</button>
-                                    </div>
-                                `).join('')}
-                                
-                                <label style="display:flex; flex-direction:column; justify-content:center; align-items:center; border:2px dashed #333; border-radius:6px; cursor:pointer; color:#666; aspect-ratio:16/9; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--primary)'; this.style.color='white'" onmouseout="this.style.borderColor='#333'; this.style.color='#666'">
-                                    <span class="material-symbols-outlined" style="font-size:2rem;">add_photo_alternate</span>
-                                    <span style="font-size:0.75rem; margin-top:5px;">Ajouter</span>
-                                    <input type="file" id="up-chap-add-pages" multiple accept="image/*" style="display:none;">
-                                </label>
+                            <div id="edit-thumb-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap:15px; min-height:150px; padding:10px; border-radius:8px; transition:background 0.3s;">
+                                <!-- Les miniatures seront générées / rafraîchies par le contrôleur -->
+                                <p style="color:#444; text-align:center; grid-column: 1 / -1; padding:40px;">Chargement du studio...</p>
                             </div>
+
+                            <div id="drop-indicator" style="display:none; position:absolute; inset:0; background:rgba(229,9,20,0.2); border:3px dashed var(--primary); border-radius:10px; z-index:5; pointer-events:none; flex-direction:column; justify-content:center; align-items:center; color:white;">
+                                <span class="material-symbols-outlined" style="font-size:4rem;">cloud_upload</span>
+                                <b style="font-size:1.2rem;">Lâchez pour importer</b>
+                            </div>
+                            
+                            <input type="file" id="up-chap-add-pages-hidden" multiple accept="image/*" style="display:none;">
+                            <button type="button" id="btn-trigger-add-pages" style="margin-top:20px; width:100%; padding:12px; background:rgba(255,255,255,0.05); color:white; border:1px dashed #444; border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;">
+                                <span class="material-symbols-outlined">add_photo_alternate</span> Ajouter des planches depuis l'ordinateur
+                            </button>
                         </div>
 
                         <div style="display:flex; gap:15px; margin-top:10px;">
