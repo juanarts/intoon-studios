@@ -54,6 +54,7 @@ export default class VueVip {
                         <ul style="list-style:none; padding:0; margin:0 0 40px 0; color:white; font-size:1.1rem; flex:1;">
                             <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">local_fire_department</span> <b>Tous les avantages Prestige</b></li>
                             <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">star</span> <b>ŒUVRE ORIGINALE DÉDICACÉE</b></li>
+                            <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">shopping_cart</span> <b>VENTES PRIVÉES (Planches @ Prix Pro)</b></li>
                             <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">local_fire_department</span> Artwork Exclusif HD mensuel</li>
                             <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">local_fire_department</span> Droit de vote sur les Scénarios</li>
                         </ul>
