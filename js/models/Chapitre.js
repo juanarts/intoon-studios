@@ -10,5 +10,11 @@ export default class Chapitre {
         // Jointure Supabase Cloud
         this.pages = data.pages_urls || data.pages || [];
         this.isPremium = data.is_premium || false;
+
+        // Génération du Slug SEO (ex: "Chapitre 1" -> "chapitre-1")
+        this.slug = this.titre ? this.titre.toLowerCase().trim()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[\s_-]+/g, '-')
+            .replace(/^-+|-+$/g, '') : `chapitre-${this.ordre}`;
     }
 }

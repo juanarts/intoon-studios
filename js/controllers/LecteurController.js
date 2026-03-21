@@ -24,10 +24,17 @@ export default class LecteurController {
         LecteurController.scrollEngine.rafId = null;
 
         try {
-            const projet = await Projet.chargerParId(idProjet);
+            const projet = await Projet.chargerParId(idProjet) || await Projet.chargerParSlug(idProjet);
             if (projet) {
-                const chapitre = projet.chapitres.find(c => c.id === idChapitre);
-                Historique.enregistrer(idProjet, idChapitre);
+                // Recherche par ID ou par Slug
+                const chapitre = projet.chapitres.find(c => c.id === idChapitre || c.slug === idChapitre);
+                
+                if (!chapitre) {
+                    app.innerHTML = '<div class="error">Chapitre introuvable. <a href="/" data-link class="btn-primary">Retour à l\'accueil</a></div>';
+                    return;
+                }
+
+                Historique.enregistrer(projet.id, chapitre.id);
                 const userConnecte = Auth.estConnecte();
                 app.innerHTML = VueLecteur.rendreLecteur(projet, chapitre, userConnecte);
 
