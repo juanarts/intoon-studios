@@ -35,8 +35,6 @@ export default class LecteurController {
                 );
                 
                 if (!chapitre) {
-                    console.error("[Lecteur] Chapitre introuvable pour ID/Slug:", idChapitre);
-                    console.log("[Lecteur] Slugs disponibles:", projet.chapitres.map(c => c.slug));
                     app.innerHTML = `
                         <div class="error" style="text-align:center; padding:50px; color:white;">
                             <h2>Oups ! Ce chapitre est introuvable.</h2>
@@ -52,6 +50,11 @@ export default class LecteurController {
                             <a href="/" data-link class="btn-primary" style="margin-top:40px; display:inline-block;">Retour à l'accueil</a>
                         </div>`;
                     return;
+                }
+
+                // BEAUTIFFIER L'URL (REPLACE STATE)
+                if (idProjet !== projet.slug || idChapitre !== chapitre.slug) {
+                    history.replaceState(null, '', `/lire/${projet.slug}/${chapitre.slug}`);
                 }
 
                 Historique.enregistrer(projet.id, chapitre.id);
