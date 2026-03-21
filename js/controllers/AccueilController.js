@@ -157,6 +157,11 @@ export default class AccueilController {
                 projet = await Projet.chargerParSlug(id);
             }
             if (projet && (projet.statut === 'publie' || projet.statut === 'brouillon')) {
+                // BEAUTIFFIER L'URL (REPLACE STATE)
+                if (id !== projet.slug) {
+                    history.replaceState(null, '', `/projet/${projet.slug}`);
+                }
+
                 const estFavori = Favoris.estFavori(projet.id);
                 const aLikeLocal = await Likes.aLike(projet.id);
                 
