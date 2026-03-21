@@ -32,7 +32,8 @@ export default class AccueilController {
             let chapitreEnCours = null;
             
             if (dataHisto) {
-                projetEnCours = projets.find(p => p.id === dataHisto.idProjet);
+                // On cherche dans TOUS les projets (Publiés ou Lab) pour la reprise de lecture
+                projetEnCours = projetsBruts.find(p => p.id === dataHisto.idProjet);
                 if (projetEnCours) {
                     chapitreEnCours = projetEnCours.chapitres.find(c => c.id === dataHisto.idChapitre);
                 }
