@@ -138,7 +138,8 @@ export default class Projet {
     static async chargerParSlug(slug) {
         try {
             const projets = await this.chargerTous();
-            return projets.find(p => p.slug === slug) || null;
+            const target = slug.toLowerCase();
+            return projets.find(p => p.slug.toLowerCase() === target) || null;
         } catch (e) {
             return null;
         }
