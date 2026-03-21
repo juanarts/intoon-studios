@@ -2,8 +2,11 @@ import VueCheckout from '../views/VueCheckout.js';
 
 export default class CheckoutController {
     static afficher() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const plan = urlParams.get('plan') || '5'; // 5 par défaut
+        
         const app = document.getElementById('app');
-        app.innerHTML = VueCheckout.rendre();
+        app.innerHTML = VueCheckout.rendre(plan);
         window.scrollTo(0, 0);
 
         const form = document.getElementById('form-checkout');

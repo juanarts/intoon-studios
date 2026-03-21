@@ -1,5 +1,10 @@
 export default class VueCheckout {
-    static rendre() {
+    static rendre(plan = '5') {
+        const total = parseFloat(plan);
+        const ht = (total / 1.2).toFixed(2);
+        const tva = (total - ht).toFixed(2);
+        const name = plan === '35' ? 'Mécène Argent' : (plan === '50' ? 'Mécène Or' : 'Supporter');
+        
         return `
             <div class="checkout-page" style="padding: 60px 4%; animation: fadeIn 0.5s ease-out; max-width: 900px; margin: 0 auto; min-height:80vh; display:flex; gap:40px; flex-wrap:wrap; justify-content:center; align-items:flex-start;">
                 
@@ -14,17 +19,17 @@ export default class VueCheckout {
                     </div>
 
                     <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:1.1rem; color:#ccc;">
-                        <span>Sous-total</span>
-                        <span>4.17 €</span>
+                        <span>Sous-total (${name})</span>
+                        <span>${ht} €</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:1.1rem; color:#ccc;">
                         <span>Taxes (TVA 20%)</span>
-                        <span>0.83 €</span>
+                        <span>${tva} €</span>
                     </div>
 
                     <div style="display:flex; justify-content:space-between; margin-top:20px; padding-top:20px; border-top:1px dashed #444; font-size:1.5rem; color:white; font-weight:bold; font-family:'Outfit', sans-serif;">
                         <span>TOTAL</span>
-                        <span>5.00 €<span style="font-size:0.9rem; color:#888;">/mois</span></span>
+                        <span>${total.toFixed(2)} €<span style="font-size:0.9rem; color:#888;">/mois</span></span>
                     </div>
                 </div>
 
@@ -68,7 +73,7 @@ export default class VueCheckout {
                         </div>
                         
                         <button type="submit" class="btn-primary" style="width:100%; padding:18px; font-size:1.2rem; background:var(--primary); margin-top:10px; border-radius:6px; font-weight:bold; letter-spacing:1px; display:flex; justify-content:center; align-items:center; gap:10px;">
-                            <span class="material-symbols-outlined">lock</span> Payer 5.00 €
+                            <span class="material-symbols-outlined">lock</span> Payer ${total.toFixed(2)} €
                         </button>
                         
                         <p style="text-align:center; color:#555; font-size:0.8rem; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:5px;">
