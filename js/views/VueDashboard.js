@@ -8,23 +8,26 @@ export default class VueDashboard {
      * @param {Array} projetsFavoris Les favoris
      * @param {Object} utilisateur Les infos de session (pseudo, statut)
      */
-    static rendre(projetsFavoris, utilisateur, mesProjets = []) {
+    static rendre(projetsFavoris, utilisateur, mesProjets = [], projetEnCours = null, chapitreEnCours = null) {
         
-        // Simuler un historique
-        const historiqueHtml = projetsFavoris.length > 0 ? `
-            <div class="dashboard-section" style="margin-bottom: 50px;">
-                <h2 style="font-size: 1.5rem; margin-bottom: 20px; color: #e5e5e5;">Reprendre la lecture</h2>
-                <div class="projet-card" style="max-width:300px;">
-                    <a href="/lire/${projetsFavoris[0].id}/chapitre-1" data-link class="projet-link">
-                        <img class="projet-cover" src="${projetsFavoris[0].couverture}" alt="${projetsFavoris[0].titre}">
-                        <div class="projet-info">
-                            <h3 style="color:var(--primary); font-size: 1.2rem; font-weight:800;">▶ Continuer - Chapitre 1</h3>
-                            <p style="font-size:0.9rem; color:#d0d0d0; margin-top:5px;">${Security.escapeHTML(projetsFavoris[0].titre)}</p>
-                        </div>
-                    </a>
+        let historiqueHtml = `<div style="margin-bottom:50px; background:rgba(255,255,255,0.05); padding:20px; border-radius:8px;"><p style="color:#aaa;">Vous n'avez aucune lecture en cours.</p></div>`;
+
+        if (projetEnCours && chapitreEnCours) {
+            historiqueHtml = `
+                <div class="dashboard-section" style="margin-bottom: 50px;">
+                    <h2 style="font-size: 1.5rem; margin-bottom: 20px; color: #e5e5e5;">Reprendre la lecture</h2>
+                    <div class="projet-card" style="max-width:300px; box-shadow: 0 5px 25px rgba(229,9,20,0.25); border: 1px solid rgba(229,9,20,0.4);">
+                        <a href="/lire/${projetEnCours.slug}/${chapitreEnCours.slug}" data-link class="projet-link">
+                            <img class="projet-cover" src="${projetEnCours.couverture}" alt="${projetEnCours.titre}">
+                            <div class="projet-info" style="opacity:1; background:linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0.6) 100%);">
+                                <h3 style="color:var(--primary); font-size: 1.1rem; font-weight:800;">▶ Continuer</h3>
+                                <p style="font-size:0.85rem; color:#d0d0d0; margin-top:5px;">${Security.escapeHTML(projetEnCours.titre)} - Ch.${chapitreEnCours.ordre}</p>
+                            </div>
+                        </a>
+                    </div>
                 </div>
-            </div>
-        ` : `<div style="margin-bottom:50px; background:rgba(255,255,255,0.05); padding:20px; border-radius:8px;"><p style="color:#aaa;">Vous n'avez aucune lecture en cours.</p></div>`;
+            `;
+        }
 
 
         return `

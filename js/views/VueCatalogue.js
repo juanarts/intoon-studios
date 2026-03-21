@@ -20,7 +20,7 @@ export default class VueCatalogue {
         const heroHtml = `
             <div class="projet-hero" style="position:relative; overflow:hidden;">
                 ${heroSlides.map((projet, idx) => {
-                    const statsHero = Reviews.getMoyenne(projet.id);
+                    const statsHero = projet.statsReviews || { moyenne: 0, total: 0 };
                     let btnLireHero = "";
                     if (projet.chapitres && projet.chapitres.length > 0) {
                         const premierCh = projet.chapitres.find(ch => ch.ordre === 1) || projet.chapitres[0];

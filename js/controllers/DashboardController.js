@@ -30,8 +30,24 @@ export default class DashboardController {
             ]);
 
             const mesProjets = dbProjets ? dbProjets.map(p => new Projet(p)) : [];
-            
-            app.innerHTML = VueDashboard.rendre(projetsFavoris, utilisateur, mesProjets);
+
+            // RÉCUPÉRATION DE L'HISTORIQUE RÉEL
+            import('../models/Historique.js').then(async (m) => {
+                const Historique = m.default;
+                const dataHisto = Historique.getDernier();
+                let projetEnCours = null;
+                let chapitreEnCours = null;
+
+                if (dataHisto) {
+                    // Charger le projet de l'historique (peut être un favori ou un autre)
+                    projetEnCours = await Projet.chargerParId(dataHisto.idProjet) || await Projet.chargerParSlug(dataHisto.idProjet);
+                    if (projetEnCours) {
+                        chapitreEnCours = projetEnCours.chapitres.find(c => c.id === dataHisto.idChapitre);
+                    }
+                }
+
+                app.innerHTML = VueDashboard.rendre(projetsFavoris, utilisateur, mesProjets, projetEnCours, chapitreEnCours);
+            });
 
             // GESTION DES ÉVÉNEMENTS DÉLÉGUÉS (DASHBOARD)
             app.onclick = async (e) => {
