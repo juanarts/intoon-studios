@@ -16,7 +16,6 @@ export default class LecteurController {
     };
 
     static async lireChapitre(idProjet, idChapitre) {
-        console.log("[Lecteur] Début lireChapitre - Projet:", idProjet, "Chapitre:", idChapitre);
         const app = document.getElementById('app');
         app.innerHTML = '<div class="loader">Chargement du webtoon...</div>';
 
@@ -26,14 +25,10 @@ export default class LecteurController {
 
         try {
             const projet = await Projet.chargerParId(idProjet) || await Projet.chargerParSlug(idProjet);
-            console.log("[Lecteur] Projet chargé:", projet ? projet.titre : "NULL");
 
             if (projet) {
                 // Recherche par ID ou par Slug (insensible à la casse)
                 const target = idChapitre.toLowerCase();
-                console.log("[Lecteur] Recherche chapitre pour cible:", target);
-                console.log("[Lecteur] Chapitres disponibles dans projet:", projet.chapitres.map(c => ({ id: c.id, slug: c.slug })));
-
                 const chapitre = projet.chapitres.find(c => 
                     (c.id && c.id.toLowerCase() === target) || 
                     (c.slug && c.slug.toLowerCase() === target)
