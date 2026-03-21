@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         { path: '/checkout', controller: CheckoutController.afficher },
         { path: '/inbox', controller: () => MessagerieController.afficher() },
         { path: '/profil/:id', controller: (id) => ProfilController.afficher(id) },
+        { path: '/shop', controller: () => ShopController.afficherTout() },
         { path: '/shop/:slug', controller: (slug) => ShopController.afficher(slug) }
     ];
 
@@ -61,6 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 navLinks.innerHTML = `
                     <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">Accueil</span></a>
+                    <a href="/shop" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">shopping_bag</span> <span class="nav-text">Boutique</span></a>
                     <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">Le Studio</span></a>
                     <a href="/favoris" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">bookmark</span> <span class="nav-text">Ma Liste</span></a>
                     <a href="/inbox" data-link style="position:relative; display:flex; align-items:center; margin:0 10px;" title="Messagerie Privée">
@@ -75,6 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
                 navLinks.innerHTML = `
                     <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">Accueil</span></a>
+                    <a href="/shop" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">shopping_bag</span> <span class="nav-text">Boutique</span></a>
                     <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">Le Studio</span></a>
                     <a href="/connexion" data-link style="display:flex; align-items:center; gap:6px; color:var(--text-muted);"><span class="nav-text">S'identifier</span></a>
                     <a href="/inscription" data-link class="btn-primary" style="display:flex; align-items:center; gap:6px; padding:8px 20px;"><span class="nav-text">S'inscrire</span></a>

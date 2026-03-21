@@ -37,4 +37,34 @@ export default class ShopController {
             window.appRouter.navigate('/');
         }
     }
+
+    /**
+     * Affiche l'index de la marketplace (toutes les boutiques actives)
+     */
+    static async afficherTout() {
+        const app = document.getElementById('app');
+        app.innerHTML = '<div class="loader" style="color:white;">Exploration du Marketplace INTOON...</div>';
+
+        try {
+            const client = SupabaseService.getClient();
+            const { data: dbProjets, error } = await client
+                .from('projets')
+                .select('*')
+                .eq('shop_enabled', true)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            const projetsShop = dbProjets ? dbProjets.map(p => new Projet(p)) : [];
+            
+            // [SEO]
+            document.title = "Marketplace INTOON | Boutique BD & Webtoons";
+
+            app.innerHTML = VueShop.rendreIndex(projetsShop);
+
+        } catch (err) {
+            console.error("[Shop Index Error]", err);
+            app.innerHTML = '<div class="error" style="color:white; padding:50px; text-align:center;">Erreur lors du chargement de la marketplace.</div>';
+        }
+    }
 }

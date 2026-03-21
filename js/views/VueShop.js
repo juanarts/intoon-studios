@@ -75,4 +75,42 @@ export default class VueShop {
             </div>
         `;
     }
+
+    /**
+     * Rendu de la page d'accueil de la Boutique (Marketplace)
+     * @param {Array} projetsShop Liste des projets avec boutique active
+     */
+    static rendreIndex(projetsShop) {
+        return `
+            <div class="shop-index-page" style="padding: 60px 4%; animation: fadeIn 0.8s ease-out; max-width: 1200px; margin: 0 auto; min-height:80vh;">
+                <header style="text-align:center; margin-bottom: 60px;">
+                    <h1 style="font-size: 3.5rem; color: white; margin-bottom:15px; font-family:'Outfit', sans-serif;">Le <span style="color:#60a5fa">Marketplace</span> Artiste</h1>
+                    <p style="color:#aaa; font-size:1.2rem; max-width:700px; margin:0 auto; line-height:1.6;">
+                        Découvrez les éditions physiques exclusives et les planches originales directement auprès des créateurs du studio.
+                    </p>
+                </header>
+
+                <div class="shop-index-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:30px;">
+                    ${projetsShop.length > 0 ? projetsShop.map(p => `
+                        <div class="shop-card" style="background:rgba(25,25,30,0.5); border:1px solid #333; border-radius:16px; overflow:hidden; transition:all 0.3s; position:relative;" onmouseover="this.style.transform='translateY(-10px)'; this.style.borderColor='var(--primary)';" onmouseout="this.style.transform='none'; this.style.borderColor='#333';">
+                            <img src="${p.couverture}" style="width:100%; height:320px; object-fit:cover;">
+                            <div style="padding:20px; background:linear-gradient(to top, #000, transparent); margin-top:-100px; position:relative; z-index:2;">
+                                <h3 style="color:white; font-size:1.3rem; margin-bottom:10px;">${Security.escapeHTML(p.titre)}</h3>
+                                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                    ${p.hasPhysical ? '<span style="background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid #4ade80; font-size:0.7rem; padding:4px 10px; border-radius:30px; font-weight:bold;">BD PHYSIQUE</span>' : ''}
+                                    ${p.hasOriginals ? '<span style="background:rgba(244,114,182,0.1); color:#f472b6; border:1px solid #f472b6; font-size:0.7rem; padding:4px 10px; border-radius:30px; font-weight:bold;">ORIGINAUX</span>' : ''}
+                                </div>
+                                <a href="/shop/${p.slug}" data-link class="btn-primary" style="display:block; text-align:center; margin-top:20px; padding:12px; font-weight:bold; font-size:0.9rem;">VISITER LA BOUTIQUE</a>
+                            </div>
+                        </div>
+                    `).join('') : `
+                        <div style="grid-column: 1 / -1; text-align:center; padding:100px 0; color:#555;">
+                            <span class="material-symbols-outlined" style="font-size:4rem; margin-bottom:20px;">storefront</span>
+                            <p>Le Marketplace arrive très bientôt. Les créateurs préparent leurs éditions physiques !</p>
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
+    }
 }
