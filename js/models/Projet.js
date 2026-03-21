@@ -12,6 +12,8 @@ export default class Projet {
         this.description = data.description;
         this.couverture = data.couverture_url || data.couverture;
         this.videoPromoUrl = data.video_promo_url || data.videoPromoUrl || null;
+        this.scenariste = data.scenariste || "";
+        this.dessinateur = data.dessinateur || "";
         this.likes = data.likes_total || data.likes || 0;
         this.pegi = data.pegi_rating || data.pegi || "TP";
         this.statut = data.statut || "publie";

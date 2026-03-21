@@ -98,6 +98,25 @@ export default class AdminController {
                     const id = target.closest('.btn-restore-serie').getAttribute('data-id');
                     await SupabaseService.getClient().from('projets').update({ statut: 'publie' }).eq('id', id);
                     AdminController.afficher(); 
+                } else if (target.closest('.btn-manage-chaps')) {
+                    const id = target.closest('.btn-manage-chaps').getAttribute('data-id');
+                    const projetActuel = projets.find(p => p.id === id);
+                    if (projetActuel) modalRoot.innerHTML = VueAdmin.rendreModaleGestionChapitres(projetActuel);
+                } else if (target.closest('.btn-edit-chap-content')) {
+                    const pid = target.closest('.btn-edit-chap-content').getAttribute('data-projet-id');
+                    const cid = target.closest('.btn-edit-chap-content').getAttribute('data-chap-id');
+                    const proj = projets.find(p => p.id === pid);
+                    const chap = proj.chapitres.find(c => c.id === cid);
+                    if (proj && chap) modalRoot.innerHTML = VueAdmin.rendreModaleEditionChapitre(proj, chap);
+                } else if (target.closest('.btn-del-chap')) {
+                    if (confirm("Attention : Supprimer ce chapitre est définitif. Confirmer ?")) {
+                        const cid = target.closest('.btn-del-chap').getAttribute('data-chap-id');
+                        await client.from('chapitres').delete().eq('id', cid);
+                        AdminController.afficher();
+                    }
+                } else if (target.closest('.btn-remove-thumb')) {
+                    const thumb = target.closest('.edit-chap-thumb');
+                    if (confirm("Enlever cette planche du chapitre ?")) thumb.remove();
                 }
             };
 
@@ -240,6 +259,9 @@ export default class AdminController {
                     const editId = document.getElementById('edit-id').value;
                     const titre = document.getElementById('edit-titre').value;
                     const desc = document.getElementById('edit-desc').value;
+                    const scenariste = document.getElementById('edit-scenariste').value;
+                    const dessinateur = document.getElementById('edit-dessinateur').value;
+                    const trailer = document.getElementById('edit-trailer').value;
                     const couvInput = document.getElementById('edit-couverture');
                     const inputStatut = document.getElementById('edit-statut').value;
                     const inputPegi = document.getElementById('edit-pegi').value;
@@ -269,6 +291,9 @@ export default class AdminController {
                         const payload = {
                             titre: titre,
                             description: desc,
+                            scenariste: scenariste,
+                            dessinateur: dessinateur,
+                            video_promo_url: trailer,
                             couverture_url: finalCouv,
                             statut: inputStatut,
                             pegi_rating: inputPegi
@@ -354,6 +379,52 @@ export default class AdminController {
                         alert("Erreur lors de l'Upload : " + e.message);
                         btn.disabled = false;
                         btn.innerHTML = 'Publier Chapitre';
+                    }
+                }
+
+                // [NEW] MISE À JOUR CHAPITRE EXISTANT
+                if (formId === 'form-update-chap') {
+                    const chapId = document.getElementById('up-chap-id').value;
+                    const projetId = document.getElementById('up-chap-projet-id').value;
+                    const titre = document.getElementById('up-chap-titre').value;
+                    const addFilesInput = document.getElementById('up-chap-add-pages');
+
+                    const btn = e.target.querySelector('button[type="submit"]');
+                    btn.innerHTML = 'Synchronisation Cloud...';
+                    btn.disabled = true;
+
+                    try {
+                        const client = SupabaseService.getClient();
+                        
+                        // 1. Récupérer les URLs conservées
+                        const remainingUrls = [...document.querySelectorAll('.edit-chap-thumb')].map(t => t.dataset.url);
+                        
+                        // 2. Uploader les nouvelles pages si besoin
+                        const newUrls = [];
+                        if (addFilesInput && addFilesInput.files.length > 0) {
+                            for(let i=0; i<addFilesInput.files.length; i++) {
+                                const file = addFilesInput.files[i];
+                                const ext = file.name.split('.').pop();
+                                const filename = `${projetId}_update_${Date.now()}_${i}.${ext}`;
+                                await client.storage.from('pages').upload(filename, file);
+                                const { data: { publicUrl } } = client.storage.from('pages').getPublicUrl(filename);
+                                newUrls.push(publicUrl);
+                            }
+                        }
+
+                        // 3. Fusionner et Update BDD
+                        const finalPages = [...remainingUrls, ...newUrls];
+                        await client.from('chapitres').update({
+                            titre: titre,
+                            pages_urls: finalPages
+                        }).eq('id', chapId);
+
+                        document.getElementById('admin-modal-root').innerHTML = '';
+                        AdminController.afficher();
+                    } catch(errUp) {
+                        alert("Erreur MAJ Chapitre : " + errUp.message);
+                        btn.disabled = false;
+                        btn.innerHTML = 'Enregistrer les modifications';
                     }
                 }
             };

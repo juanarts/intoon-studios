@@ -37,10 +37,12 @@ export default class VueAdmin {
                     </button>
 
                     <button class="btn-secondary btn-edit-serie" data-id="${p.id}" style="background:transparent; border:1px solid rgba(255,255,255,0.1);"><span class="material-symbols-outlined">edit</span> Éditer</button>
-                    ${(!isBanni && !isBrouillon) ? `<button class="btn-primary btn-add-chap" data-id="${p.id}"><span class="material-symbols-outlined">add</span> Chapitre</button>` : ''}
+                    ${(!isBanni && !isBrouillon) ? `<button class="btn-primary btn-add-chap" data-id="${p.id}" title="Ajouter un chapitre"><span class="material-symbols-outlined">post_add</span></button>` : ''}
+                    <button class="btn-secondary btn-manage-chaps" data-id="${p.id}" style="background:rgba(255,255,255,0.05); color:#aaa; border:1px solid #333;" title="Gérer les chapitres existants"><span class="material-symbols-outlined">library_books</span> Chapitres</button>
+                    
                     ${(isBanni || isBrouillon) 
-                        ? `<button class="btn-secondary btn-restore-serie" data-id="${p.id}" style="background:rgba(0,255,0,0.1); color:#4ade80; border:1px solid #4ade80;"><span class="material-symbols-outlined">restore</span> Restaurer / Publier</button>`
-                        : `<button class="btn-secondary btn-ban-serie" data-id="${p.id}" style="background:rgba(255,0,0,0.1); color:red; border:1px solid red;"><span class="material-symbols-outlined">block</span> Bannir</button>`
+                        ? `<button class="btn-secondary btn-restore-serie" data-id="${p.id}" style="background:rgba(0,255,0,0.1); color:#4ade80; border:1px solid #4ade80;"><span class="material-symbols-outlined">restore</span></button>`
+                        : `<button class="btn-secondary btn-ban-serie" data-id="${p.id}" style="background:rgba(255,0,0,0.1); color:red; border:1px solid red;"><span class="material-symbols-outlined">block</span></button>`
                     }
                 </div>
             </div>
@@ -144,6 +146,27 @@ export default class VueAdmin {
                             <textarea id="edit-desc" rows="4" style="padding:15px; border-radius:4px; border:1px solid #444; background:#1a1a20; color:white; font-size:1rem; font-family:'Inter', sans-serif;" required>${Security.escapeHTML(projet.description || '')}</textarea>
                         </div>
 
+                        <!-- SECTION CREW / FICHE DE PROD -->
+                        <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:8px; border:1px solid #333; display:flex; flex-direction:column; gap:15px;">
+                            <h3 style="color:var(--primary); font-size:1rem; margin-bottom:5px; display:flex; align-items:center; gap:8px;">
+                                <span class="material-symbols-outlined">movie_filter</span> Fiche de Production (Cast & Crew)
+                            </h3>
+                            <div style="display:flex; gap:15px;">
+                                <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                                    <label style="color:#888; font-size:0.8rem;">Scénariste(s)</label>
+                                    <input type="text" id="edit-scenariste" value="${Security.escapeHTML(projet.scenariste || '')}" placeholder="Ex: Jean Du-Script" style="padding:10px; border-radius:4px; border:1px solid #444; background:#000; color:white;">
+                                </div>
+                                <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                                    <label style="color:#888; font-size:0.8rem;">Dessinateur(s)</label>
+                                    <input type="text" id="edit-dessinateur" value="${Security.escapeHTML(projet.dessinateur || '')}" placeholder="Ex: Kim Art" style="padding:10px; border-radius:4px; border:1px solid #444; background:#000; color:white;">
+                                </div>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:5px;">
+                                <label style="color:#888; font-size:0.8rem;">Lien Trailer (YouTube/Vimeo)</label>
+                                <input type="url" id="edit-trailer" value="${Security.escapeHTML(projet.video_promo_url || '')}" placeholder="https://..." style="padding:10px; border-radius:4px; border:1px solid #444; background:#000; color:#60a5fa;">
+                            </div>
+                        </div>
+
                         <div style="display:flex; gap:15px;">
                             <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
                                 <label style="color:#aaa; font-size:0.9rem;">Statut de Publication</label>
@@ -218,6 +241,92 @@ export default class VueAdmin {
                         <div style="display:flex; gap:15px; margin-top:20px;">
                             <button type="button" class="btn-secondary btn-close-modal" style="flex:1;">Annuler</button>
                             <button type="submit" class="btn-primary" style="flex:2;"><span class="material-symbols-outlined">publish</span> Mettre en ligne</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Gestionnaire de chapitres pour une série
+     */
+    static rendreModaleGestionChapitres(projet) {
+        return `
+            <div id="modal-overlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:110; display:flex; justify-content:center; align-items:center; backdrop-filter:blur(10px);">
+                <div style="background:#111; padding:40px; border-radius:var(--radius-card); border:1px solid #333; max-width:800px; width:95%; max-height:85vh; overflow-y:auto; display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                        <h2 style="color:white; font-size:1.8rem;">📖 Gestion des Chapitres : <span style="color:var(--primary);">${Security.escapeHTML(projet.titre)}</span></h2>
+                        <button class="btn-secondary btn-close-modal" style="background:none; border:none; color:#666;"><span class="material-symbols-outlined" style="font-size:2rem;">cancel</span></button>
+                    </div>
+
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        ${projet.chapitres && projet.chapitres.length > 0 ? projet.chapitres.sort((a,b) => a.ordre - b.ordre).map(ch => `
+                            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:15px 20px; border-radius:8px; border:1px solid #222;">
+                                <div style="display:flex; align-items:center; gap:15px;">
+                                    <span style="color:var(--primary); font-weight:800; font-size:1.2rem;">#${ch.ordre}</span>
+                                    <div>
+                                        <h4 style="color:white; margin:0;">${Security.escapeHTML(ch.titre)}</h4>
+                                        <p style="color:#555; font-size:0.8rem; margin:0;">${ch.pages_urls ? ch.pages_urls.length : 0} planches</p>
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:10px;">
+                                    <button class="btn-secondary btn-edit-chap-content" data-projet-id="${projet.id}" data-chap-id="${ch.id}" style="padding:8px 15px; font-size:0.85rem;"><span class="material-symbols-outlined" style="font-size:1.1rem; vertical-align:middle;">edit</span> Éditer</button>
+                                    <button class="btn-secondary btn-del-chap" data-projet-id="${projet.id}" data-chap-id="${ch.id}" style="color:#ef4444; border-color:rgba(239,68,68,0.2); padding:8px 10px; border-radius:4px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">delete</span></button>
+                                </div>
+                            </div>
+                        `).join('') : '<p style="color:#666; text-align:center; padding:40px;">Aucun chapitre publié pour le moment.</p>'}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Éditeur de contenu de chapitre (Thumpnails, suppression, ajout)
+     */
+    static rendreModaleEditionChapitre(projet, chapitre) {
+        return `
+            <div id="modal-overlay" style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); z-index:120; display:flex; justify-content:center; align-items:center; backdrop-filter:blur(15px);">
+                <div style="background:#0a0a0d; padding:40px; border-radius:12px; border:1px solid var(--primary); max-width:900px; width:95%; max-height:90vh; overflow-y:auto;">
+                    <h2 style="color:white; margin-bottom:10px;">🛠️ Édition Chapitre ${chapitre.ordre}</h2>
+                    <p style="color:#888; margin-bottom:30px;">Modifiez le titre ou gérez l'ordre des planches.</p>
+
+                    <form id="form-update-chap" style="display:flex; flex-direction:column; gap:25px;">
+                        <input type="hidden" id="up-chap-id" value="${chapitre.id}">
+                        <input type="hidden" id="up-chap-projet-id" value="${projet.id}">
+                        
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label style="color:#aaa; font-size:0.9rem;">Titre du Chapitre</label>
+                            <input type="text" id="up-chap-titre" value="${Security.escapeHTML(chapitre.titre)}" style="padding:15px; border-radius:6px; border:1px solid #444; background:#111; color:white; font-size:1.2rem; font-weight:bold;">
+                        </div>
+
+                        <div style="background:#111; padding:25px; border-radius:10px; border:1px solid #222;">
+                            <h3 style="color:white; font-size:1rem; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
+                                <span>📚 Planches du Chapitre (${chapitre.pages_urls ? chapitre.pages_urls.length : 0})</span>
+                                <span style="font-size:0.8rem; color:#555;">Glissez pour réorganiser (À Venir) • Cliquez [X] pour supprimer</span>
+                            </h3>
+                            
+                            <div id="edit-thumb-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:15px;">
+                                ${(chapitre.pages_urls || []).map((url, idx) => `
+                                    <div class="edit-chap-thumb" data-url="${url}" style="position:relative; border-radius:6px; overflow:hidden; border:2px solid #222; aspect-ratio:16/9; background:#000;">
+                                        <img src="${url}" style="width:100%; height:100%; object-fit:cover; opacity:0.8;">
+                                        <div style="position:absolute; bottom:0; left:0; background:rgba(0,0,0,0.8); color:white; padding:2px 6px; font-size:0.7rem; font-weight:bold;">#${idx+1}</div>
+                                        <button type="button" class="btn-remove-thumb" style="position:absolute; top:5px; right:5px; background:rgba(239,68,68,0.9); color:white; border:none; width:22px; height:22px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;">✕</button>
+                                    </div>
+                                `).join('')}
+                                
+                                <label style="display:flex; flex-direction:column; justify-content:center; align-items:center; border:2px dashed #333; border-radius:6px; cursor:pointer; color:#666; aspect-ratio:16/9; transition:all 0.2s;" onmouseover="this.style.borderColor='var(--primary)'; this.style.color='white'" onmouseout="this.style.borderColor='#333'; this.style.color='#666'">
+                                    <span class="material-symbols-outlined" style="font-size:2rem;">add_photo_alternate</span>
+                                    <span style="font-size:0.75rem; margin-top:5px;">Ajouter</span>
+                                    <input type="file" id="up-chap-add-pages" multiple accept="image/*" style="display:none;">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; gap:15px; margin-top:10px;">
+                            <button type="button" class="btn-secondary btn-close-modal" style="flex:1;">Annuler</button>
+                            <button type="submit" class="btn-primary" style="flex:2;"><span class="material-symbols-outlined">save</span> Enregistrer les modifications</button>
                         </div>
                     </form>
                 </div>

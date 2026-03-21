@@ -178,8 +178,30 @@ export default class AccueilController {
 
             app.innerHTML = VueCatalogue.rendreDetailProjet(projet, estFavori, aLikeLocal, statsReviews, listeReviews, estConnecte);
 
-            // 1. EFFET NICONICO : Commentaires flottants sur la page projet
+            // 1. EFFET NICONICO : Nettoyage et Relance
+            const overlay = document.getElementById('project-comments-overlay');
+            if (overlay) overlay.innerHTML = ''; 
             AccueilController.lancerCommentairesFlottants(listeReviews);
+
+            // 2. PARTAGE SOCIAL
+            const btnShare = document.querySelector('.btn-share-project');
+            if (btnShare) {
+                btnShare.onclick = async () => {
+                    const shareData = {
+                        title: `INTOON : ${projet.titre}`,
+                        text: `Découvrez "${projet.titre}" sur INTOON STUDIOS !`,
+                        url: window.location.href
+                    };
+                    try {
+                        if (navigator.share) {
+                            await navigator.share(shareData);
+                        } else {
+                            await navigator.clipboard.writeText(shareData.url);
+                            alert("Lien copié dans le presse-papier ! 🔗");
+                        }
+                    } catch(e) { console.warn("Share failed", e); }
+                };
+            }
 
             // 2. Gestion du Formulaire Principal
             const formReview = document.getElementById('form-add-review');

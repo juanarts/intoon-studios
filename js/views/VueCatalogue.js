@@ -316,6 +316,10 @@ export default class VueCatalogue {
                             <a href="/vip" data-link class="btn-secondary btn-soutenir" style="border-color:#eab308; color:#eab308!important; margin-left:15px; background:rgba(234,179,8,0.05); display:inline-flex; align-items:center; gap:8px;">
                                 <span class="material-symbols-outlined">stars</span> Devenir Mécène
                             </a>
+
+                            <button class="btn-secondary btn-share-project" style="margin-left:10px; background:rgba(255,255,255,0.05); color:white; border:1px solid #333; padding:10px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;" title="Partager cette œuvre">
+                                <span class="material-symbols-outlined">share</span>
+                            </button>
                         </div>
 
                         <!-- [NEW] SECTION BOUTIQUE MARKETPLACE -->
