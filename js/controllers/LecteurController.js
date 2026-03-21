@@ -30,7 +30,22 @@ export default class LecteurController {
                 const chapitre = projet.chapitres.find(c => c.id === idChapitre || c.slug === idChapitre);
                 
                 if (!chapitre) {
-                    app.innerHTML = '<div class="error">Chapitre introuvable. <a href="/" data-link class="btn-primary">Retour à l\'accueil</a></div>';
+                    console.error("[Lecteur] Chapitre introuvable pour ID/Slug:", idChapitre);
+                    console.log("[Lecteur] Slugs disponibles:", projet.chapitres.map(c => c.slug));
+                    app.innerHTML = `
+                        <div class="error" style="text-align:center; padding:50px; color:white;">
+                            <h2>Oups ! Ce chapitre est introuvable.</h2>
+                            <p style="color:#aaa; margin-top:10px;">Le lien semble incorrect ou le chapitre a été renommé.</p>
+                            <div style="margin-top:30px;">
+                                <h3 style="font-size:1rem; margin-bottom:15px;">Chapitres disponibles :</h3>
+                                <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+                                    ${projet.chapitres.map(c => `
+                                        <a href="/lire/${projet.slug}/${c.slug}" data-link style="background:#222; padding:8px 15px; border-radius:30px; border:1px solid #444; color:white; font-size:0.85rem; text-decoration:none;">${c.titre || 'Chapitre ' + c.ordre}</a>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <a href="/" data-link class="btn-primary" style="margin-top:40px; display:inline-block;">Retour à l'accueil</a>
+                        </div>`;
                     return;
                 }
 
