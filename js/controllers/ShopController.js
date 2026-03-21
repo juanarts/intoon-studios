@@ -65,7 +65,20 @@ export default class ShopController {
 
         } catch (err) {
             console.error("[Shop Index Error]", err);
-            app.innerHTML = '<div class="error" style="color:white; padding:50px; text-align:center;">Erreur lors du chargement de la marketplace.</div>';
+            const errorMsg = err.message || "Erreur de connexion Supabase";
+            const errorDetails = err.details || "";
+            app.innerHTML = `
+                <div class="error" style="color:white; padding:50px; text-align:center;">
+                    <h2>Oups ! Connexion impossible à la Marketplace.</h2>
+                    <p style="color:#aaa; margin-top:10px;">Message : ${errorMsg}</p>
+                    ${errorDetails ? `<p style="font-size:0.8rem; color:#666; margin-top:5px;">${errorDetails}</p>` : ''}
+                    <button onclick="location.reload()" class="btn-primary" style="margin-top:20px;">Réessayer</button>
+                    ${errorMsg.includes('column') ? `
+                        <div style="margin-top:30px; background:rgba(229,9,20,0.1); padding:20px; border-radius:8px; border:1px solid var(--primary); font-size:0.9rem;">
+                            <p>💡 <b>Note Admin :</b> Il semble que les colonnes Marketplace soient manquantes dans votre table <code>projets</code>. <br>Exécutez le script <b>ALTER TABLE</b> fourni par l'assistant dans votre SQL Editor.</p>
+                        </div>
+                    ` : ''}
+                </div>`;
         }
     }
 }
