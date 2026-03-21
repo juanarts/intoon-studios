@@ -97,6 +97,31 @@ export default class DashboardController {
                             <input type="url" id="crew-trailer" placeholder="https://youtube.com/..." value="${projetActuel.videoPromoUrl || ''}" style="width:100%; padding:12px; background:#1a1a24; border:1px solid #258cf4; color:white; border-radius:6px; outline:none;">
                         </div>
 
+                        <!-- [NEW] SECTION BOUTIQUE MARKETPLACE -->
+                        ${projetActuel.shopEnabled ? `
+                        <div style="margin-top:20px; padding:20px; background:rgba(96,165,250,0.05); border:1px solid rgba(96,165,250,0.2); border-radius:8px;">
+                            <h3 style="color:#60a5fa; font-size:1rem; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                                <span class="material-symbols-outlined">shopping_cart</span> Configuration Boutique
+                            </h3>
+                            
+                            <div style="display:flex; flex-direction:column; gap:12px;">
+                                <label style="display:flex; align-items:center; gap:10px; color:white; cursor :pointer;">
+                                    <input type="checkbox" id="shop-has-physical" ${projetActuel.hasPhysical ? 'checked' : ''} style="accent-color:#4ade80; width:18px; height:18px;">
+                                    <span>Vendre une Version Physique (Comic)</span>
+                                </label>
+                                <input type="number" id="shop-price-physical" value="${projetActuel.pricePhysical || 0}" step="0.01" placeholder="Prix du comic (€)" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#4ade80; border-radius:6px; margin-bottom:5px;">
+
+                                <label style="display:flex; align-items:center; gap:10px; color:white; cursor:pointer; margin-top:5px;">
+                                    <input type="checkbox" id="shop-has-originals" ${projetActuel.hasOriginals ? 'checked' : ''} style="accent-color:#f472b6; width:18px; height:18px;">
+                                    <span>Vendre des Planches Originales</span>
+                                </label>
+                                <input type="number" id="shop-price-original" value="${projetActuel.priceOriginal || 0}" step="0.01" placeholder="Prix de la planche (€)" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#f472b6; border-radius:6px;">
+
+                                <textarea id="shop-desc" placeholder="Infos de livraison, dédicaces, etc..." style="width:100%; padding:12px; background:#222; border:1px solid #444; color:#aaa; border-radius:6px; margin-top:10px; resize:none;">${projetActuel.shopDescription || ''}</textarea>
+                            </div>
+                        </div>
+                        ` : ''}
+
                         <div style="display:flex; gap:10px; margin-top:15px;">
                             <button type="button" class="btn-close-crew" style="flex:1; padding:12px; background:#333; color:white; border:none; border-radius:6px; cursor:pointer;">Annuler</button>
                             <button type="submit" style="flex:2; padding:12px; background:var(--primary); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Mettre à jour la Fiche</button>
@@ -132,10 +157,21 @@ export default class DashboardController {
                     if (dessin) newDesc += `• Illustration : ${dessin}\n`;
                 }
 
-                const { error: updateErr } = await client.from('projets').update({
+                // [NEW] DATA MARKETPLACE
+                const payload = {
                     description: newDesc,
                     video_promo_url: trailer || null
-                }).eq('id', projetId);
+                };
+
+                if (projetActuel.shopEnabled) {
+                    payload.has_physical = document.getElementById('shop-has-physical').checked;
+                    payload.has_originals = document.getElementById('shop-has-originals').checked;
+                    payload.price_physical = parseFloat(document.getElementById('shop-price-physical').value) || 0;
+                    payload.price_original = parseFloat(document.getElementById('shop-price-original').value) || 0;
+                    payload.shop_description = document.getElementById('shop-desc').value.trim();
+                }
+
+                const { error: updateErr } = await client.from('projets').update(payload).eq('id', projetId);
 
                 if (updateErr) throw updateErr;
 

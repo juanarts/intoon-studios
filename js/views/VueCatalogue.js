@@ -317,6 +317,36 @@ export default class VueCatalogue {
                                 <span class="material-symbols-outlined">stars</span> Devenir Mécène
                             </a>
                         </div>
+
+                        <!-- [NEW] SECTION BOUTIQUE MARKETPLACE -->
+                        ${projet.shopEnabled ? `
+                        <div class="shop-actions" style="margin-top:25px; display:flex; gap:15px; align-items:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); width:fit-content;">
+                           <span class="material-symbols-outlined" style="color:#60a5fa;">shopping_bag</span>
+                           <span style="font-weight:bold; color:#aaa; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px; margin-right:5px;">Collection :</span>
+                           
+                           <!-- Bouton Version Physique -->
+                           ${projet.hasPhysical ? `
+                               <a href="/shop/${projet.slug}?type=physique" data-link class="btn-secondary" style="border-color:#4ade80; color:#4ade80!important; background:rgba(74,222,128,0.1); display:inline-flex; align-items:center; gap:8px;">
+                                   <span class="material-symbols-outlined">menu_book</span> Version Physique
+                               </a>
+                           ` : `
+                               <button class="btn-secondary" disabled style="opacity:0.3; cursor:not-allowed; border-color:#555; pointer-events:none; display:inline-flex; align-items:center; gap:8px;">
+                                   <span class="material-symbols-outlined">menu_book</span> Version Physique (Bientôt)
+                               </button>
+                           `}
+
+                           <!-- Bouton Originaux -->
+                           ${projet.hasOriginals ? `
+                               <a href="/shop/${projet.slug}?type=originaux" data-link class="btn-secondary" style="border-color:#f472b6; color:#f472b6!important; background:rgba(244,114,182,0.1); display:inline-flex; align-items:center; gap:8px;">
+                                   <span class="material-symbols-outlined">palette</span> Planches Originales
+                               </a>
+                           ` : `
+                               <button class="btn-secondary" disabled style="opacity:0.3; cursor:not-allowed; border-color:#555; pointer-events:none; display:inline-flex; align-items:center; gap:8px;">
+                                   <span class="material-symbols-outlined">palette</span> Originaux (Bientôt)
+                               </button>
+                           `}
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
                 

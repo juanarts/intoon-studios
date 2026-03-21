@@ -28,6 +28,15 @@ export default class Projet {
         chaps.sort((a,b) => a.ordre - b.ordre);
         
         this.chapitres = chaps.map(chData => new Chapitre(chData, this.id));
+
+        // [BOUTIQUE] Marketplace & Ventes Physiques
+        this.shopEnabled = data.shop_enabled || false;
+        this.hasPhysical = data.has_physical || false;
+        this.hasOriginals = data.has_originals || false;
+        this.pricePhysical = data.price_physical || 0;
+        this.priceOriginal = data.price_original || 0;
+        this.shopDescription = data.shop_description || '';
+        this.shopItems = data.shop_items || [];
     }
 
     /**

@@ -11,6 +11,7 @@ import VipController from './controllers/VipController.js';
 import CheckoutController from './controllers/CheckoutController.js';
 import MessagerieController from './controllers/MessagerieController.js';
 import ProfilController from './controllers/ProfilController.js';
+import ShopController from './controllers/ShopController.js';
 import Messagerie from './models/Messagerie.js';
 import Favoris from './models/Favoris.js';
 import Auth from './models/Auth.js';
@@ -39,7 +40,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         { path: '/vip', controller: VipController.afficher },
         { path: '/checkout', controller: CheckoutController.afficher },
         { path: '/inbox', controller: () => MessagerieController.afficher() },
-        { path: '/profil/:id', controller: (id) => ProfilController.afficher(id) }
+        { path: '/profil/:id', controller: (id) => ProfilController.afficher(id) },
+        { path: '/shop/:slug', controller: (slug) => ShopController.afficher(slug) }
     ];
 
     // Gestion Dynamique de la Navbar (Simulation Authentification)

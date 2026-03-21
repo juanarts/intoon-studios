@@ -29,6 +29,13 @@ export default class VueAdmin {
                 </div>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
                     <a href="/projet/${p.slug}" data-link class="btn-secondary" style="background:rgba(255,255,255,0.05); color:white; border:none;" title="Voir le rendu final public"><span class="material-symbols-outlined">visibility</span></a>
+                    
+                    <!-- [NEW] Toggle Boutique Admin -->
+                    <button class="btn-secondary btn-toggle-shop" data-id="${p.id}" data-enabled="${p.shopEnabled}" style="background:${p.shopEnabled ? 'rgba(234,179,8,0.15)' : 'transparent'}; color:${p.shopEnabled ? '#eab308' : '#777'}; border:1px solid ${p.shopEnabled ? '#eab308' : '#333'};" title="${p.shopEnabled ? 'Désactiver la boutique' : 'Autoriser la boutique'}">
+                        <span class="material-symbols-outlined">${p.shopEnabled ? 'storefront' : 'store'}</span>
+                        ${p.shopEnabled ? 'Shop ON' : 'Shop OFF'}
+                    </button>
+
                     <button class="btn-secondary btn-edit-serie" data-id="${p.id}" style="background:transparent; border:1px solid rgba(255,255,255,0.1);"><span class="material-symbols-outlined">edit</span> Éditer</button>
                     ${(!isBanni && !isBrouillon) ? `<button class="btn-primary btn-add-chap" data-id="${p.id}"><span class="material-symbols-outlined">add</span> Chapitre</button>` : ''}
                     ${(isBanni || isBrouillon) 

@@ -63,12 +63,23 @@ export default class AdminController {
                         alert("Badge Bêta attribué avec succès ! ✨");
                         AdminController.afficher();
                     }
-                }
-
-                if (target.closest('.btn-close-modal')) {
+                } else if (target.closest('.btn-close-modal')) {
                     modalRoot.innerHTML = '';
                 } else if (target.id === 'btn-create-serie') {
                     modalRoot.innerHTML = VueAdmin.rendreModaleEdition();
+                } else if (target.closest('.btn-toggle-shop')) {
+                    // [NEW] Toggle Boutique Marketplace
+                    const btn = target.closest('.btn-toggle-shop');
+                    const id = btn.getAttribute('data-id');
+                    const isEnabled = btn.getAttribute('data-enabled') === 'true';
+                    
+                    if (confirm(`ADMIN : ${isEnabled ? 'Désactiver' : 'AUTORISER'} la boutique pour ce projet ?`)) {
+                        await SupabaseService.getClient()
+                            .from('projets')
+                            .update({ shop_enabled: !isEnabled })
+                            .eq('id', id);
+                        AdminController.afficher();
+                    }
                 } else if (target.closest('.btn-edit-serie')) {
                     const id = target.closest('.btn-edit-serie').getAttribute('data-id');
                     const projetActuel = projets.find(p => p.id === id);
