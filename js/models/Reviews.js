@@ -21,8 +21,8 @@ export default class Reviews {
             .eq('projet_id', idProjet)
             .order('created_at', { ascending: false });
 
-        if (error) {
-            console.error("Erreur chargement avis:", error);
+        if (error || !data) {
+            console.error("Erreur chargement avis (la table 'reviews' manque sans doute):", error);
             return [];
         }
 

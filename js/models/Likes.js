@@ -51,6 +51,10 @@ export default class Likes {
             .from('likes')
             .select('*', { count: 'exact', head: true })
             .eq('projet_id', idProjet);
+        if (error) {
+            console.error("Erreur likes:", error);
+            return 0;
+        }
         
         return count || 0;
     }
