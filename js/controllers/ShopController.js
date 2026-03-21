@@ -1,5 +1,6 @@
 import Projet from '../models/Projet.js';
 import VueShop from '../views/VueShop.js';
+import SupabaseService from '../services/SupabaseService.js';
 
 export default class ShopController {
     /**
