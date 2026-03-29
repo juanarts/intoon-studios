@@ -1,8 +1,10 @@
+import I18n from '../utils/I18n.js';
+
 export default class VueLecteur {
     
     static rendreLecteur(projet, chapitre, estConnecte = false) {
         if (!chapitre) {
-            return `<div class="lecteur-error"><h2>Chapitre introuvable.</h2><a href="/" data-link class="btn-primary">Retour</a></div>`;
+            return `<div class="lecteur-error"><h2>${I18n.t('reader_not_found')}</h2><a href="/" data-link class="btn-primary">${I18n.t('reader_btn_back')}</a></div>`;
         }
 
         const maximumVuesLibres = estConnecte ? 9999 : 2;
@@ -22,7 +24,7 @@ export default class VueLecteur {
                 <img 
                     class="webtoon-page-horizontal" 
                     src="${url}" 
-                    alt="Planche ${index + 1}"
+                    alt="${I18n.t('reader_page')} ${index + 1}"
                     style="
                         width: 100%;
                         height: auto;
@@ -55,10 +57,10 @@ export default class VueLecteur {
                     <img src="${imgBloquee}" style="max-width:1400px; width:100%; height:auto; filter:blur(16px) brightness(0.35); pointer-events:none;">
                     <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px;">
                         <span class="material-symbols-outlined" style="font-size:4rem; color:var(--primary); margin-bottom:20px;">lock</span>
-                        <h2 style="font-size:2.5rem; color:white; margin-bottom:15px; font-family:'Outfit',sans-serif;">Fin de l'aperçu gratuit</h2>
-                        <p style="color:#aaa; font-size:1.1rem; margin-bottom:30px; max-width:450px; line-height:1.6;">Inscrivez-vous gratuitement pour lire la suite de <strong>${projet.titre}</strong>.</p>
-                        <a href="/inscription" data-link class="btn-primary" style="font-size:1.2rem; padding:15px 40px;">M'inscrire gratuitement</a>
-                        <a href="/connexion" data-link style="color:#aaa; margin-top:15px; font-size:0.9rem;">Déjà un compte ? Se connecter</a>
+                        <h2 style="font-size:2.5rem; color:white; margin-bottom:15px; font-family:'Outfit',sans-serif;">${I18n.t('reader_paywall_title')}</h2>
+                        <p style="color:#aaa; font-size:1.1rem; margin-bottom:30px; max-width:450px; line-height:1.6;">${I18n.t('reader_paywall_text').replace('{title}', `<strong>${projet.titre}</strong>`)}</p>
+                        <a href="/inscription" data-link class="btn-primary" style="font-size:1.2rem; padding:15px 40px;">${I18n.t('reader_paywall_btn_signup')}</a>
+                        <a href="/connexion" data-link style="color:#aaa; margin-top:15px; font-size:0.9rem;">${I18n.t('reader_paywall_btn_login')}</a>
                     </div>
                 </div>
             `;
@@ -69,23 +71,23 @@ export default class VueLecteur {
         const footerHtml = `
             <div class="reader-slide" style="width:100%; min-height:60vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#08080a; flex-shrink:0; gap:25px;">
                 <span class="material-symbols-outlined" style="font-size:3rem; color:var(--primary);">check_circle</span>
-                <h2 style="font-size:2rem; color:white; font-family:'Outfit',sans-serif;">Fin du Chapitre ${chapitre.ordre}</h2>
+                <h2 style="font-size:2rem; color:white; font-family:'Outfit',sans-serif;">${I18n.t('reader_end_ch')} ${chapitre.ordre}</h2>
                 <div style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center;">
                     ${chapSuivant 
-                        ? `<a href="/lire/${projet.id}/${chapSuivant.id}" data-link class="btn-primary" style="font-size:1.1rem; display:flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">skip_next</span> Chapitre ${chapSuivant.ordre}</a>`
-                        : `<span style="color:#666; font-style:italic;">Dernier chapitre disponible — revenez bientôt !</span>`
+                        ? `<a href="/lire/${projet.id}/${chapSuivant.id}" data-link class="btn-primary" style="font-size:1.1rem; display:flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">skip_next</span> ${I18n.t('chapter')} ${chapSuivant.ordre}</a>`
+                        : `<span style="color:#666; font-style:italic;">${I18n.t('reader_no_more_ch')}</span>`
                     }
-                    <a href="/projet/${projet.slug}" data-link class="btn-secondary" style="font-size:1.1rem;">Retour à la série</a>
+                    <a href="/projet/${projet.slug}" data-link class="btn-secondary" style="font-size:1.1rem;">${I18n.t('reader_btn_back_serie')}</a>
                 </div>
             </div>
         `;
 
         const formComment = estConnecte ? `
             <form id="form-live-comment" style="display:flex; align-items:center; gap:8px;">
-                <input type="text" id="live-comment-input" placeholder="Réagir..." maxlength="60" style="background:rgba(255,255,255,0.08); border:1px solid #333; border-radius:20px; padding:6px 14px; color:white; font-size:0.8rem; outline:none; text-transform:lowercase; width:150px;" required>
+                <input type="text" id="live-comment-input" placeholder="${I18n.t('reader_comment_placeholder')}" maxlength="60" style="background:rgba(255,255,255,0.08); border:1px solid #333; border-radius:20px; padding:6px 14px; color:white; font-size:0.8rem; outline:none; text-transform:lowercase; width:150px;" required>
                 <button type="submit" style="background:none; border:none; color:var(--primary); font-weight:bold; cursor:pointer; font-size:0.8rem;">OK</button>
             </form>
-        ` : `<a href="/connexion" data-link style="color:#666; font-size:0.8rem;">Connexion pour réagir</a>`;
+        ` : `<a href="/connexion" data-link style="color:#666; font-size:0.8rem;">${I18n.t('reader_login_react')}</a>`;
 
         return `
             <div class="webtoon-reader" style="background:#000; position:relative; overflow:hidden;">
@@ -100,7 +102,7 @@ export default class VueLecteur {
                     </a>
                     <span style="font-size:0.9rem; color:rgba(255,255,255,0.7); font-family:'Outfit',sans-serif; letter-spacing:1px; text-align:center;">
                         Ch.<strong>${chapitre.ordre}</strong> — ${projet.titre}
-                        <div style="font-size:0.75rem; margin-top:2px;"><a href="/profil/${projet.authorPseudo}" data-link style="color:var(--primary); text-decoration:none; opacity:0.8; hover:opacity:1;">par ${projet.authorPseudo}</a></div>
+                        <div style="font-size:0.75rem; margin-top:2px;"><a href="/profil/${projet.authorPseudo}" data-link style="color:var(--primary); text-decoration:none; opacity:0.8; hover:opacity:1;">${I18n.t('by')} ${projet.authorPseudo}</a></div>
                     </span>
                     <div style="display:flex; align-items:center; gap:10px;">
                         ${formComment}
@@ -140,23 +142,23 @@ export default class VueLecteur {
                         accent-color: var(--primary);
                         cursor: pointer;
                         background: transparent;
-                    " title="Vitesse de défilement">
+                    " title="${I18n.t('reader_scroll_speed')}">
                     
                     <div style="width:1px; height:20px; background:rgba(255,255,255,0.1); margin:0 4px;"></div>
 
                     <!-- Stop (retour début) -->
-                    <button id="btn-stop" title="Redémarrer" style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; padding:6px; border-radius:50%; transition:all 0.2s; display:flex;">
+                    <button id="btn-stop" title="${I18n.t('reader_btn_restart')}" style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; padding:6px; border-radius:50%; transition:all 0.2s; display:flex;">
                         <span class="material-symbols-outlined" style="font-size:1.3rem;">stop</span>
                     </button>
 
                     <!-- Play / Pause -->
-                    <button id="btn-play-pause" title="Lecture automatique" style="background:white; border:none; color:#000; cursor:pointer; padding:10px; border-radius:50%; transition:all 0.2s; display:flex; box-shadow:0 2px 12px rgba(255,255,255,0.2);">
+                    <button id="btn-play-pause" title="${I18n.t('reader_btn_autoplay')}" style="background:white; border:none; color:#000; cursor:pointer; padding:10px; border-radius:50%; transition:all 0.2s; display:flex; box-shadow:0 2px 12px rgba(255,255,255,0.2);">
                         <span class="material-symbols-outlined" id="play-icon" style="font-size:1.5rem;">play_arrow</span>
                     </button>
 
                     <!-- Chapitre suivant -->
                     ${chapSuivant 
-                        ? `<a href="/lire/${projet.id}/${chapSuivant.id}" data-link title="Chapitre suivant" style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; padding:6px; border-radius:50%; display:flex; text-decoration:none;">
+                        ? `<a href="/lire/${projet.id}/${chapSuivant.id}" data-link title="${I18n.t('reader_btn_next_ch')}" style="background:none; border:none; color:rgba(255,255,255,0.6); cursor:pointer; padding:6px; border-radius:50%; display:flex; text-decoration:none;">
                             <span class="material-symbols-outlined" style="font-size:1.3rem;">skip_next</span>
                         </a>`
                         : `<button disabled style="background:none; border:none; color:rgba(255,255,255,0.2); padding:6px; cursor:not-allowed; display:flex;">
@@ -167,7 +169,7 @@ export default class VueLecteur {
                     <div style="width:1px; height:20px; background:rgba(255,255,255,0.1); margin:0 4px;"></div>
 
                     <!-- Plein écran -->
-                    <button id="btn-fullscreen" title="Plein écran TV" style="background:none; border:none; color:rgba(255,255,255,0.5); cursor:pointer; padding:6px; display:flex;">
+                    <button id="btn-fullscreen" title="${I18n.t('reader_btn_fullscreen')}" style="background:none; border:none; color:rgba(255,255,255,0.5); cursor:pointer; padding:6px; display:flex;">
                         <span class="material-symbols-outlined" style="font-size:1.1rem;">fullscreen</span>
                     </button>
                 </div>

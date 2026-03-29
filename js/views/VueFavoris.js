@@ -1,3 +1,5 @@
+import I18n from '../utils/I18n.js';
+
 export default class VueFavoris {
     
     /**
@@ -6,9 +8,9 @@ export default class VueFavoris {
     static rendreVide() {
         return `
             <div class="favoris-vide" style="text-align:center; padding: 15vh 4%; animation: fadeIn 1s ease-out;">
-                <h1 style="font-size:3rem; margin-bottom: 20px;">Votre liste est vide</h1>
-                <p style="font-size:1.2rem; color:var(--text-muted); margin-bottom: 40px;">Parcourez notre catalogue et ajoutez des BDs et Webtoons à votre liste pour les retrouver ici plus tard !</p>
-                <a href="/" data-link class="btn-primary" style="font-size:1.1rem; padding: 15px 30px;">Découvrir les originaux</a>
+                <h1 style="font-size:3rem; margin-bottom: 20px;">${I18n.t('fav_empty_title')}</h1>
+                <p style="font-size:1.2rem; color:var(--text-muted); margin-bottom: 40px;">${I18n.t('fav_empty_text')}</p>
+                <a href="/" data-link class="btn-primary" style="font-size:1.1rem; padding: 15px 30px;">${I18n.t('fav_btn_discover')}</a>
             </div>
         `;
     }
@@ -17,7 +19,7 @@ export default class VueFavoris {
      * Grille de "Ma Liste" identique au design Netflix
      */
     static rendreListe(projets) {
-        const titre = `<h1 class="page-title">Ma Liste</h1>`;
+        const titre = `<h1 class="page-title">${I18n.t('fav_page_title')}</h1>`;
         
         const grille = projets.map(projet => `
             <div class="projet-card">

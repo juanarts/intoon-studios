@@ -16,11 +16,15 @@ import Messagerie from './models/Messagerie.js';
 import Favoris from './models/Favoris.js';
 import Auth from './models/Auth.js';
 import Likes from './models/Likes.js';
+import I18n from './utils/I18n.js';
 
 /**
  * Point d'entrée de l'application (Bootstrapper)
  */
 document.addEventListener("DOMContentLoaded", async () => {
+    
+    // Initialiser le système de traduction
+    I18n.init();
     
     // Attendre le chargement de la session Supabase avant de dessiner la page
     await Auth.initialiser();
@@ -49,6 +53,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const rafraichirNavbar = () => {
         const navLinks = document.querySelector('.nav-links');
         if (navLinks) {
+            const currentLocale = I18n.getLocale();
+            const switcherHtml = `
+                <div class="lang-switcher" style="display:flex; gap:8px; margin-right:15px; border-right:1px solid rgba(255,255,255,0.1); padding-right:15px; align-items:center;">
+                    <button class="btn-lang ${currentLocale === 'fr' ? 'active' : ''}" data-locale="fr" style="background:${currentLocale === 'fr' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}; border:1px solid ${currentLocale === 'fr' ? 'var(--primary)' : '#444'}; color:${currentLocale === 'fr' ? 'white' : '#888'}; cursor:pointer; padding:3px 7px; border-radius:4px; font-size:0.7rem; font-weight:900; transition:all 0.2s; font-family:'Outfit', sans-serif;" title="Français">FR</button>
+                    <button class="btn-lang ${currentLocale === 'en' ? 'active' : ''}" data-locale="en" style="background:${currentLocale === 'en' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}; border:1px solid ${currentLocale === 'en' ? 'var(--primary)' : '#444'}; color:${currentLocale === 'en' ? 'white' : '#888'}; cursor:pointer; padding:3px 7px; border-radius:4px; font-size:0.7rem; font-weight:900; transition:all 0.2s; font-family:'Outfit', sans-serif;" title="English">EN</button>
+                </div>
+            `;
+
             if (Auth.estConnecte()) {
                 const unreadCount = Messagerie.getTotalNonLus ? Messagerie.getTotalNonLus() : 0;
                 const badgeHtml = unreadCount > 0 
@@ -61,10 +73,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const couronne = user?.role === 'admin' ? '👑 ' : '';
 
                 navLinks.innerHTML = `
-                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">Accueil</span></a>
-                    <a href="/shop" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">shopping_bag</span> <span class="nav-text">Boutique</span></a>
-                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">Le Studio</span></a>
-                    <a href="/favoris" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">bookmark</span> <span class="nav-text">Ma Liste</span></a>
+                    ${switcherHtml}
+                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">${I18n.t('nav_home')}</span></a>
+                    <a href="/shop" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">shopping_bag</span> <span class="nav-text">${I18n.t('nav_shop')}</span></a>
+                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">${I18n.t('nav_studio')}</span></a>
+                    <a href="/favoris" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">bookmark</span> <span class="nav-text">${I18n.t('nav_favorites')}</span></a>
                     <a href="/inbox" data-link style="position:relative; display:flex; align-items:center; margin:0 10px;" title="Messagerie Privée">
                         <span class="material-symbols-outlined" style="font-size:1.3rem;">mail</span>
                         ${badgeHtml}
@@ -76,11 +89,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 `;
             } else {
                 navLinks.innerHTML = `
-                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">Accueil</span></a>
-                    <a href="/shop" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">shopping_bag</span> <span class="nav-text">Boutique</span></a>
-                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">Le Studio</span></a>
-                    <a href="/connexion" data-link style="display:flex; align-items:center; gap:6px; color:var(--text-muted);"><span class="nav-text">S'identifier</span></a>
-                    <a href="/inscription" data-link class="btn-primary" style="display:flex; align-items:center; gap:6px; padding:8px 20px;"><span class="nav-text">S'inscrire</span></a>
+                    ${switcherHtml}
+                    <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">${I18n.t('nav_home')}</span></a>
+                    <a href="/shop" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">shopping_bag</span> <span class="nav-text">${I18n.t('nav_shop')}</span></a>
+                    <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">${I18n.t('nav_studio')}</span></a>
+                    <a href="/connexion" data-link style="display:flex; align-items:center; gap:6px; color:var(--text-muted);"><span class="nav-text">${I18n.t('auth_login')}</span></a>
+                    <a href="/inscription" data-link class="btn-primary" style="display:flex; align-items:center; gap:6px; padding:8px 20px;"><span class="nav-text">${I18n.t('auth_signup')}</span></a>
                 `;
             }
         }
@@ -89,6 +103,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Écoute l'événement local de changement d'état
     window.addEventListener('authStateChanged', rafraichirNavbar);
     rafraichirNavbar(); // État initial au chargement
+
+    // Écouteur global pour le sélecteur de langue
+    document.body.addEventListener('click', e => {
+        const btnLang = e.target.closest('.btn-lang');
+        if (btnLang) {
+            e.preventDefault();
+            const locale = btnLang.dataset.locale;
+            I18n.setLocale(locale);
+        }
+    });
     
     // Déconnexion globale à l'écoute des boutons .btn-logout de n'importe quelle page
     document.body.addEventListener('click', e => {
@@ -107,8 +131,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             const idProjet = btn.dataset.projetId;
             const isFav = Favoris.basculer(idProjet);
             
-            // Met à jour le texte du bouton et le design dynamiquement
-            btn.innerHTML = isFav ? '❤️ Retirer de ma liste' : '🤍 Ajouter à ma liste';
+            // Met à jour le texte du bouton et le design dynamiquement (I18n)
+            btn.innerHTML = isFav 
+                ? `❤️ ${I18n.t('details_in_list')}` 
+                : `🤍 ${I18n.t('details_favorite')}`;
+                
             btn.style.transform = "scale(0.95)";
             setTimeout(() => btn.style.transform = "scale(1)", 150);
         }
@@ -147,6 +174,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const searchTrigger = document.getElementById('search-trigger');
 
         if (!searchWrapper || !searchInput) return;
+
+        searchInput.placeholder = I18n.t('search_placeholder');
 
         // Ouvrir au clic
         searchWrapper.onclick = (e) => {

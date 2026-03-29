@@ -1,6 +1,7 @@
 import Reviews from '../models/Reviews.js';
 import Auth from '../models/Auth.js';
 import Security from '../utils/Security.js';
+import I18n from '../utils/I18n.js';
 
 export default class VueCatalogue {
     
@@ -11,7 +12,7 @@ export default class VueCatalogue {
     }
     
     static rendreCatalogue(projets, projetsLab, projetEnCours = null, chapitreEnCours = null) {
-        if (!projets || projets.length === 0) return `<h1 class="page-title">C'est bien vide ici...</h1>`;
+        if (!projets || projets.length === 0) return `<h1 class="page-title">${I18n.t('empty_catalog')}</h1>`;
         
         // 3 premiers projets pour le Carousel Hero
         const heroSlides = projets.slice(0, Math.min(3, projets.length)); 
@@ -24,9 +25,9 @@ export default class VueCatalogue {
                     let btnLireHero = "";
                     if (projet.chapitres && projet.chapitres.length > 0) {
                         const premierCh = projet.chapitres.find(ch => ch.ordre === 1) || projet.chapitres[0];
-                        btnLireHero = `<a href="/lire/${projet.id}/${premierCh.id}" data-link class="btn-primary" style="margin-right:15px; font-size:1.1rem; background:white; color:black!important; border:none;"><span class="material-symbols-outlined">play_arrow</span> Lecture</a>`;
+                        btnLireHero = `<a href="/lire/${projet.id}/${premierCh.id}" data-link class="btn-primary" style="margin-right:15px; font-size:1.1rem; background:white; color:black!important; border:none;"><span class="material-symbols-outlined">play_arrow</span> ${I18n.t('hero_play')}</a>`;
                     } else {
-                        btnLireHero = `<span style="color:var(--text-muted); padding:12px 0; margin-right:15px; font-weight:bold;">Prochainement...</span>`;
+                        btnLireHero = `<span style="color:var(--text-muted); padding:12px 0; margin-right:15px; font-weight:bold;">${I18n.t('coming_soon')}</span>`;
                     }
                     
                     // Génération intelligente selon le type de média
@@ -62,12 +63,12 @@ export default class VueCatalogue {
                                 <h1>${projet.titre}</h1>
                                 <div style="margin-bottom:25px; display:flex; gap:15px; align-items:center;">
                                     <span style="font-size:1.2rem;">${Reviews.genererEtoilesHTML(statsHero.moyenne)}</span>
-                                    <span style="color:#aaa; font-weight:bold;">${statsHero.moyenne}/5 (${statsHero.total} avis)</span>
+                                    <span style="color:#aaa; font-weight:bold;">${statsHero.moyenne}/5 (${statsHero.total} ${I18n.t('reviews_count')})</span>
                                 </div>
                                 <p class="description">${projet.description}</p>
                                 <div class="hero-actions">
                                     ${btnLireHero}
-                                    <a href="/projet/${projet.slug}" data-link class="btn-secondary" style="font-size:1.1rem; border:none;"><span class="material-symbols-outlined">info</span> Plus d'infos</a>
+                                    <a href="/projet/${projet.slug}" data-link class="btn-secondary" style="font-size:1.1rem; border:none;"><span class="material-symbols-outlined">info</span> ${I18n.t('hero_info')}</a>
                                     <button class="btn-secondary btn-cast-tv" style="font-size:1.1rem; border:none; background:rgba(255,255,255,0.1); margin-left:10px;"><span class="material-symbols-outlined">cast</span> TV</button>
                                 </div>
                             </div>
@@ -106,16 +107,16 @@ export default class VueCatalogue {
             repriseHtml = `
                 <div style="position:relative; z-index:10; margin-top:-35px; margin-bottom: 20px;">
                     <h2 class="page-title" style="font-size:1.5rem; color:#fff; display:flex; align-items:center; gap:10px;">
-                        <span class="material-symbols-outlined" style="color:var(--primary); font-size:1.8rem;">play_circle</span> Reprendre la lecture
+                        <span class="material-symbols-outlined" style="color:var(--primary); font-size:1.8rem;">play_circle</span> ${I18n.t('continue_reading')}
                     </h2>
                     <div class="catalogue-grid" style="padding-bottom:10px; padding-top:0;">
                         <div class="projet-card" style="box-shadow: 0 5px 25px rgba(229,9,20,0.25); border: 1px solid rgba(229,9,20,0.4); max-width:280px;">
                             <a href="/lire/${projetEnCours.id}/${chapitreEnCours.id}" data-link class="projet-link">
                                 <img class="projet-cover" src="${projetEnCours.couverture}" alt="${projetEnCours.titre}" style="filter: brightness(0.7);">
                                 <div class="projet-info" style="opacity:1; background:linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0.6) 100%); bottom:0; padding:15px; transform:none;">
-                                    <div style="color:var(--primary); font-size:0.8rem; font-weight:800; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; font-family:'Outfit', sans-serif;">En cours</div>
+                                    <div style="color:var(--primary); font-size:0.8rem; font-weight:800; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; font-family:'Outfit', sans-serif;">${I18n.t('in_progress')}</div>
                                     <h3 style="font-size:1.1rem;">${projetEnCours.titre}</h3>
-                                    <p style="font-size:0.85rem; color:#aaa; margin-top:5px; margin-bottom:12px;">Chapitre ${chapitreEnCours.ordre} : ${chapitreEnCours.titre}</p>
+                                    <p style="font-size:0.85rem; color:#aaa; margin-top:5px; margin-bottom:12px;">${I18n.t('chapter')} ${chapitreEnCours.ordre} : ${chapitreEnCours.titre}</p>
                                     <div style="height:4px; width:100%; background:#333; border-radius:2px; overflow:hidden;">
                                         <div style="width:40%; height:100%; background:var(--primary);"></div>
                                     </div>
@@ -128,7 +129,7 @@ export default class VueCatalogue {
         }
 
         const othersHtml = autresProjets.length > 0 
-            ? `<h2 class="page-title" style="margin-top: ${projetEnCours ? '10px' : '-30px'}; position:relative; z-index:10; font-size:1.5rem; color:#e5e5e5;">Top Tendances <span class="material-symbols-outlined" style="color:orange; font-size:1.2rem; vertical-align:middle;">local_fire_department</span></h2>
+            ? `<h2 class="page-title" style="margin-top: ${projetEnCours ? '10px' : '-30px'}; position:relative; z-index:10; font-size:1.5rem; color:#e5e5e5;">${I18n.t('trending_now')} <span class="material-symbols-outlined" style="color:orange; font-size:1.2rem; vertical-align:middle;">local_fire_department</span></h2>
                <div class="catalogue-grid" style="position:relative; z-index:10;">${grille}</div>`
             : '';
 
@@ -137,7 +138,7 @@ export default class VueCatalogue {
                 <h2 style="font-size:2rem; margin-bottom:10px; color:white; display:flex; align-items:center; gap:10px; font-family:'Outfit', sans-serif;">
                     <span class="material-symbols-outlined" style="font-size:2.5rem; color:#258cf4;">experiment</span> INTOON LAB
                 </h2>
-                <p style="color:#aaa; font-size:1.1rem; margin-top:0; margin-bottom:30px;">Découvrez les pitchs et brouillons des créateurs. Le Studio de la communauté : Notez, commentez et décidez des prochaines productions originales !</p>
+                <p style="color:#aaa; font-size:1.1rem; margin-top:0; margin-bottom:30px;">${I18n.t('lab_description')}</p>
                 
                 <div class="catalogue-grid" style="padding:0;">
                     ${projetsLab.map((projet, idx) => `
@@ -149,7 +150,7 @@ export default class VueCatalogue {
                                 <div style="position:absolute; bottom:60px; right:6px; background:rgba(0,0,0,0.8); padding:3px 6px; border-radius:var(--radius-badge); font-size:0.9rem; z-index:5;">${VueCatalogue.genererDrapeaux(projet.langues)}</div>
                                 <div class="projet-info">
                                     <h3>${projet.titre}</h3>
-                                    <p>Soutien Communautaire Requis</p>
+                                    <p>${I18n.t('community_support')}</p>
                                 </div>
                             </a>
                         </div>
@@ -171,12 +172,12 @@ export default class VueCatalogue {
         const isBrouillon = projet.statut === 'brouillon';
 
         if (isBrouillon) {
-            btnLireHtml = `<span class="badge" style="background:#555; color:white; padding:12px 25px; border-radius:var(--radius-pill); font-weight:bold; margin-right:15px; border:1px dashed #ccc; display:inline-flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">science</span> Projet en évaluation</span>`;
+            btnLireHtml = `<span class="badge" style="background:#555; color:white; padding:12px 25px; border-radius:var(--radius-pill); font-weight:bold; margin-right:15px; border:1px dashed #ccc; display:inline-flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">science</span> ${I18n.t('lab_badge')}</span>`;
         } else if (projet.chapitres && projet.chapitres.length > 0) {
             const premierCh = projet.chapitres.find(ch => ch.ordre === 1) || projet.chapitres[0];
-            btnLireHtml = `<a href="/lire/${projet.id}/${premierCh.id}" data-link class="btn-primary" style="margin-right:15px; background:white; color:black!important;"><span class="material-symbols-outlined">play_arrow</span> Lancer le Chapitre 1</a>`;
+            btnLireHtml = `<a href="/lire/${projet.id}/${premierCh.id}" data-link class="btn-primary" style="margin-right:15px; background:white; color:black!important;"><span class="material-symbols-outlined">play_arrow</span> ${I18n.t('hero_play_ch1')}</a>`;
         } else {
-            btnLireHtml = `<span class="badge" style="background:gray; color:white; padding:12px 25px; border-radius:var(--radius-pill); font-weight:bold; margin-right:15px; display:inline-flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">schedule</span> Prochainement...</span>`;
+            btnLireHtml = `<span class="badge" style="background:gray; color:white; padding:12px 25px; border-radius:var(--radius-pill); font-weight:bold; margin-right:15px; display:inline-flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">schedule</span> ${I18n.t('coming_soon')}</span>`;
         }
 
         let trailerHtml = `<img class="projet-trailer-fallback" src="${projet.couverture}" alt="Cover">`;
@@ -204,26 +205,26 @@ export default class VueCatalogue {
 
         let formAvisHtml = estConnecte ? `
             <div style="background:rgba(16,25,34,0.4); padding:25px; border-radius:var(--radius-card); border:1px solid rgba(255,255,255,0.05); margin-bottom:30px;">
-                <h3 style="margin-bottom:15px; color:white; font-size:1.2rem; font-family:'Outfit', sans-serif;">Laissez une note (Abonné)</h3>
+                <h3 style="margin-bottom:15px; color:white; font-size:1.2rem; font-family:'Outfit', sans-serif;">${I18n.t('review_leave_note')}</h3>
                 <form id="form-add-review" style="display:flex; flex-direction:column; gap:15px;">
                     <div>
                         <select id="review-note" style="padding:10px; background:#111; color:white; border:1px solid #444; border-radius:4px; font-size:1rem;" required>
-                            <option value="">-- Choisir une note --</option>
-                            <option value="5">⭐⭐⭐⭐⭐ Chef-d'œuvre (5/5)</option>
-                            <option value="4">⭐⭐⭐⭐ Très bien (4/5)</option>
-                            <option value="3">⭐⭐⭐ Sympa (3/5)</option>
-                            <option value="2">⭐⭐ Bof (2/5)</option>
-                            <option value="1">⭐ Déception (1/5)</option>
+                            <option value="">-- ${I18n.t('review_choose_note')} --</option>
+                            <option value="5">⭐⭐⭐⭐⭐ ${I18n.t('review_note_5')}</option>
+                            <option value="4">⭐⭐⭐⭐ ${I18n.t('review_note_4')}</option>
+                            <option value="3">⭐⭐⭐ ${I18n.t('review_note_3')}</option>
+                            <option value="2">⭐⭐ ${I18n.t('review_note_2')}</option>
+                            <option value="1">⭐ ${I18n.t('review_note_1')}</option>
                         </select>
                     </div>
-                    <textarea id="review-text" rows="3" placeholder="Qu'avez-vous pensé de cette œuvre ?" style="padding:15px; border-radius:12px; border:1px solid #333; background:#0a0a0d; color:white; font-size:0.95rem; resize:none; font-family:'Inter', sans-serif;" required></textarea>
-                    <button type="submit" class="btn-primary" style="align-self:flex-end; border-radius:20px; padding:10px 25px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">send</span> Publier</button>
+                    <textarea id="review-text" rows="3" placeholder="${I18n.t('review_placeholder')}" style="padding:15px; border-radius:12px; border:1px solid #333; background:#0a0a0d; color:white; font-size:0.95rem; resize:none; font-family:'Inter', sans-serif;" required></textarea>
+                    <button type="submit" class="btn-primary" style="align-self:flex-end; border-radius:20px; padding:10px 25px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">send</span> ${I18n.t('review_publish')}</button>
                 </form>
             </div>
         ` : `
             <div style="background:rgba(229,9,20,0.05); padding:20px; border-radius:var(--radius-card); border:1px dashed rgba(229,9,20,0.5); margin-bottom:30px; color:#aaa; text-align:center;">
-                <p style="margin-bottom:15px;">⚠️ Connectez-vous pour publier un avis et soutenir le projet.</p>
-                <a href="/connexion" data-link class="btn-primary" style="display:inline-flex;"><span class="material-symbols-outlined">lock_open</span> Me connecter</a>
+                <p style="margin-bottom:15px;">⚠️ ${I18n.t('review_login_required')}</p>
+                <a href="/connexion" data-link class="btn-primary" style="display:inline-flex;"><span class="material-symbols-outlined">lock_open</span> ${I18n.t('review_login_btn')}</a>
             </div>
         `;
 
@@ -266,16 +267,16 @@ export default class VueCatalogue {
                             </div>
                             <div style="display:flex; align-items:center; gap:15px; margin-top:8px; font-size:0.75rem; color:#8e8e8e; font-weight:600;">
                                 <span>${r.date}</span>
-                                <span class="btn-review-like" style="cursor:pointer; color:${isLiked ? '#e50914' : '#8e8e8e'};">${likeCount > 0 ? likeCount + ' ' : ''}${isLiked ? 'Aimé' : 'J\'aime'}</span>
-                                <span class="btn-review-repondre" style="cursor:pointer;">Répondre</span>
-                                ${isOwner ? '<span class="btn-review-edit" style="cursor:pointer; color:var(--primary);">Modifier</span>' : ''}
+                                <span class="btn-review-like" style="cursor:pointer; color:${isLiked ? '#e50914' : '#8e8e8e'};">${likeCount > 0 ? likeCount + ' ' : ''}${isLiked ? I18n.t('review_liked') : I18n.t('review_like')}</span>
+                                <span class="btn-review-repondre" style="cursor:pointer;">${I18n.t('review_reply')}</span>
+                                ${isOwner ? `<span class="btn-review-edit" style="cursor:pointer; color:var(--primary);">${I18n.t('review_edit')}</span>` : ''}
                             </div>
                         </div>
                     </div>
                     ${reponsesHtml}
                 </div>
               `}).join('')
-            : '<p style="color:#666; font-style:italic; text-align:center; padding:20px;">Aucun avis pour le moment. Soyez le premier à commenter !</p>';
+            : `<p style="color:#666; font-style:italic; text-align:center; padding:20px;">${I18n.t('review_empty')}</p>`;
 
         return `
             <div class="projet-detail">
@@ -295,7 +296,7 @@ export default class VueCatalogue {
                             <!-- Etoiles Visuelles -->
                             <div style="display:flex; align-items:center; gap:10px;">
                                 <span style="font-size:1.3rem;">${etoilesHtml}</span>
-                                <span style="font-weight:bold; color:#aaa; font-size:1.1rem; font-family:'Be Vietnam Pro', sans-serif;">${statsReviews.moyenne}/5 <span style="font-size:0.9rem; font-weight:normal;">(${statsReviews.total} Avis)</span></span>
+                                <span style="font-weight:bold; color:#aaa; font-size:1.1rem; font-family:'Be Vietnam Pro', sans-serif;">${statsReviews.moyenne}/5 <span style="font-size:0.9rem; font-weight:normal;">(${statsReviews.total} ${I18n.t('reviews_count')})</span></span>
                             </div>
                         </div>
 
@@ -305,7 +306,7 @@ export default class VueCatalogue {
                             ${btnLireHtml}
                             <button class="btn-secondary btn-favori" data-projet-id="${projet.id}">
                                 <span class="material-symbols-outlined">${estFavori ? 'bookmark_added' : 'bookmark_add'}</span>
-                                ${estFavori ? 'Dans la liste' : 'En favori'}
+                                ${estFavori ? I18n.t('details_in_list') : I18n.t('details_favorite')}
                             </button>
                             <button class="btn-secondary btn-like" data-id="${projet.id}" style="border:1px solid ${aLike ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}; color:${aLike ? 'var(--primary)' : 'white'};">
                                 <span class="material-symbols-outlined">${aLike ? 'favorite' : 'favorite_border'}</span> 
@@ -314,7 +315,7 @@ export default class VueCatalogue {
                             
                             <!-- CTAs DE MONÉTISATION -->
                             <a href="/vip" data-link class="btn-secondary btn-soutenir" style="border-color:#eab308; color:#eab308!important; margin-left:15px; background:rgba(234,179,8,0.05); display:inline-flex; align-items:center; gap:8px;">
-                                <span class="material-symbols-outlined">stars</span> Devenir Mécène
+                                <span class="material-symbols-outlined">stars</span> ${I18n.t('details_become_sponsor')}
                             </a>
 
                             <button class="btn-secondary btn-share-project" style="margin-left:10px; background:rgba(255,255,255,0.05); color:white; border:1px solid #333; padding:10px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;" title="Partager cette œuvre">
@@ -331,22 +332,22 @@ export default class VueCatalogue {
                            <!-- Bouton Version Physique -->
                            ${projet.hasPhysical ? `
                                <a href="/shop/${projet.slug}?type=physique" data-link class="btn-secondary" style="border-color:#4ade80; color:#4ade80!important; background:rgba(74,222,128,0.1); display:inline-flex; align-items:center; gap:8px;">
-                                   <span class="material-symbols-outlined">menu_book</span> Version Physique
+                                   <span class="material-symbols-outlined">menu_book</span> ${I18n.t('details_physical_ver')}
                                </a>
                            ` : `
                                <button class="btn-secondary" disabled style="opacity:0.3; cursor:not-allowed; border-color:#555; pointer-events:none; display:inline-flex; align-items:center; gap:8px;">
-                                   <span class="material-symbols-outlined">menu_book</span> Version Physique (Bientôt)
+                                   <span class="material-symbols-outlined">menu_book</span> ${I18n.t('details_physical_ver')} (${I18n.t('soon')})
                                </button>
                            `}
 
                            <!-- Bouton Originaux -->
                            ${projet.hasOriginals ? `
                                <a href="/shop/${projet.slug}?type=originaux" data-link class="btn-secondary" style="border-color:#f472b6; color:#f472b6!important; background:rgba(244,114,182,0.1); display:inline-flex; align-items:center; gap:8px;">
-                                   <span class="material-symbols-outlined">palette</span> Planches Originales
+                                   <span class="material-symbols-outlined">palette</span> ${I18n.t('details_originals')}
                                </a>
                            ` : `
                                <button class="btn-secondary" disabled style="opacity:0.3; cursor:not-allowed; border-color:#555; pointer-events:none; display:inline-flex; align-items:center; gap:8px;">
-                                   <span class="material-symbols-outlined">palette</span> Originaux (Bientôt)
+                                   <span class="material-symbols-outlined">palette</span> ${I18n.t('details_originals')} (${I18n.t('soon')})
                                </button>
                            `}
                         </div>
@@ -367,12 +368,12 @@ export default class VueCatalogue {
                                     </a>
                                 </li>
                             `).join('')}
-                            ${projet.chapitres.length === 0 ? '<li><span class="ch-titre" style="color:var(--text-muted)">Aucun chapitre disponible pour le moment...</span></li>' : ''}
+                            ${projet.chapitres.length === 0 ? `<li><span class="ch-titre" style="color:var(--text-muted)">${I18n.t('details_no_chapters')}</span></li>` : ''}
                         </ul>
                     </div>
                     
                     <div style="flex:1; min-width:350px; padding-top:10px;">
-                        <h2 style="font-size:1.5rem; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px; color:white; font-family:'Outfit', sans-serif;">Avis de la Communauté</h2>
+                        <h2 style="font-size:1.5rem; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px; color:white; font-family:'Outfit', sans-serif;">${I18n.t('details_community_reviews')}</h2>
                         ${formAvisHtml}
                         <div style="max-height:500px; overflow-y:auto; padding-right:10px; border-top:1px solid rgba(255,255,255,0.05); padding-top:20px;">
                             ${listeAvisHtml}

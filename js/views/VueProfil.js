@@ -1,5 +1,6 @@
 import Badges from '../models/Badges.js';
 import Security from '../utils/Security.js';
+import I18n from '../utils/I18n.js';
 
 export default class VueProfil {
 
@@ -34,20 +35,20 @@ export default class VueProfil {
         const badges = [];
 
         // Bouche en or (commentaires)
-        if (commentaires >= 50) badges.push(this.renderStatBadge('👄', 'Commentaires', `${commentaires}`, '#FFD700', 'gold'));
-        else if (commentaires >= 10) badges.push(this.renderStatBadge('💬', 'Commentaires', `${commentaires}`, '#a855f7'));
-        else if (commentaires > 0) badges.push(this.renderStatBadge('💬', 'Commentaires', `${commentaires}`, '#666'));
+        if (commentaires >= 50) badges.push(this.renderStatBadge('👄', I18n.t('stats_comments'), `${commentaires}`, '#FFD700', 'gold'));
+        else if (commentaires >= 10) badges.push(this.renderStatBadge('💬', I18n.t('stats_comments'), `${commentaires}`, '#a855f7'));
+        else if (commentaires > 0) badges.push(this.renderStatBadge('💬', I18n.t('stats_comments'), `${commentaires}`, '#666'));
 
         // Heures lues
-        if (heuresLues >= 100) badges.push(this.renderStatBadge('⏱️', 'Heures lues', `${heuresLues}h`, '#f97316', 'gold'));
-        else if (heuresLues > 0) badges.push(this.renderStatBadge('⏱️', 'Heures lues', `${heuresLues}h`, '#888'));
+        if (heuresLues >= 100) badges.push(this.renderStatBadge('⏱️', I18n.t('stats_hours'), `${heuresLues}h`, '#f97316', 'gold'));
+        else if (heuresLues > 0) badges.push(this.renderStatBadge('⏱️', I18n.t('stats_hours'), `${heuresLues}h`, '#888'));
 
         // Projets créés
-        if (projetsCreer >= 5) badges.push(this.renderStatBadge('🗂️', 'Projets', `×${projetsCreer}`, '#22c55e', 'gold'));
-        else if (projetsCreer > 0) badges.push(this.renderStatBadge('🗂️', 'Projets', `×${projetsCreer}`, '#22c55e'));
+        if (projetsCreer >= 5) badges.push(this.renderStatBadge('🗂️', I18n.t('stats_projects'), `×${projetsCreer}`, '#22c55e', 'gold'));
+        else if (projetsCreer > 0) badges.push(this.renderStatBadge('🗂️', I18n.t('stats_projects'), `×${projetsCreer}`, '#22c55e'));
 
         // Chapitres publiés
-        if (chapitresPublies > 0) badges.push(this.renderStatBadge('📄', 'Chapitres', `×${chapitresPublies}`, '#06b6d4'));
+        if (chapitresPublies > 0) badges.push(this.renderStatBadge('📄', I18n.t('stats_chapters'), `×${chapitresPublies}`, '#06b6d4'));
 
         return badges.join('');
     }
@@ -62,7 +63,13 @@ export default class VueProfil {
         const genresArr = genres_preferes ? (Array.isArray(genres_preferes) ? genres_preferes : [genres_preferes]) : [];
 
         const roleColor = { admin: '#FFD700', createur: '#a855f7', moderateur: '#6366f1', vip: '#f59e0b', lecteur: '#22c55e', nouveau: '#06b6d4' }[role] || '#666';
-        const roleLabel = { admin: '👑 Admin', createur: '✨ Créateur', moderateur: '🔰 Modérateur', vip: '💎 VIP', lecteur: '📖 Lecteur' }[role] || '⭐ Nouveau';
+        const roleLabel = { 
+            admin: `👑 ${I18n.t('role_admin')}`, 
+            createur: `✨ ${I18n.t('role_creator')}`, 
+            moderateur: `🔰 ${I18n.t('role_moderator')}`, 
+            vip: `💎 ${I18n.t('role_vip')}`, 
+            lecteur: `📖 ${I18n.t('role_reader')}` 
+        }[role] || `⭐ ${I18n.t('role_new')}`;
 
         const mainBadges = Badges.getBadgesUtilisateur(profil);
         const statBadgesHtml = this.getStatBadges(stats);
@@ -79,10 +86,10 @@ export default class VueProfil {
                 <img src="${p.couverture_url || p.couverture}" alt="${p.titre}" style="width:50px;height:70px;object-fit:cover;border-radius:4px;flex-shrink:0;">
                 <div>
                     <div style="color:white;font-weight:bold;font-family:'Outfit',sans-serif;font-size:0.95rem;">${p.titre}</div>
-                    <div style="color:#666;font-size:0.8rem;margin-top:3px;">${p.statut || 'en cours'}</div>
+                    <div style="color:#666;font-size:0.8rem;margin-top:3px;">${p.statut === 'publie' ? I18n.t('status_published') : I18n.t('status_ongoing')}</div>
                 </div>
             </a>
-        `).join('') : `<p style="color:#555;font-style:italic;">Aucune série publiée.</p>`;
+        `).join('') : `<p style="color:#555;font-style:italic;">${I18n.t('profile_no_series')}</p>`;
 
         return `
         <div style="max-width:900px; margin:60px auto; padding:0 4%; animation:fadeIn 0.4s ease;">
@@ -112,9 +119,9 @@ export default class VueProfil {
                         </div>
                         <div class="profil-actions-wrap" style="display:flex;gap:10px;flex-wrap:wrap;padding-bottom:8px;">
                             <a href="/inbox" data-link style="background:rgba(255,255,255,0.08);border:1px solid #333;color:white;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:0.85rem;display:flex;align-items:center;gap:6px;">
-                                <span class="material-symbols-outlined" style="font-size:1rem;">mail</span> Message
+                                <span class="material-symbols-outlined" style="font-size:1rem;">mail</span> ${I18n.t('profile_btn_message')}
                             </a>
-                            ${estMoi ? `<a href="/dashboard" data-link style="background:${roleColor};color:#000;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:0.85rem;font-weight:bold;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:1rem;">edit</span> Éditer mon profil</a>` : ''}
+                            ${estMoi ? `<a href="/dashboard" data-link style="background:${roleColor};color:#000;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:0.85rem;font-weight:bold;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:1rem;">edit</span> ${I18n.t('profile_btn_edit')}</a>` : ''}
                         </div>
                     </div>
 
@@ -129,7 +136,7 @@ export default class VueProfil {
 
                     <!-- Badges principaux -->
                     <div style="margin-bottom:24px;">
-                        <div style="font-size:0.65rem;color:#555;letter-spacing:3px;text-transform:uppercase;font-family:'Outfit',sans-serif;margin-bottom:10px;">🎮 Badges</div>
+                        <div style="font-size:0.65rem;color:#555;letter-spacing:3px;text-transform:uppercase;font-family:'Outfit',sans-serif;margin-bottom:10px;">🎮 ${I18n.t('profile_txt_badges')}</div>
                         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
                             ${mainBadges.map(b => Badges.renderBadge(b, 52)).join('')}
                         </div>
@@ -138,7 +145,7 @@ export default class VueProfil {
                     <!-- Mini-badges stats -->
                     ${statBadgesHtml ? `
                     <div>
-                        <div style="font-size:0.65rem;color:#555;letter-spacing:3px;text-transform:uppercase;font-family:'Outfit',sans-serif;margin-bottom:10px;">📊 Statistiques</div>
+                        <div style="font-size:0.65rem;color:#555;letter-spacing:3px;text-transform:uppercase;font-family:'Outfit',sans-serif;margin-bottom:10px;">📊 ${I18n.t('profile_txt_stats')}</div>
                         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;">
                             ${statBadgesHtml}
                         </div>
@@ -151,7 +158,7 @@ export default class VueProfil {
             <div style="background:#0d0d10;border:1px solid #222;border-radius:16px;padding:25px;">
                 <h2 style="font-size:1.2rem;color:white;font-family:'Outfit',sans-serif;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
                     <span class="material-symbols-outlined" style="color:var(--primary);">movie_creation</span>
-                    Séries (${projets.length})
+                    ${I18n.t('series')} (${projets.length})
                 </h2>
                 <div style="display:flex;flex-direction:column;gap:10px;">${projetsHtml}</div>
             </div>` : ''}
@@ -182,9 +189,9 @@ export default class VueProfil {
         <div style="background:rgba(255,255,255,0.03);border:1px solid #222;border-radius:12px;padding:25px;margin-bottom:30px;">
             <h3 style="font-size:1.1rem;color:white;font-family:'Outfit',sans-serif;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
                 <span class="material-symbols-outlined" style="color:var(--primary);">manage_accounts</span>
-                Gérer mon Profil Public
+                ${I18n.t('edit_profile_title')}
                 <a href="/profil/${profil?.id || ''}" data-link style="margin-left:auto;color:var(--primary);font-size:0.8rem;text-decoration:none;display:flex;align-items:center;gap:4px;">
-                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> Voir mon profil public
+                    <span class="material-symbols-outlined" style="font-size:1rem;">open_in_new</span> ${I18n.t('edit_profile_link_view')}
                 </a>
             </h3>
             <form id="form-edit-profil" style="display:flex;flex-direction:column;gap:18px;">
@@ -193,7 +200,7 @@ export default class VueProfil {
                     <img id="avatar-preview" src="${profil?.avatar_url || `https://api.dicebear.com/7.x/identicon/svg?seed=${profil?.pseudo}`}"
                         style="width:70px;height:70px;border-radius:50%;border:2px solid #333;object-fit:cover;background:#111;">
                     <div>
-                        <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:6px;">Photo de profil</label>
+                        <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:6px;">${I18n.t('edit_profile_label_avatar')}</label>
                         <input type="file" id="profil-avatar" accept="image/png,image/jpeg,image/webp"
                             style="color:#aaa;font-size:0.8rem;" onchange="
                                 const file = this.files[0];
@@ -204,14 +211,14 @@ export default class VueProfil {
 
                 <!-- Bio -->
                 <div>
-                    <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:6px;">Bio</label>
-                    <textarea id="profil-bio" maxlength="160" placeholder="Décris-toi en quelques mots..." style="width:100%;padding:12px;background:#1a1a20;border:1px solid #333;border-radius:8px;color:white;font-size:0.9rem;resize:vertical;min-height:80px;font-family:'Outfit',sans-serif;" rows="3">${profil?.bio || ''}</textarea>
-                    <div style="font-size:0.7rem;color:#555;text-align:right;margin-top:3px;">Max 160 caractères</div>
+                    <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:6px;">${I18n.t('edit_profile_label_bio')}</label>
+                    <textarea id="profil-bio" maxlength="160" placeholder="${I18n.t('edit_profile_placeholder_bio')}" style="width:100%;padding:12px;background:#1a1a20;border:1px solid #333;border-radius:8px;color:white;font-size:0.9rem;resize:vertical;min-height:80px;font-family:'Outfit',sans-serif;" rows="3">${profil?.bio || ''}</textarea>
+                    <div style="font-size:0.7rem;color:#555;text-align:right;margin-top:3px;">${I18n.t('edit_profile_max_chars')}</div>
                 </div>
 
                 <!-- Genres préférés -->
                 <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; border:1px solid #222;">
-                    <label style="color:white;font-size:0.95rem;display:block;margin-bottom:12px; font-weight:bold;">📚 Ce que tu aimes lire</label>
+                    <label style="color:white;font-size:0.95rem;display:block;margin-bottom:12px; font-weight:bold;">📚 ${I18n.t('edit_profile_label_genres')}</label>
                     
                     ${Object.entries(categoriesGenres).map(([titre, genres]) => `
                         <div style="margin-bottom:12px;">
@@ -225,7 +232,7 @@ export default class VueProfil {
 
                 <!-- Style musique -->
                 <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; border:1px solid #222;">
-                    <label style="color:white;font-size:0.95rem;display:block;margin-bottom:10px; font-weight:bold;">🎵 C'est quoi ton style de son ?</label>
+                    <label style="color:white;font-size:0.95rem;display:block;margin-bottom:10px; font-weight:bold;">🎵 ${I18n.t('edit_profile_label_music')}</label>
                     <div style="display:flex;flex-wrap:wrap;gap:8px;">
                         ${renderTags(musiques, 'musique', prefMusique)}
                     </div>
@@ -234,7 +241,7 @@ export default class VueProfil {
                 <div id="profil-save-feedback" style="font-size:0.85rem; font-weight:bold;"></div>
 
                 <button type="submit" class="btn-primary" style="align-self:flex-start;display:flex;align-items:center;gap:8px; padding:10px 20px;">
-                    <span class="material-symbols-outlined">save</span> Mettre à jour mon identité
+                    <span class="material-symbols-outlined">save</span> ${I18n.t('edit_profile_btn_save')}
                 </button>
             </form>
         </div>`;
