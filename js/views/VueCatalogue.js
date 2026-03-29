@@ -30,28 +30,31 @@ export default class VueCatalogue {
                         btnLireHero = `<span style="color:var(--text-muted); padding:12px 0; margin-right:15px; font-weight:bold;">${I18n.t('coming_soon')}</span>`;
                     }
                     
+                    // Harmonisation camelCase / snake_case selon la source (Supabase/Mock)
+                    const videoUrl = projet.video_promo_url || projet.videoPromoUrl;
+                    
                     // Génération intelligente selon le type de média
                     let mediaHtml;
-                    if (!projet.videoPromoUrl) {
+                    if (!videoUrl) {
                         mediaHtml = `<img class="projet-trailer-fallback" src="${projet.couverture}" alt="${projet.titre}" style="width:100%; height:100%; object-fit:cover; animation: slowZoom 12s alternate infinite;">`;
-                    } else if (projet.videoPromoUrl.includes('youtube.com') || projet.videoPromoUrl.includes('youtu.be')) {
-                        const ytId = projet.videoPromoUrl.includes('youtu.be')
-                            ? projet.videoPromoUrl.split('youtu.be/')[1].split('?')[0]
-                            : (projet.videoPromoUrl.split('v=')[1] || '').split('&')[0];
+                    } else if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                        const ytId = videoUrl.includes('youtu.be')
+                            ? videoUrl.split('youtu.be/')[1].split('?')[0]
+                            : (videoUrl.split('v=')[1] || '').split('&')[0];
                         mediaHtml = `<div style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;">
                             <iframe src="https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&modestbranding=1&playsinline=1&rel=0"
                                 frameborder="0" allow="autoplay; encrypted-media"
                                 style="width:100%;height:140%;object-fit:cover;transform:translateY(-12%);pointer-events:none;">
                             </iframe></div>`;
-                    } else if (projet.videoPromoUrl.includes('vimeo.com')) {
-                        const vimeoId = projet.videoPromoUrl.split('vimeo.com/')[1].split('?')[0];
+                    } else if (videoUrl.includes('vimeo.com')) {
+                        const vimeoId = videoUrl.split('vimeo.com/')[1].split('?')[0];
                         mediaHtml = `<div style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;">
                             <iframe src="https://player.vimeo.com/video/${vimeoId}?background=1&autoplay=1&loop=1&byline=0&title=0"
                                 frameborder="0" allow="autoplay; fullscreen"
                                 style="width:100%;height:100%;object-fit:cover;pointer-events:none;">
                             </iframe></div>`;
                     } else {
-                        mediaHtml = `<video class="projet-trailer hero-video" playsinline muted loop autoplay style="width:100%;height:100%;object-fit:cover;" data-index="${idx}"><source src="${projet.videoPromoUrl}" type="video/mp4"></video>`;
+                        mediaHtml = `<video class="projet-trailer hero-video" playsinline muted loop autoplay style="width:100%;height:100%;object-fit:cover;" data-index="${idx}"><source src="${videoUrl}" type="video/mp4"></video>`;
                     }
 
 
@@ -181,22 +184,23 @@ export default class VueCatalogue {
         }
 
         let trailerHtml = `<img class="projet-trailer-fallback" src="${projet.couverture}" alt="Cover">`;
-        if (projet.videoPromoUrl) {
-            if (projet.videoPromoUrl.includes('youtube.com') || projet.videoPromoUrl.includes('youtu.be')) {
-                const ytId = projet.videoPromoUrl.includes('youtu.be') 
-                    ? projet.videoPromoUrl.split('youtu.be/')[1].split('?')[0] 
-                    : projet.videoPromoUrl.split('v=')[1].split('&')[0];
-                // FIX VIDEO FULL : La logique est maintenant dans style.css (.projet-trailer iframe)
+        const videoUrl = projet.video_promo_url || projet.videoPromoUrl;
+        if (videoUrl) {
+            if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                const ytId = videoUrl.includes('youtu.be') 
+                    ? videoUrl.split('youtu.be/')[1].split('?')[0] 
+                    : videoUrl.split('v=')[1].split('&')[0];
+                // FIX VIDEO FULL
                 trailerHtml = `<div class="projet-trailer">
                     <iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${ytId}&modestbranding=1&rel=0" 
                         frameborder="0" allow="autoplay; encrypted-media">
                     </iframe>
                 </div>`;
-            } else if (projet.videoPromoUrl.includes('vimeo.com')) {
-                const vimeoId = projet.videoPromoUrl.split('vimeo.com/')[1].split('?')[0];
+            } else if (videoUrl.includes('vimeo.com')) {
+                const vimeoId = videoUrl.split('vimeo.com/')[1].split('?')[0];
                 trailerHtml = `<div class="projet-trailer" style="position:absolute; top:0; left:0; width:100%; height:100%;"><iframe src="https://player.vimeo.com/video/${vimeoId}?background=1&autoplay=1&loop=1&byline=0&title=0" frameborder="0" allow="autoplay; fullscreen" style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></iframe></div>`;
             } else {
-                trailerHtml = `<video class="projet-trailer" autoplay loop muted playsinline><source src="${projet.videoPromoUrl}" type="video/mp4"></video>`;
+                trailerHtml = `<video class="projet-trailer" autoplay loop muted playsinline><source src="${videoUrl}" type="video/mp4"></video>`;
             }
         }
 

@@ -148,40 +148,41 @@ export default class VueAdmin {
                         </div>
 
                         <!-- SECTION CREW / FICHE DE PROD -->
-                        <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:8px; border:1px solid #333; display:flex; flex-direction:column; gap:15px;">
-                            <h3 style="color:var(--primary); font-size:1rem; margin-bottom:5px; display:flex; align-items:center; gap:8px;">
+                        <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; border:1px solid #333; display:flex; flex-direction:column; gap:20px;">
+                            <h3 style="color:var(--primary); font-size:1rem; margin-bottom:0; display:flex; align-items:center; gap:8px;">
                                 <span class="material-symbols-outlined">movie_filter</span> ${I18n.t('admin_label_prod_sheet')}
                             </h3>
-                            <div style="display:flex; gap:15px;">
-                                <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                            
+                            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                                <div style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:5px;">
                                     <label style="color:#888; font-size:0.8rem;">${I18n.t('admin_label_writer')}</label>
-                                    <input type="text" id="edit-scenariste" value="${Security.escapeHTML(projet.scenariste || '')}" placeholder="Ex: Jean Du-Script" style="padding:10px; border-radius:4px; border:1px solid #444; background:#000; color:white;">
+                                    <input type="text" id="edit-scenariste" value="${Security.escapeHTML(projet.scenariste || '')}" placeholder="Ex: Jean Du-Script" style="padding:12px; border-radius:6px; border:1px solid #444; background:#000; color:white; width:100%;">
                                 </div>
-                                <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                                <div style="flex:1; min-width:200px; display:flex; flex-direction:column; gap:5px;">
                                     <label style="color:#888; font-size:0.8rem;">${I18n.t('admin_label_artist')}</label>
-                                    <input type="text" id="edit-dessinateur" value="${Security.escapeHTML(projet.dessinateur || '')}" placeholder="Ex: Kim Art" style="padding:10px; border-radius:4px; border:1px solid #444; background:#000; color:white;">
+                                    <input type="text" id="edit-dessinateur" value="${Security.escapeHTML(projet.dessinateur || '')}" placeholder="Ex: Kim Art" style="padding:12px; border-radius:6px; border:1px solid #444; background:#000; color:white; width:100%;">
                                 </div>
                             </div>
-                             </div>
+
                             <div style="display:flex; flex-direction:column; gap:5px;">
                                 <label style="color:#888; font-size:0.8rem;">${I18n.t('admin_label_trailer_url')}</label>
-                                <input type="url" id="edit-trailer" value="${Security.escapeHTML(projet.video_promo_url || '')}" placeholder="https://..." style="padding:10px; border-radius:4px; border:1px solid #444; background:#000; color:#60a5fa;">
+                                <input type="url" id="edit-trailer" value="${Security.escapeHTML(projet.video_promo_url || projet.videoPromoUrl || '')}" placeholder="https://..." style="padding:12px; border-radius:6px; border:1px solid #444; background:#000; color:#60a5fa; width:100%;">
                             </div>
                         </div>
 
-                        <div style="display:flex; gap:15px;">
-                            <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                            <div style="flex:1; min-width:140px; display:flex; flex-direction:column; gap:5px;">
                                 <label style="color:#aaa; font-size:0.9rem;">${I18n.t('admin_label_statut_pub')}</label>
-                                <select id="edit-statut" style="padding:15px; border-radius:4px; border:1px solid #444; background:#222; color:white; font-size:1rem;">
+                                <select id="edit-statut" style="padding:15px; border-radius:6px; border:1px solid #444; background:#1a1a20; color:white; font-size:1rem; cursor:pointer;">
                                     <option value="publie" ${!isNew && projet.statut === 'publie' ? 'selected' : ''}>${I18n.t('admin_opt_pub')}</option>
                                     <option value="brouillon" ${!isNew && projet.statut === 'brouillon' ? 'selected' : ''}>${I18n.t('admin_opt_draft')}</option>
                                     <option value="banni" ${!isNew && projet.statut === 'banni' ? 'selected' : ''}>${I18n.t('admin_opt_ban')}</option>
                                 </select>
                             </div>
                             
-                            <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                            <div style="flex:1; min-width:140px; display:flex; flex-direction:column; gap:5px;">
                                 <label style="color:#aaa; font-size:0.9rem;">${I18n.t('admin_label_pegi')}</label>
-                                <select id="edit-pegi" style="padding:15px; border-radius:4px; border:1px solid #444; background:#222; color:white; font-size:1rem;">
+                                <select id="edit-pegi" style="padding:15px; border-radius:6px; border:1px solid #444; background:#1a1a20; color:white; font-size:1rem; cursor:pointer;">
                                     <option value="TP" ${!isNew && projet.pegi === 'TP' ? 'selected' : ''}>${I18n.t('admin_opt_pegi_tp')}</option>
                                     <option value="12+" ${!isNew && projet.pegi === '12+' ? 'selected' : ''}>${I18n.t('admin_opt_pegi_12')}</option>
                                     <option value="16+" ${!isNew && projet.pegi === '16+' ? 'selected' : ''}>${I18n.t('admin_opt_pegi_16')}</option>
@@ -190,27 +191,27 @@ export default class VueAdmin {
                             </div>
                         </div>
 
-                        <label style="color:#aaa; font-size:0.9rem; margin-bottom:-10px; margin-top:10px;">${I18n.t('admin_label_langs')}</label>
-                        <div style="display:flex; gap:15px; background:#1a1a20; padding:15px; border-radius:4px; border:1px solid #444;">
-                            <label style="color:white; display:flex; align-items:center; gap:5px; cursor:pointer;">
-                                <input type="checkbox" name="edit-lang" value="fr" ${(!isNew && projet.langues && projet.langues.includes('fr')) || isNew ? 'checked' : ''}> 🇫🇷 FR
-                            </label>
-                            <label style="color:white; display:flex; align-items:center; gap:5px; cursor:pointer;">
-                                <input type="checkbox" name="edit-lang" value="en" ${!isNew && projet.langues && projet.langues.includes('en') ? 'checked' : ''}> 🇬🇧 EN
-                            </label>
-                            <label style="color:white; display:flex; align-items:center; gap:5px; cursor:pointer;">
-                                <input type="checkbox" name="edit-lang" value="es" ${!isNew && projet.langues && projet.langues.includes('es') ? 'checked' : ''}> 🇪🇸 ES
-                            </label>
-                            <label style="color:white; display:flex; align-items:center; gap:5px; cursor:pointer;">
-                                <input type="checkbox" name="edit-lang" value="jp" ${!isNew && projet.langues && projet.langues.includes('jp') ? 'checked' : ''}> 🇯🇵 JP
-                            </label>
+                        <div style="display:flex; flex-direction:column; gap:10px; margin-top:5px;">
+                            <label style="color:#aaa; font-size:0.9rem;">${I18n.t('admin_label_langs')}</label>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap; background:#1a1a20; padding:15px; border-radius:8px; border:1px solid #444;">
+                                ${['fr', 'en', 'es', 'jp'].map(lang => `
+                                    <label style="color:white; display:flex; align-items:center; gap:8px; cursor:pointer; background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:6px; border:1px solid #333; font-size:0.9rem;">
+                                        <input type="checkbox" name="edit-lang" value="${lang}" ${(!isNew && projet.langues && projet.langues.includes(lang)) || (isNew && lang === 'fr') ? 'checked' : ''} style="accent-color:var(--primary); width:18px; height:18px;"> 
+                                        <span>${lang === 'fr' ? '🇫🇷 FR' : lang === 'en' ? '🇬🇧 EN' : lang === 'es' ? '🇪🇸 ES' : '🇯🇵 JP'}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
                         </div>
 
-                        <label style="color:#aaa; font-size:0.9rem; margin-bottom:-10px; margin-top:10px;">${I18n.t('admin_label_upload_cover')}</label>
-                        <input type="file" id="edit-couverture" accept="image/png, image/jpeg, image/jpg, image/webp" style="padding:15px; border-radius:4px; border:1px dashed #444; background:#1a1a20; color:white; font-size:1rem; cursor:pointer;" ${isNew ? 'required' : ''}>
-                        ${!isNew ? `<p style="font-size:0.85rem; color:#888; font-style:italic; margin-top:-5px;">${I18n.t('admin_txt_current_cover')} : <code>${projet.couverture}</code></p>` : ''}
+                        <div style="display:flex; flex-direction:column; gap:10px; margin-top:5px;">
+                            <label style="color:#aaa; font-size:0.9rem;">${I18n.t('admin_label_upload_cover')}</label>
+                            <div style="position:relative;">
+                                <input type="file" id="edit-couverture" accept="image/png, image/jpeg, image/jpg, image/webp" style="padding:15px; border-radius:8px; border:2px dashed #444; background:#1a1a20; color:white; font-size:0.95rem; cursor:pointer; width:100%; transition:border-color 0.2s;" ${isNew ? 'required' : ''}>
+                            </div>
+                            ${!isNew ? `<p style="font-size:0.8rem; color:#888; font-style:italic; background:rgba(0,0,0,0.3); padding:8px; border-radius:4px; border:1px solid #222;">${I18n.t('admin_txt_current_cover')} : <span style="font-family:monospace; color:#60a5fa; word-break:break-all;">${projet.couverture}</span></p>` : ''}
+                        </div>
                         
-                        <div style="display:flex; gap:15px; margin-top:20px;">
+                        <div style="display:flex; gap:15px; margin-top:10px;">
                             <button type="button" class="btn-secondary btn-close-modal" style="flex:1;"><span class="material-symbols-outlined">close</span> ${I18n.t('admin_btn_cancel')}</button>
                             <button type="submit" class="btn-primary" style="flex:2;">${isNew ? `<span class="material-symbols-outlined">add</span> ${I18n.t('admin_btn_create_serie_confirm')}` : `<span class="material-symbols-outlined">save</span> ${I18n.t('admin_btn_save')}`}</button>
                         </div>

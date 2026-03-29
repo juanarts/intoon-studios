@@ -89,7 +89,8 @@ export default class Reviews {
         const note = Math.round(parseFloat(noteMoyenne));
         let html = '';
         for(let i = 1; i <= 5; i++) {
-            html += `<span style="color:${i <= note ? '#e50914' : '#444'};">★</span>`;
+            const colore = i <= note;
+            html += `<span style="color:${colore ? '#eab308' : '#333'}; font-size:1.2rem; margin-right:2px;">${colore ? '★' : '☆'}</span>`;
         }
         return html;
     }
