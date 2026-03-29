@@ -325,6 +325,7 @@ export default class AdminController {
                         
                         document.getElementById('admin-modal-root').innerHTML = '';
                         AdminController.afficher(); 
+                        alert("✅ Vos modifications ont bien été enregistrées !");
                     } catch(e) {
                         console.error('Erreur form-edit-serie:', e);
                         alert("Erreur BDD: " + (e.message || "Impossible de sauvegarder le projet."));
