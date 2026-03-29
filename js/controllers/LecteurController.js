@@ -12,7 +12,8 @@ export default class LecteurController {
         rafId: null,
         accumulator: 0,    // Accumulation pixels fractionnaires (fix bug v=1)
         hidden: false,
-        hideTimer: null
+        hideTimer: null,
+        commentsPaused: false
     };
 
     static async lireChapitre(idProjet, idChapitre) {
@@ -102,6 +103,7 @@ export default class LecteurController {
             const distanceRestante = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
             if (distanceRestante <= 2) {
                 engine.active = false;
+                engine.commentsPaused = false;
                 engine.accumulator = 0;
                 if (playIcon) playIcon.textContent = 'play_arrow';
                 return;
@@ -112,7 +114,15 @@ export default class LecteurController {
         // Play / Pause
         btnPlay.onclick = () => {
             engine.active = !engine.active;
+            engine.commentsPaused = engine.active;
             playIcon.textContent = engine.active ? 'pause' : 'play_arrow';
+            
+            // Si on lance la lecture dynamique, on efface les commentaires déjà existants pour immersion 100%
+            if (engine.active) {
+                const overlay = document.getElementById('comments-overlay');
+                if (overlay) overlay.innerHTML = '';
+            }
+
             if (engine.active) {
                 engine.rafId = requestAnimationFrame(scrollLoop);
             } else {
@@ -123,6 +133,7 @@ export default class LecteurController {
         // Stop → retour tout en haut + pause
         btnStop.onclick = () => {
             engine.active = false;
+            engine.commentsPaused = false;
             cancelAnimationFrame(engine.rafId);
             playIcon.textContent = 'play_arrow';
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -147,10 +158,22 @@ export default class LecteurController {
             const el = document.documentElement;
             if (!document.fullscreenElement) {
                 el.requestFullscreen().catch(() => {});
-                btnFs.querySelector('.material-symbols-outlined').textContent = 'fullscreen_exit';
             } else {
                 document.exitFullscreen();
-                btnFs.querySelector('.material-symbols-outlined').textContent = 'fullscreen';
+            }
+        };
+
+        // Refonte de l'écouteur Plein Écran pour cacher la Navbar (Responsive Fullscreen)
+        document.onfullscreenchange = () => {
+            const isFs = !!document.fullscreenElement;
+            const navbar = document.querySelector('.navbar');
+            
+            if (btnFs) {
+                btnFs.querySelector('.material-symbols-outlined').textContent = isFs ? 'fullscreen_exit' : 'fullscreen';
+            }
+            if (navbar) {
+                if (isFs) navbar.classList.add('navbar-hidden');
+                else navbar.classList.remove('navbar-hidden');
             }
         };
 
@@ -261,7 +284,7 @@ export default class LecteurController {
         let commentsActive = true;
 
         const dropComment = (text, isUser = false) => {
-            if (!commentsActive) return;
+            if (!commentsActive || LecteurController.scrollEngine.commentsPaused) return;
             const span = document.createElement('span');
             span.textContent = text.toLowerCase();
             span.style.cssText = `
@@ -302,6 +325,7 @@ export default class LecteurController {
 
         const streamInterval = setInterval(() => {
             if (!document.getElementById('comments-overlay')) { clearInterval(streamInterval); return; }
+            if (LecteurController.scrollEngine.commentsPaused) return; // Ne pas générer si lecture
             if (Math.random() > 0.4) dropComment(fakeComments[Math.floor(Math.random() * fakeComments.length)]);
         }, 2200);
 
