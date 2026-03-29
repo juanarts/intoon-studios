@@ -91,7 +91,7 @@ export default class DashboardController {
         modale.id = 'modal-crew';
         modale.innerHTML = `
             <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; display:flex; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
-                <div style="background:#111; border:1px solid #333; padding:40px; border-radius:12px; width:90%; max-width:500px; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
+                <div style="background:#111; border:1px solid #333; padding:25px; border-radius:12px; width:90%; max-width:500px; max-height:90vh; overflow-y:auto; box-sizing:border-box; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
                     <h2 style="font-size:1.8rem; margin-bottom:10px; color:var(--primary);">Fiche de Production</h2>
                     <p style="color:#aaa; margin-bottom:25px; font-size:0.9rem;">Complétez l'équipe créative de <b>${projetActuel.titre}</b> et mettez à jour votre Bande-Annonce Officielle.</p>
                     

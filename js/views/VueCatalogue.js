@@ -305,7 +305,7 @@ export default class VueCatalogue {
                         </div>
 
                         ${projet.scenariste || projet.dessinateur || projet.casting ? `
-                        <div style="margin-bottom:20px; padding:15px; background:rgba(0,0,0,0.4); border:1px dashed #333; border-radius:8px; display:inline-block;">
+                        <div style="margin-bottom:20px; padding:15px; background:rgba(0,0,0,0.4); border:1px dashed #333; border-radius:8px; display:inline-block; max-width:100%; box-sizing:border-box;">
                             <h4 style="margin:0 0 10px 0; color:var(--primary); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Fiche de Production</h4>
                             ${projet.scenariste ? `<p style="margin:4px 0; color:#aaa; font-size:0.95rem;">Scénario : <span style="color:white; font-weight:bold;">${Security.escapeHTML(projet.scenariste)}</span></p>` : ''}
                             ${projet.dessinateur ? `<p style="margin:4px 0; color:#aaa; font-size:0.95rem;">Illustration : <span style="color:white; font-weight:bold;">${Security.escapeHTML(projet.dessinateur)}</span></p>` : ''}
@@ -327,18 +327,18 @@ export default class VueCatalogue {
                             </button>
                             
                             <!-- CTAs DE MONÉTISATION -->
-                            <a href="/vip" data-link class="btn-secondary btn-soutenir" style="border-color:#eab308; color:#eab308!important; margin-left:15px; background:rgba(234,179,8,0.05); display:inline-flex; align-items:center; gap:8px;">
+                            <a href="/vip" data-link class="btn-secondary btn-soutenir" style="border-color:#eab308; color:#eab308!important; background:rgba(234,179,8,0.05); display:inline-flex; align-items:center; gap:8px;">
                                 <span class="material-symbols-outlined">stars</span> ${I18n.t('details_become_sponsor')}
                             </a>
 
-                            <button class="btn-secondary btn-share-project" style="margin-left:10px; background:rgba(255,255,255,0.05); color:white; border:1px solid #333; padding:10px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;" title="Partager cette œuvre">
+                            <button class="btn-secondary btn-share-project" style="background:rgba(255,255,255,0.05); color:white; border:1px solid #333; padding:10px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center;" title="Partager cette œuvre">
                                 <span class="material-symbols-outlined">share</span>
                             </button>
                         </div>
 
                         <!-- [NEW] SECTION BOUTIQUE MARKETPLACE -->
                         ${projet.shopEnabled ? `
-                        <div class="shop-actions" style="margin-top:25px; display:flex; gap:15px; align-items:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); width:fit-content;">
+                        <div class="shop-actions" style="margin-top:25px; display:flex; gap:15px; align-items:center; background:rgba(255,255,255,0.03); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); width:fit-content; max-width:100%; box-sizing:border-box; flex-wrap:wrap;">
                            <span class="material-symbols-outlined" style="color:#60a5fa;">shopping_bag</span>
                            <span style="font-weight:bold; color:#aaa; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px; margin-right:5px;">Collection :</span>
                            
