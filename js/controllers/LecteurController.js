@@ -117,10 +117,13 @@ export default class LecteurController {
             engine.commentsPaused = engine.active;
             playIcon.textContent = engine.active ? 'pause' : 'play_arrow';
             
-            // Si on lance la lecture dynamique, on efface les commentaires déjà existants pour immersion 100%
+            // Si on lance la lecture dynamique, on efface les commentaires déjà existants en fondu pour immersion 100%
             if (engine.active) {
                 const overlay = document.getElementById('comments-overlay');
-                if (overlay) overlay.innerHTML = '';
+                if (overlay) {
+                    const spans = overlay.querySelectorAll('span');
+                    spans.forEach(span => span.style.opacity = '0');
+                }
             }
 
             if (engine.active) {
