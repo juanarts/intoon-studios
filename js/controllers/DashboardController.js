@@ -62,7 +62,7 @@ export default class DashboardController {
                 // Édition Crew
                 const btnCrew = e.target.closest('.btn-edit-crew');
                 if (btnCrew) {
-                    this.ouvrirModaleCrew(btnCrew.getAttribute('data-id'), mesProjets, client);
+                    DashboardController.ouvrirModaleCrew(btnCrew.getAttribute('data-id'), mesProjets, client);
                 }
             };
 
