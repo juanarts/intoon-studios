@@ -100,17 +100,22 @@ export default class DashboardController {
                         
                         <div>
                             <label style="color:#888; font-size:0.85rem; margin-bottom:5px; display:block;">Scénariste(s)</label>
-                            <input type="text" id="crew-scenariste" placeholder="Nom du scénariste..." style="width:100%; padding:12px; background:#222; border:1px solid #444; color:white; border-radius:6px; outline:none;">
+                            <input type="text" id="crew-scenariste" value="${projetActuel.scenariste || ''}" placeholder="Nom du scénariste..." style="width:100%; padding:12px; background:#222; border:1px solid #444; color:white; border-radius:6px; outline:none;">
                         </div>
                         
                         <div>
                             <label style="color:#888; font-size:0.85rem; margin-bottom:5px; display:block;">Dessinateur(s) / Illustrateur(s)</label>
-                            <input type="text" id="crew-dessinateur" placeholder="Nom de l'illustrateur..." style="width:100%; padding:12px; background:#222; border:1px solid #444; color:white; border-radius:6px; outline:none;">
+                            <input type="text" id="crew-dessinateur" value="${projetActuel.dessinateur || ''}" placeholder="Nom de l'illustrateur..." style="width:100%; padding:12px; background:#222; border:1px solid #444; color:white; border-radius:6px; outline:none;">
+                        </div>
+                        
+                        <div>
+                            <label style="color:#888; font-size:0.85rem; margin-bottom:5px; display:block;">Cast (Personnages Principaux / Acteurs)</label>
+                            <input type="text" id="crew-cast" value="${projetActuel.casting || ''}" placeholder="Ex: Alex, Sarah, Leo..." style="width:100%; padding:12px; background:#222; border:1px solid #444; color:white; border-radius:6px; outline:none;">
                         </div>
                         
                         <div>
                             <label style="color:#888; font-size:0.85rem; margin-bottom:5px; display:block;">Mettre à jour le Trailer TV (Lien YouTube / Vimeo)</label>
-                            <input type="url" id="crew-trailer" placeholder="https://youtube.com/..." value="${projetActuel.videoPromoUrl || ''}" style="width:100%; padding:12px; background:#1a1a24; border:1px solid #258cf4; color:white; border-radius:6px; outline:none;">
+                            <input type="url" id="crew-trailer" placeholder="https://youtube.com/..." value="${projetActuel.videoPromoUrl || projetActuel.video_promo_url || ''}" style="width:100%; padding:12px; background:#1a1a24; border:1px solid #258cf4; color:white; border-radius:6px; outline:none;">
                         </div>
 
                         <!-- [NEW] SECTION BOUTIQUE MARKETPLACE -->
@@ -159,23 +164,13 @@ export default class DashboardController {
             try {
                 const scenar = document.getElementById('crew-scenariste').value.trim();
                 const dessin = document.getElementById('crew-dessinateur').value.trim();
+                const cast = document.getElementById('crew-cast').value.trim();
                 const trailer = document.getElementById('crew-trailer').value.trim();
 
-                // On injecte discrètement l'équipe dans la description
-                let newDesc = projetActuel.description || "";
-                if(newDesc.includes('🎬 **Fiche de Production :**')) {
-                    newDesc = newDesc.split('🎬 **Fiche de Production :**')[0].trim();
-                }
-                
-                if (scenar || dessin) {
-                    newDesc += `\n\n🎬 **Fiche de Production :**\n`;
-                    if (scenar) newDesc += `• Scénario : ${scenar}\n`;
-                    if (dessin) newDesc += `• Illustration : ${dessin}\n`;
-                }
-
-                // [NEW] DATA MARKETPLACE
                 const payload = {
-                    description: newDesc,
+                    scenariste: scenar,
+                    dessinateur: dessin,
+                    casting: cast,
                     video_promo_url: trailer || null
                 };
 

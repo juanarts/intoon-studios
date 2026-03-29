@@ -304,6 +304,15 @@ export default class VueCatalogue {
                             </div>
                         </div>
 
+                        ${projet.scenariste || projet.dessinateur || projet.casting ? `
+                        <div style="margin-bottom:20px; padding:15px; background:rgba(0,0,0,0.4); border:1px dashed #333; border-radius:8px; display:inline-block;">
+                            <h4 style="margin:0 0 10px 0; color:var(--primary); font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">Fiche de Production</h4>
+                            ${projet.scenariste ? `<p style="margin:4px 0; color:#aaa; font-size:0.95rem;">Scénario : <span style="color:white; font-weight:bold;">${Security.escapeHTML(projet.scenariste)}</span></p>` : ''}
+                            ${projet.dessinateur ? `<p style="margin:4px 0; color:#aaa; font-size:0.95rem;">Illustration : <span style="color:white; font-weight:bold;">${Security.escapeHTML(projet.dessinateur)}</span></p>` : ''}
+                            ${projet.casting ? `<p style="margin:4px 0; color:#aaa; font-size:0.95rem;">Cast : <span style="color:#60a5fa; font-weight:bold;">${Security.escapeHTML(projet.casting)}</span></p>` : ''}
+                        </div>
+                        ` : ''}
+
                         <p class="description">${projet.description}</p>
                         
                         <div class="hero-actions">
