@@ -269,7 +269,11 @@ export default class AdminController {
                     const inputStatut = document.getElementById('edit-statut').value;
                     const inputPegi = document.getElementById('edit-pegi').value;
                     
-                    const btn = document.querySelector('#form-edit-serie button');
+                    const langsElements = document.querySelectorAll('input[name="edit-lang"]:checked');
+                    const langs = Array.from(langsElements).map(el => el.value);
+                    
+                    const btn = document.querySelector('#form-edit-serie button[type="submit"]');
+                    const originalBtnText = btn.innerHTML;
                     btn.innerHTML = '<span class="material-symbols-outlined" style="animation:spin 1s linear infinite;">sync</span> Sauvegarde Cloud...';
                     btn.disabled = true;
 
@@ -286,7 +290,9 @@ export default class AdminController {
                             const file = couvInput.files[0];
                             const ext = file.name.split('.').pop();
                             const filename = `cover_${Date.now()}.${ext}`;
-                            await client.storage.from('covers').upload(filename, file);
+                            const uploadRes = await client.storage.from('covers').upload(filename, file);
+                            if (uploadRes.error) throw uploadRes.error;
+                            
                             const { data: { publicUrl } } = client.storage.from('covers').getPublicUrl(filename);
                             finalCouv = publicUrl;
                         }
@@ -299,24 +305,31 @@ export default class AdminController {
                             video_promo_url: trailer,
                             couverture_url: finalCouv,
                             statut: inputStatut,
-                            pegi_rating: inputPegi
+                            pegi_rating: inputPegi,
+                            langues: langs
                         };
 
+                        let dbRes;
                         if (editId) {
-                            await client.from('projets').update(payload).eq('id', editId);
+                            dbRes = await client.from('projets').update(payload).eq('id', editId);
                         } else {
                             const currentUser = Auth.getUtilisateur();
                             if(!currentUser) throw new Error("Accès refusé");
                             payload.author_id = currentUser.id;
-                            await client.from('projets').insert([payload]);
+                            dbRes = await client.from('projets').insert([payload]);
+                        }
+                        
+                        if (dbRes && dbRes.error) {
+                            throw dbRes.error;
                         }
                         
                         document.getElementById('admin-modal-root').innerHTML = '';
                         AdminController.afficher(); 
                     } catch(e) {
-                        alert("Erreur BDD: " + e.message);
+                        console.error('Erreur form-edit-serie:', e);
+                        alert("Erreur BDD: " + (e.message || "Impossible de sauvegarder le projet."));
                         btn.disabled = false;
-                        btn.innerHTML = 'Enregistrer';
+                        btn.innerHTML = originalBtnText;
                     }
                 }
 
