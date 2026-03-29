@@ -505,10 +505,35 @@ footer a:hover { color: white; }
 
 /* ── RESPONSIVE DESIGN (Mobile & Tablette) ── */
 @media (max-width: 900px) {
-    /* Navbar Mobile-Friendly */
+    /* Navbar Mobile-Friendly (Burger Menu) */
+    .burger-menu-btn { display: block !important; }
+    
     .nav-container { padding: 0 4%; gap: 10px; }
-    .nav-links { gap: 15px; }
-    .nav-text { display: none !important; } /* Masque les textes des boutons, garde icônes */
+    
+    /* Le menu complet se cache par défaut sur mobile */
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 80px; /* navbar height */
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 10, 0.95);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px 4%;
+        gap: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    /* État ouvert du menu */
+    .nav-links.mobile-open {
+        display: flex !important;
+    }
+    
+    /* Dans le menu burger, on VEUT le texte */
+    .nav-text { display: inline-block !important; margin-left:10px; } /* Restore text in burger menu */
     .logo span.logo-text-hide { display: none; } /* Cache "STUDIOS" sur mobile pour gain de place */
 
     /* Hero Cinematique Adjustments */

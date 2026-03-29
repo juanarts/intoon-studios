@@ -52,15 +52,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Gestion Dynamique de la Navbar (Simulation Authentification)
     const rafraichirNavbar = () => {
         const navLinks = document.querySelector('.nav-links');
-        if (navLinks) {
-            const currentLocale = I18n.getLocale();
-            const switcherHtml = `
-                <div class="lang-switcher" style="display:flex; gap:8px; margin-right:15px; border-right:1px solid rgba(255,255,255,0.1); padding-right:15px; align-items:center;">
-                    <button class="btn-lang ${currentLocale === 'fr' ? 'active' : ''}" data-locale="fr" style="background:${currentLocale === 'fr' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}; border:1px solid ${currentLocale === 'fr' ? 'var(--primary)' : '#444'}; color:${currentLocale === 'fr' ? 'white' : '#888'}; cursor:pointer; padding:3px 7px; border-radius:4px; font-size:0.7rem; font-weight:900; transition:all 0.2s; font-family:'Outfit', sans-serif;" title="Français">FR</button>
-                    <button class="btn-lang ${currentLocale === 'en' ? 'active' : ''}" data-locale="en" style="background:${currentLocale === 'en' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}; border:1px solid ${currentLocale === 'en' ? 'var(--primary)' : '#444'}; color:${currentLocale === 'en' ? 'white' : '#888'}; cursor:pointer; padding:3px 7px; border-radius:4px; font-size:0.7rem; font-weight:900; transition:all 0.2s; font-family:'Outfit', sans-serif;" title="English">EN</button>
-                </div>
-            `;
+        const langContainer = document.getElementById('nav-lang-switcher');
+        
+        const currentLocale = I18n.getLocale();
+        const switcherHtml = `
+            <div class="lang-switcher" style="display:flex; gap:8px; margin-right:5px; border-right:1px solid rgba(255,255,255,0.1); padding-right:15px; align-items:center;">
+                <button class="btn-lang ${currentLocale === 'fr' ? 'active' : ''}" data-locale="fr" style="background:${currentLocale === 'fr' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}; border:1px solid ${currentLocale === 'fr' ? 'var(--primary)' : '#444'}; color:${currentLocale === 'fr' ? 'white' : '#888'}; cursor:pointer; padding:3px 7px; border-radius:4px; font-size:0.7rem; font-weight:900; transition:all 0.2s; font-family:'Outfit', sans-serif;" title="Français">FR</button>
+                <button class="btn-lang ${currentLocale === 'en' ? 'active' : ''}" data-locale="en" style="background:${currentLocale === 'en' ? 'var(--primary)' : 'rgba(255,255,255,0.05)'}; border:1px solid ${currentLocale === 'en' ? 'var(--primary)' : '#444'}; color:${currentLocale === 'en' ? 'white' : '#888'}; cursor:pointer; padding:3px 7px; border-radius:4px; font-size:0.7rem; font-weight:900; transition:all 0.2s; font-family:'Outfit', sans-serif;" title="English">EN</button>
+            </div>
+        `;
+        
+        if (langContainer) langContainer.innerHTML = switcherHtml;
 
+        if (navLinks) {
             if (Auth.estConnecte()) {
                 const unreadCount = Messagerie.getTotalNonLus ? Messagerie.getTotalNonLus() : 0;
                 const badgeHtml = unreadCount > 0 
@@ -73,7 +77,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const couronne = user?.role === 'admin' ? '👑 ' : '';
 
                 navLinks.innerHTML = `
-                    ${switcherHtml}
                     <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">${I18n.t('nav_home')}</span></a>
                     <a href="/shop" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">shopping_bag</span> <span class="nav-text">${I18n.t('nav_shop')}</span></a>
                     <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">${I18n.t('nav_studio')}</span></a>
@@ -89,7 +92,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 `;
             } else {
                 navLinks.innerHTML = `
-                    ${switcherHtml}
                     <a href="/" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">home</span> <span class="nav-text">${I18n.t('nav_home')}</span></a>
                     <a href="/shop" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">shopping_bag</span> <span class="nav-text">${I18n.t('nav_shop')}</span></a>
                     <a href="/studio" data-link style="display:flex; align-items:center; gap:5px;"><span class="material-symbols-outlined" style="font-size:1.1rem;">brush</span> <span class="nav-text">${I18n.t('nav_studio')}</span></a>
@@ -99,6 +101,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     };
+    
+    // Écouteur Menu Burger Mobile
+    const btnBurger = document.getElementById('btn-burger');
+    if (btnBurger) {
+        btnBurger.addEventListener('click', () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                navLinks.classList.toggle('mobile-open');
+            }
+        });
+    }
+
+    // Fermer le menu si l'utilisateur clique sur un lien (Routing SPA)
+    document.body.addEventListener('click', e => {
+        if (e.target.closest('.nav-links a')) {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) navLinks.classList.remove('mobile-open');
+        }
+    });
     
     // Écoute l'événement local de changement d'état
     window.addEventListener('authStateChanged', rafraichirNavbar);
