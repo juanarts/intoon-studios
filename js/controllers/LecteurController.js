@@ -203,6 +203,15 @@ export default class LecteurController {
             engine.rafId = requestAnimationFrame(scrollLoop);
         };
 
+        const controls = document.getElementById('netflix-controls');
+        const navbar = document.getElementById('reader-topbar');
+
+        const toggleUI = (visible) => {
+            const isFs = document.fullscreenElement !== null;
+            if (controls) controls.style.transform = visible ? 'translate(-50%, 0)' : 'translate(-50%, 150%)';
+            if (navbar && !isFs) navbar.style.top = visible ? '0' : '-100px';
+        };
+
         btnPlay.onclick = () => {
             engine.active = !engine.active;
             engine.commentsPaused = engine.active; // Pause Niconico pendant la lecture auto pour meilleure perf
@@ -214,8 +223,10 @@ export default class LecteurController {
                     const spans = overlay.querySelectorAll('span');
                     spans.forEach(span => span.style.opacity = '0'); // Fade out doux
                 }
+                toggleUI(false);
                 engine.rafId = requestAnimationFrame(scrollLoop);
             } else {
+                toggleUI(true);
                 cancelAnimationFrame(engine.rafId);
             }
         };
@@ -227,6 +238,7 @@ export default class LecteurController {
             if (playIcon) playIcon.textContent = 'play_arrow';
             window.scrollTo({ top: 0, behavior: 'smooth' });
             engine.accumulator = 0;
+            toggleUI(true);
         };
 
         // Plein Écran
@@ -234,7 +246,6 @@ export default class LecteurController {
         if (btnFs) {
             btnFs.onclick = () => {
                 const isFs = document.fullscreenElement !== null;
-                const navbar = document.getElementById('reader-topbar');
                 
                 if (!isFs) {
                     document.documentElement.requestFullscreen().catch(err => console.log('Erreur FS', err));
@@ -246,12 +257,23 @@ export default class LecteurController {
             };
         }
 
-        // Fix de la barre (disparition optionnelle)
+        // Clic ou touch sur l'écran pour réafficher ou pauser
+        const handleScreenInteraction = (e) => {
+            if (e.target.closest('button, a, input, form')) return; // ignorer les éléments interactifs
+            if (engine.active) {
+                btnPlay.click(); // Met en pause
+            } else {
+                toggleUI(true); // Réaffiche au touché
+            }
+        };
+        document.addEventListener('click', handleScreenInteraction);
+
+        // Fix de la barre (disparition au scroll)
         let lastScrollY = window.scrollY;
-        const controls = document.getElementById('netflix-controls');
-        const navbar = document.getElementById('reader-topbar');
         
         window.onscroll = () => {
+            if (engine.active) return; // Forcer caché pendant le lecteur
+            
             const isFs = document.fullscreenElement !== null;
             if (window.scrollY > lastScrollY && window.scrollY > 200 && !isFs) {
                 if (controls) controls.style.transform = 'translate(-50%, 150%)'; // Cache en bas
@@ -262,6 +284,13 @@ export default class LecteurController {
             }
             lastScrollY = window.scrollY;
         };
+
+        // Nettoyage spécial pour les écouteurs document-level
+        const cleanupControls = () => {
+             document.removeEventListener('click', handleScreenInteraction);
+             window.removeEventListener('popstate', cleanupControls);
+        };
+        window.addEventListener('popstate', cleanupControls);
     }
 
     // ────────────────────────────────────────────────────────────
