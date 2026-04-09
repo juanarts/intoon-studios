@@ -204,12 +204,24 @@ export default class LecteurController {
         };
 
         const controls = document.getElementById('netflix-controls');
-        const navbar = document.getElementById('reader-topbar');
+        const topbar = document.getElementById('reader-topbar');
 
         const toggleUI = (visible) => {
             const isFs = document.fullscreenElement !== null;
             if (controls) controls.style.transform = visible ? 'translate(-50%, 0)' : 'translate(-50%, 150%)';
-            if (navbar && !isFs) navbar.style.top = visible ? '0' : '-100px';
+            if (topbar && !isFs) topbar.style.top = visible ? '0' : '-100px';
+            
+            // Garantir que la navbar principale (globale de l'app) disparaît aussi
+            const globalNavbar = document.querySelector('.navbar');
+            if (globalNavbar) {
+                if (visible && !isFs) {
+                    globalNavbar.classList.remove('navbar-hidden');
+                    globalNavbar.style.transform = 'translateY(0)';
+                } else {
+                    globalNavbar.classList.add('navbar-hidden');
+                    globalNavbar.style.transform = 'translateY(-100%)';
+                }
+            }
         };
 
         btnPlay.onclick = () => {
@@ -249,10 +261,14 @@ export default class LecteurController {
                 
                 if (!isFs) {
                     document.documentElement.requestFullscreen().catch(err => console.log('Erreur FS', err));
-                    if (navbar) navbar.style.display = 'none'; // Cacher la navbar
+                    if (topbar) topbar.style.display = 'none'; // Cacher la navbar locale
+                    const globalNavbar = document.querySelector('.navbar');
+                    if (globalNavbar) globalNavbar.style.display = 'none';
                 } else {
                     document.exitFullscreen();
-                    if (navbar) navbar.style.display = 'flex'; // Remettre la navbar
+                    if (topbar) topbar.style.display = 'flex'; // Remettre locale
+                    const globalNavbar = document.querySelector('.navbar');
+                    if (globalNavbar) globalNavbar.style.display = 'flex';
                 }
             };
         }
@@ -275,12 +291,22 @@ export default class LecteurController {
             if (engine.active) return; // Forcer caché pendant le lecteur
             
             const isFs = document.fullscreenElement !== null;
-            if (window.scrollY > lastScrollY && window.scrollY > 200 && !isFs) {
+            const globalNavbar = document.querySelector('.navbar');
+            
+            if (window.scrollY > lastScrollY && window.scrollY > 100 && !isFs) {
                 if (controls) controls.style.transform = 'translate(-50%, 150%)'; // Cache en bas
-                if (navbar) navbar.style.top = '-100px';
+                if (topbar) topbar.style.top = '-100px';
+                if (globalNavbar) {
+                    globalNavbar.classList.add('navbar-hidden');
+                    globalNavbar.style.transform = 'translateY(-100%)';
+                }
             } else {
                 if (controls) controls.style.transform = 'translate(-50%, 0)'; // Réaffiche
-                if (navbar && !isFs) navbar.style.top = '0';
+                if (topbar && !isFs) topbar.style.top = '0';
+                if (globalNavbar && !isFs) {
+                    globalNavbar.classList.remove('navbar-hidden');
+                    globalNavbar.style.transform = 'translateY(0)';
+                }
             }
             lastScrollY = window.scrollY;
         };
