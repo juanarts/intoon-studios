@@ -140,25 +140,21 @@ export default class VueLecteur {
                 <!-- OVERLAY COMMENTAIRES TRANSPARENTS -->
                 <div id="comments-overlay" style="position:fixed; top:40px; left:0; right:0; bottom:80px; pointer-events:none; z-index:45; overflow:hidden;"></div>
 
-                <!-- PILULE FLOTTANTE SUR SCROLL-UP -->
-                <div id="floating-reader-menu" class="floating-reader-menu">
-                    <a href="/projet/${projet.slug}" data-link class="floating-btn" title="${I18n.t('reader_btn_back')}">
-                        <span class="material-symbols-outlined">close</span>
+                <!-- BARRE NETFLIX COLLANTE (haut) -->
+                <div class="reader-toolbar" style="position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%); z-index:100; transition:opacity 0.4s;" id="reader-topbar">
+                    <a href="/projet/${projet.slug}" data-link style="color:white; text-decoration:none; display:flex; align-items:center; gap:6px; opacity:0.7; font-size:0.9rem;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+                        <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_back</span>
                     </a>
-                    
-                    <div class="floating-title" title="${projet.titre} - Ch. ${chapitre.ordre}">
-                        Ch. ${chapitre.ordre} <br><span style="font-size:0.7rem; color:#888;">${projet.titre}</span>
+                    <span style="font-size:0.9rem; color:rgba(255,255,255,0.7); font-family:'Outfit',sans-serif; letter-spacing:1px; text-align:center;">
+                        Ch.<strong>${chapitre.ordre}</strong> — ${projet.titre}
+                        <div style="font-size:0.75rem; margin-top:2px;"><a href="/profil/${projet.authorPseudo}" data-link style="color:var(--primary); text-decoration:none; opacity:0.8;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">${I18n.t('by') || 'Par'} ${projet.authorPseudo}</a></div>
+                    </span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        ${formComment}
+                        <button id="toggle-comments" style="background:none; border:none; color:rgba(255,255,255,0.5); cursor:pointer; padding:4px;" title="Commentaires">
+                            <span class="material-symbols-outlined" style="font-size:1.2rem;">chat</span>
+                        </button>
                     </div>
-
-                    ${formComment}
-                    
-                    <button id="toggle-comments" class="floating-btn" title="Activer/Désactiver Niconico">
-                        <span class="material-symbols-outlined">chat</span>
-                    </button>
-
-                    <button id="btn-floating-play" class="floating-btn primary" title="Auto Scroll">
-                        <span class="material-symbols-outlined">swipe_down</span>
-                    </button>
                 </div>
 
                 <!-- CONTAINER SLIDES VERTICAL (scroll classique entre les planches) -->

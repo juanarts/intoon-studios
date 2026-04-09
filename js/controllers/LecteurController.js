@@ -82,7 +82,6 @@ export default class LecteurController {
 
                 LecteurController.initialiserControlesNetflix();
                 LecteurController.initialiserCommentairesImmersifs();
-                LecteurController.initialiserAutoHide();
                 LecteurController.initialiserLazyLoading();
                 
                 SEOManager.update({
@@ -170,7 +169,99 @@ export default class LecteurController {
     // MOTEUR NETFLIX : AUTO-SCROLL CINÉMATIQUE
     // ────────────────────────────────────────────────────────────
     static initialiserControlesNetflix() {
-        // Transféré à la pilule flottante (voir initialiserAutoHide)
+        const btnPlay = document.getElementById('btn-play-pause');
+        const btnStop = document.getElementById('btn-stop');
+        const slider = document.getElementById('scroll-speed');
+        const playIcon = document.getElementById('play-icon');
+        const engine = LecteurController.scrollEngine;
+
+        if (!btnPlay || !btnStop || !slider) return;
+
+        slider.value = engine.speed;
+        slider.oninput = (e) => engine.speed = parseInt(e.target.value);
+
+        const scrollLoop = () => {
+            if (!engine.active) return;
+
+            // Accumulation des pixels fractionnaires pour éviter que scrollBy(0,0.3) = 0
+            engine.accumulator += engine.speed * 0.4;
+            const pixelsToScroll = Math.floor(engine.accumulator);
+            if (pixelsToScroll >= 1) {
+                window.scrollBy(0, pixelsToScroll);
+                engine.accumulator -= pixelsToScroll;
+            }
+
+            // Fin naturelle de la page → pause automatique
+            const distanceRestante = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
+            if (distanceRestante <= 2) {
+                engine.active = false;
+                engine.commentsPaused = false;
+                engine.accumulator = 0;
+                if (playIcon) playIcon.textContent = 'play_arrow';
+                return;
+            }
+            engine.rafId = requestAnimationFrame(scrollLoop);
+        };
+
+        btnPlay.onclick = () => {
+            engine.active = !engine.active;
+            engine.commentsPaused = engine.active; // Pause Niconico pendant la lecture auto pour meilleure perf
+            if (playIcon) playIcon.textContent = engine.active ? 'pause' : 'play_arrow';
+            
+            if (engine.active) {
+                const overlay = document.getElementById('comments-overlay');
+                if (overlay) {
+                    const spans = overlay.querySelectorAll('span');
+                    spans.forEach(span => span.style.opacity = '0'); // Fade out doux
+                }
+                engine.rafId = requestAnimationFrame(scrollLoop);
+            } else {
+                cancelAnimationFrame(engine.rafId);
+            }
+        };
+
+        btnStop.onclick = () => {
+            engine.active = false;
+            engine.commentsPaused = false;
+            cancelAnimationFrame(engine.rafId);
+            if (playIcon) playIcon.textContent = 'play_arrow';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            engine.accumulator = 0;
+        };
+
+        // Plein Écran
+        const btnFs = document.getElementById('btn-fullscreen');
+        if (btnFs) {
+            btnFs.onclick = () => {
+                const isFs = document.fullscreenElement !== null;
+                const navbar = document.getElementById('reader-topbar');
+                
+                if (!isFs) {
+                    document.documentElement.requestFullscreen().catch(err => console.log('Erreur FS', err));
+                    if (navbar) navbar.style.display = 'none'; // Cacher la navbar
+                } else {
+                    document.exitFullscreen();
+                    if (navbar) navbar.style.display = 'flex'; // Remettre la navbar
+                }
+            };
+        }
+
+        // Fix de la barre (disparition optionnelle)
+        let lastScrollY = window.scrollY;
+        const controls = document.getElementById('netflix-controls');
+        const navbar = document.getElementById('reader-topbar');
+        
+        window.onscroll = () => {
+            const isFs = document.fullscreenElement !== null;
+            if (window.scrollY > lastScrollY && window.scrollY > 200 && !isFs) {
+                if (controls) controls.style.transform = 'translate(-50%, 150%)'; // Cache en bas
+                if (navbar) navbar.style.top = '-100px';
+            } else {
+                if (controls) controls.style.transform = 'translate(-50%, 0)'; // Réaffiche
+                if (navbar && !isFs) navbar.style.top = '0';
+            }
+            lastScrollY = window.scrollY;
+        };
     }
 
     // ────────────────────────────────────────────────────────────
@@ -313,118 +404,7 @@ export default class LecteurController {
     // ────────────────────────────────────────────────────────────
     // AUTO-HIDE : Les contrôles disparaissent après 3s d'inactivité
     // ────────────────────────────────────────────────────────────
-    static initialiserAutoHide() {
-        const menu = document.getElementById('floating-reader-menu');
-        const engine = LecteurController.scrollEngine;
-        if (!menu) return;
-
-        let lastScrollY = window.scrollY;
-        
-        const show = () => {
-            menu.classList.add('visible');
-            clearTimeout(engine.hideTimer);
-            if (engine.active) {
-                engine.hideTimer = setTimeout(hide, 3000);
-            } else {
-                engine.hideTimer = setTimeout(hide, 5000); // Hide after 5s idle
-            }
-        };
-
-        const hide = () => {
-            menu.classList.remove('visible');
-        };
-
-        // On scroll UP shows menu, on scroll DOWN hides menu
-        const onScroll = () => {
-            const currentScrollY = window.scrollY;
-            if (currentScrollY < lastScrollY - 15) {
-                show();
-            } else if (currentScrollY > lastScrollY + 15) {
-                if (!engine.active) hide();
-            }
-            lastScrollY = currentScrollY;
-        };
-
-        window.addEventListener('scroll', onScroll, { passive: true });
-        document.addEventListener('mousemove', show);
-        document.addEventListener('touchstart', show);
-
-        // Initial show
-        show();
-        
-        // Auto-scroll logic mapped to the floating play button
-        const btnPlay = document.getElementById('btn-floating-play');
-        const playIcon = btnPlay ? btnPlay.querySelector('.material-symbols-outlined') : null;
-        
-        const scrollLoop = () => {
-            if (!engine.active) return;
-            engine.accumulator += engine.speed * 0.4;
-            const pixelsToScroll = Math.floor(engine.accumulator);
-            if (pixelsToScroll >= 1) {
-                window.scrollBy(0, pixelsToScroll);
-                engine.accumulator -= pixelsToScroll;
-            }
-            const distanceRestante = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
-            if (distanceRestante <= 2) {
-                engine.active = false;
-                engine.commentsPaused = false;
-                engine.accumulator = 0;
-                if (playIcon) playIcon.textContent = 'swipe_down';
-                return;
-            }
-            engine.rafId = requestAnimationFrame(scrollLoop);
-        };
-        
-        if (btnPlay) {
-            btnPlay.onclick = () => {
-                engine.active = !engine.active;
-                engine.commentsPaused = engine.active;
-                if (playIcon) playIcon.textContent = engine.active ? 'pause' : 'swipe_down';
-                
-                if (engine.active) {
-                    const overlay = document.getElementById('comments-overlay');
-                    if (overlay) {
-                        const spans = overlay.querySelectorAll('span');
-                        spans.forEach(span => span.style.opacity = '0');
-                    }
-                    engine.rafId = requestAnimationFrame(scrollLoop);
-                    engine.hideTimer = setTimeout(hide, 1500);
-                } else {
-                    cancelAnimationFrame(engine.rafId);
-                    show();
-                }
-            };
-        }
-        
-        // Connect key events for Space/Escape
-        document.onkeydown = (e) => {
-            const forbiddenTags = ['INPUT', 'TEXTAREA', 'SELECT'];
-            if (forbiddenTags.includes(e.target.tagName)) return;
-            if (e.code === 'Space') { 
-                e.preventDefault(); 
-                if (btnPlay) btnPlay.click(); 
-            }
-            if (e.code === 'Escape' || e.code === 'KeyS') {
-                engine.active = false;
-                engine.commentsPaused = false;
-                cancelAnimationFrame(engine.rafId);
-                if (playIcon) playIcon.textContent = 'swipe_down';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                show();
-            }
-            show();
-        };
-
-        // Fix mouse wheel pausing the auto-scroll
-        window.addEventListener('wheel', () => {
-            if (engine.active) {
-                engine.active = false;
-                cancelAnimationFrame(engine.rafId);
-                if (playIcon) playIcon.textContent = 'swipe_down';
-                show();
-            }
-        }, { passive: true });
-    }
+    // AutoHide retiré (retour aux contrôles classiques)
 
     // ────────────────────────────────────────────────────────────
     // COMMENTAIRES NicoNico IMMERSIFS
