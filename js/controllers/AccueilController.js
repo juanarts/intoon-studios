@@ -102,7 +102,12 @@ export default class AccueilController {
     static initialiserCarousel() {
         const slides = document.querySelectorAll('.hero-slide');
         const dots = document.querySelectorAll('.hero-dots .dot');
-        if (slides.length <= 1) return;
+        const dotsContainer = document.querySelector('.hero-dots');
+        if (slides.length <= 1) {
+            // Cacher les dots s'il n'y a qu'une seule slide
+            if (dotsContainer) dotsContainer.style.display = 'none';
+            return;
+        }
 
         let currentIndex = 0;
         let timer = null;
@@ -313,31 +318,31 @@ export default class AccueilController {
             span.style = `
                 position: absolute;
                 white-space: nowrap;
-                color: rgba(255,255,255,0.8);
+                color: rgba(255,255,255,0.35);
                 font-family: 'Inter', sans-serif;
-                font-weight: 700;
-                font-size: ${Math.random() * 0.5 + 0.9}rem;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-                left: ${Math.random() * 80 + 5}%;
+                font-weight: 300;
+                font-size: ${Math.random() * 0.3 + 0.75}rem;
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+                left: ${Math.random() * 75 + 5}%;
                 top: 100%;
                 opacity: 0;
-                transition: top 12s linear, opacity 1s;
+                transition: top 10s linear, opacity 0.8s;
                 pointer-events: none;
-                z-index: 100;
+                z-index: 4;
             `;
             
             overlay.appendChild(span);
             // Animation : Monte du bas vers le haut
             setTimeout(() => {
                 span.style.opacity = '1';
-                span.style.top = '-20%';
+                span.style.top = '10%'; // Monte uniquement jusqu'à 10% du haut (reste discret dans la zone vidéo)
             }, 100);
 
             // Nettoyage
             setTimeout(() => span.remove(), 13000);
             
-            // Prochain commentaire entre 1.5s et 4s
-            setTimeout(createComment, 1500 + Math.random() * 2500);
+            // Prochain commentaire entre 4s et 8s (moins fréquent)
+            setTimeout(createComment, 4000 + Math.random() * 4000);
         };
 
         // Lancement progressif des 3 premiers
