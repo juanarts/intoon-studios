@@ -1,5 +1,6 @@
 import VueSoumission from '../views/VueSoumission.js';
 import Projet from '../models/Projet.js';
+import Chapitre from '../models/Chapitre.js';
 import Auth from '../models/Auth.js';
 import SupabaseService from '../services/SupabaseService.js';
 
@@ -8,36 +9,116 @@ export default class SoumissionController {
         const app = document.getElementById('app');
         app.innerHTML = VueSoumission.rendre();
         
-        // Logique Réelle d'envoi du dossier vers la modération
+        let planchesToUpload = [];
+
+        // --- GESTION DU DRAG & DROP ET COMPRESSION WEB-P ---
+        const dropzone = document.getElementById('dropzone-planches');
+        const inputPlanches = document.getElementById('input-planches');
+        const previewContainer = document.getElementById('preview-planches');
+
+        if (dropzone && inputPlanches) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => dropzone.style.borderColor = 'var(--primary)', false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => dropzone.style.borderColor = '#555', false);
+            });
+
+            dropzone.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files), false);
+            inputPlanches.addEventListener('change', (e) => handleFiles(e.target.files), false);
+            
+            dropzone.addEventListener('click', (e) => {
+                if(e.target.tagName !== 'BUTTON') inputPlanches.click();
+            });
+
+            async function handleFiles(files) {
+                const imgFiles = [...files].filter(f => f.type.startsWith('image/'));
+                // Trier par nom (utile pour manga_01, manga_02...)
+                imgFiles.sort((a,b) => a.name.localeCompare(b.name));
+                
+                dropzone.querySelector('h3').textContent = 'Compression en cours...';
+                
+                for (let i = 0; i < imgFiles.length; i++) {
+                    const file = imgFiles[i];
+                    try {
+                        const compressedBlob = await compressImage(file, 800);
+                        planchesToUpload.push({
+                            blob: compressedBlob,
+                            name: `planche_${Date.now()}_${planchesToUpload.length}.webp`,
+                            originalName: file.name
+                        });
+                    } catch (e) {
+                        console.error("Compression failed", e);
+                    }
+                }
+                dropzone.querySelector('h3').textContent = 'Planches uploadées et compressées !';
+                renderPreviews();
+            }
+
+            function renderPreviews() {
+                previewContainer.innerHTML = planchesToUpload.map((p, idx) => {
+                    const url = URL.createObjectURL(p.blob);
+                    return `
+                        <div style="position:relative; width:80px; height:120px; border-radius:4px; overflow:hidden; border:1px solid #444;">
+                            <img src="${url}" style="width:100%; height:100%; object-fit:cover;">
+                            <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.7); color:white; font-size:0.7rem; text-align:center; padding:2px;">${idx + 1}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function compressImage(file, maxWidth) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = event => {
+                        const img = new Image();
+                        img.src = event.target.result;
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            canvas.toBlob(blob => resolve(blob), 'image/webp', 0.85);
+                        };
+                        img.onerror = error => reject(error);
+                    };
+                    reader.onerror = error => reject(error);
+                });
+            }
+        }
+
+        // --- SOUMISSION ---
         document.getElementById('form-soumission').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Extraction des données du DOM
             const inputs = e.target.querySelectorAll('input, select, textarea');
             const auteurNom = inputs[0].value;
             const titreProjet = inputs[2].value;
             const descriptionPitch = inputs[4].value;
-            const lienPlanches = inputs[7].value; 
             
             const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerHTML = 'Upload en cours (veuillez patienter)...';
+            btn.innerHTML = 'Upload en cours (Création du Chapitre 1)...';
             btn.disabled = true;
 
             try {
-                // Traitement Vidéo
+                // Video & Cover handling existant...
                 const videoInput = document.getElementById('soumission-video');
                 const videoUrlInput = document.getElementById('soumission-video-url');
-                let finalVideoUrl = videoUrlInput.value.trim() !== '' ? videoUrlInput.value.trim() : null;
+                let finalVideoUrl = videoUrlInput ? videoUrlInput.value.trim() : null;
                 let fileVideo = (videoInput && videoInput.files.length > 0) ? videoInput.files[0] : null;
 
-                if (fileVideo && fileVideo.size > 20 * 1024 * 1024) { 
-                    alert('⚠️ La vidéo dépasse 20 Mo !');
-                    btn.innerHTML = 'Envoyer ma candidature 🔥';
-                    btn.disabled = false;
-                    return; 
-                }
-
-                // Récupération Cover
                 const coverInput = document.getElementById('soumission-cover');
                 let fileCover = (coverInput && coverInput.files.length > 0) ? coverInput.files[0] : null;
 
@@ -45,50 +126,72 @@ export default class SoumissionController {
                 let uploadedCoverUrl = "";
                 let uploadedVideoUrl = finalVideoUrl;
 
-                // 1. Upload Cover sur le Bucket (Storage)
                 if (fileCover) {
                     const ext = fileCover.name.split('.').pop();
                     const filename = `cover_${Date.now()}.${ext}`;
-                    const { data: dCover, error: eCover } = await client.storage.from('covers').upload(filename, fileCover);
-                    if (eCover) throw new Error("Erreur d'upload de la couverture: " + eCover.message);
-                    
+                    const { error: eCover } = await client.storage.from('covers').upload(filename, fileCover);
+                    if (eCover) throw new Error("Erreur Cover: " + eCover.message);
                     const { data: { publicUrl: pCoverUrl } } = client.storage.from('covers').getPublicUrl(filename);
                     uploadedCoverUrl = pCoverUrl;
                 }
 
-                // 2. Upload Video Natif (Storage)
                 if (fileVideo && !finalVideoUrl) {
                     const ext = fileVideo.name.split('.').pop();
                     const filename = `video_${Date.now()}.${ext}`;
-                    const { data: dVid, error: eVid } = await client.storage.from('videos').upload(filename, fileVideo);
-                    if (eVid) throw new Error("Erreur d'upload de la vidéo: " + eVid.message);
-                    
+                    const { error: eVid } = await client.storage.from('videos').upload(filename, fileVideo);
+                    if (eVid) throw new Error("Erreur Vidéo: " + eVid.message);
                     const { data: { publicUrl: pVidUrl } } = client.storage.from('videos').getPublicUrl(filename);
                     uploadedVideoUrl = pVidUrl;
                 }
 
-                // 3. Insertion SQL en BDD
+                // 1. Insertion SQL (Projet)
                 const currentUser = Auth.getUtilisateur();
-                if (!currentUser || !currentUser.id) throw new Error("Vous devez être connecté (compte Supabase) pour publier.");
+                if (!currentUser || !currentUser.id) throw new Error("Vous devez être connecté (compte Supabase).");
 
-                await Projet.ajouter({
+                const projetDbInfo = await Projet.ajouter({
                     author_id: currentUser.id,
                     titre: titreProjet,
-                    description: descriptionPitch + `\n\n[Uploadé par le Créateur : ${auteurNom}]\n[Lien externe Planches : ${lienPlanches}]`,
+                    description: descriptionPitch + `\n\n[Uploadé par le Créateur : ${auteurNom}]`,
                     couverture: uploadedCoverUrl || 'https://images.unsplash.com/photo-1542435503-956c469947f6?w=600&q=80',
                     videoPromoUrl: uploadedVideoUrl,
                     statut: 'brouillon',
                     pegi: 'TP'
                 });
+
+                // 2. Upload des planches & Création du Chapitre 1
+                let uploadedPlanchesUrls = [];
+                if (planchesToUpload.length > 0) {
+                    btn.innerHTML = `Envoi des ${planchesToUpload.length} Planches...`;
+                    for (let p of planchesToUpload) {
+                        const { error: ePlanche } = await client.storage.from('planches').upload(p.name, p.blob);
+                        if (!ePlanche) {
+                            const { data: { publicUrl: pPlancheUrl } } = client.storage.from('planches').getPublicUrl(p.name);
+                            uploadedPlanchesUrls.push(pPlancheUrl);
+                        } else {
+                            console.error("Erreur de transfert pour", p.name, ePlanche);
+                        }
+                    }
+
+                    // Créer le chapitre 1 si des pages existent
+                    if(uploadedPlanchesUrls.length > 0) {
+                        await Chapitre.ajouter({
+                            projet_id: projetDbInfo.id,
+                            titre: "Épisode 1",
+                            ordre: 1,
+                            pages_urls: uploadedPlanchesUrls,
+                            is_premium: false
+                        });
+                    }
+                }
                 
-                // Succès Visualisation
+                // Succès 
                 e.target.innerHTML = `
                     <div style="text-align:center; padding:60px 10px; animation:fadeIn 0.5s;">
                         <div style="font-size:4rem; margin-bottom:20px;">✅</div>
-                        <h2 style="color:white; font-size:2.2rem; margin-bottom:15px;">Œuvre uploadée sur le Cloud !</h2>
+                        <h2 style="color:white; font-size:2.2rem; margin-bottom:15px;">Projet & Chapitre 1 en ligne !</h2>
                         <p style="color:#aaa; font-size:1.1rem; line-height:1.6; max-width:500px; margin:0 auto;">
-                            Félicitations <b>${auteurNom}</b> ! Votre série <i>${titreProjet}</i> a bien été aspirée dans notre Base de Données Sécurisée.<br><br>
-                            Vos images sont désormais stockées de façon permanente. Nos équipes vont vérifier tout cela !
+                            Félicitations <b>${auteurNom}</b> ! Votre webtoon <i>${titreProjet}</i> a été compressé intelligemment (format WebP) et téléversé.<br><br>
+                            Il est actullement en statut de "Brouillon" dans votre tableau de bord.
                         </p>
                         <br><br>
                         <a href="/" data-link class="btn-primary">Retour à l'Accueil</a>

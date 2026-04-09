@@ -26,6 +26,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Initialiser le système de traduction
     I18n.init();
     
+    // Initialiser le Service Worker pour la PWA
+    if ('serviceWorker' in navigator) {
+        try {
+            await navigator.serviceWorker.register('/sw.js');
+            console.log('[PWA] Service Worker enregistré avec succès');
+        } catch (e) {
+            console.warn("[PWA] Erreur d'enregistrement du Service Worker", e);
+        }
+    }
+    
     // Attendre le chargement de la session Supabase avant de dessiner la page
     await Auth.initialiser();
     

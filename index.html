@@ -3,8 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INTOON STUDIOS - Lisez les meilleurs Webtoons Originaux</title>
-    <meta name="description" content="Plongez dans les univers d'INTOON STUDIOS. Lisez des dizaines de chapitres de webtoons d'action, romance et isekai gratuitement et en avant-première.">
+    <title id="meta-title">INTOON STUDIOS - Le Meilleur du Webtoon Original</title>
+    <meta name="description" id="meta-desc" content="Plongez dans les univers d'INTOON STUDIOS. Lisez des webtoons d'action, romance et isekai gratuitement et en avant-première.">
+    
+    <!-- SEO / OpenGraph (Réseaux Sociaux) Dynamique -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" id="og-url" content="https://intoonstudio.com">
+    <meta property="og:title" id="og-title" content="INTOON STUDIOS">
+    <meta property="og:description" id="og-desc" content="Lisez des webtoons originaux et de qualité.">
+    <meta property="og:image" id="og-image" content="/assets/favicon.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
     <!-- Google Fonts: Inter pour un look Netflix authentique (UI solide et lisible) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +26,10 @@
     <!-- Favicon Premium -->
     <link rel="icon" type="image/png" href="/assets/favicon.png">
     
+    <!-- PWA Manifest & Theme Color -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#c91f27">
+
     <!-- Style principal -->
     <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -32,10 +46,10 @@
                     <path class="svg-page-right" d="M 20 6 L 34 12.5 L 34 32.5 L 20 26 Z" fill="rgba(255,255,255,0.8)" />
                     <!-- Couverture avant (Rouge INTOON) -->
                     <path class="svg-cover-left" d="M 4 13.5 L 20 6 L 20 26 L 4 33.5 Z" fill="var(--primary)" stroke="#c91f27" stroke-width="1" stroke-linejoin="round"/>
-                    <!-- Rayon / Connecteur Tech -->
-                    <path class="svg-beam" d="M 12 18 L 26 12" stroke="#FFD700" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2" opacity="0.8"/>
-                    <!-- Puce centrale / Étincelle de création -->
-                    <circle class="svg-dot" cx="20" cy="14.5" r="2.5" fill="#FFD700" />
+                    
+                    <!-- Lignes intérieures du livre (effet pages manga pur) -->
+                    <path d="M 20 6 L 20 26" stroke="#c91f27" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M 23 9 L 34 15" stroke="rgba(200,200,200,0.5)" stroke-width="0.8" stroke-dasharray="3 3"/>
                 </svg>
                 
                 <div>

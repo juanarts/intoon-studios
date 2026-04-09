@@ -26,7 +26,7 @@ export default class VueVip {
                             <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#4ade80;">check_circle</span> ${I18n.t('vip_t1_feat3')}</li>
                         </ul>
                         
-                        <a href="/checkout" data-link class="btn-secondary" style="width:100%; border:1px solid white; padding:15px; font-size:1.1rem; text-align:center; display:block; box-sizing:border-box;">${I18n.t('vip_btn_choose')}</a>
+                        <a href="#" onclick="alert('Cette section sera bientôt disponible (retour)'); return false;" class="btn-secondary" style="width:100%; border:1px solid white; padding:15px; font-size:1.1rem; text-align:center; display:block; box-sizing:border-box; opacity: 0.7;">${I18n.t('vip_btn_choose')}</a>
                     </div>
 
                     <!-- TIER 2 -->
@@ -43,7 +43,7 @@ export default class VueVip {
                             <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">auto_awesome</span> ${I18n.t('vip_t2_feat4')}</li>
                         </ul>
                         
-                        <a href="/checkout?plan=35" data-link class="btn-primary" style="width:100%; padding:15px; font-size:1.1rem; text-align:center; display:block; box-sizing:border-box; background:#eab308; color:black; border:none;">${I18n.t('vip_btn_choose')}</a>
+                        <a href="#" onclick="alert('Cette section sera bientôt disponible (retour)'); return false;" class="btn-primary" style="width:100%; padding:15px; font-size:1.1rem; text-align:center; display:block; box-sizing:border-box; background:#eab308; color:black; border:none; opacity: 0.7;">${I18n.t('vip_btn_choose')}</a>
                     </div>
 
                     <!-- TIER 3 -->
@@ -61,7 +61,7 @@ export default class VueVip {
                             <li style="display:flex; align-items:center; gap:10px; margin-bottom:15px;"><span class="material-symbols-outlined" style="color:#eab308;">local_fire_department</span> ${I18n.t('vip_t3_feat5')}</li>
                         </ul>
                         
-                        <a href="/checkout?plan=50" data-link class="btn-primary" style="width:100%; padding:15px; font-size:1.1rem; text-align:center; display:block; box-sizing:border-box; background:#eab308; color:black; border:none; box-shadow:0 10px 20px rgba(0,0,0,0.3);">${I18n.t('vip_btn_choose')}</a>
+                        <a href="#" onclick="alert('Cette section sera bientôt disponible (retour)'); return false;" class="btn-primary" style="width:100%; padding:15px; font-size:1.1rem; text-align:center; display:block; box-sizing:border-box; background:#eab308; color:black; border:none; box-shadow:0 10px 20px rgba(0,0,0,0.3); opacity: 0.7;">${I18n.t('vip_btn_choose')}</a>
                     </div>
 
                 </div>

@@ -2,15 +2,16 @@ import I18n from '../utils/I18n.js';
 
 export default class VueLecteur {
     
-    static rendreLecteur(projet, chapitre, estConnecte = false) {
+    static rendreLecteur(projet, chapitre, estConnecte = false, user = null, estDebloque = true) {
         if (!chapitre) {
             return `<div class="lecteur-error"><h2>${I18n.t('reader_not_found')}</h2><a href="/" data-link class="btn-primary">${I18n.t('reader_btn_back')}</a></div>`;
         }
 
-        const maximumVuesLibres = estConnecte ? 9999 : 2;
-        const imagesAPrelever = Math.min(chapitre.pages.length, maximumVuesLibres);
+        // Si le chapitre n'est pas débloqué (Fast Pass requis et non-VIP et non-acheté)
+        // On montre seulement la 1ère image (Teaser)
+        const imagesAPrelever = estDebloque ? chapitre.pages.length : 1;
         
-        // Format HORIZONTAL cinématique : 1 planche = 1 slide plein écran
+        // Format HORIZONTAL cinématique
         const pagesVisibles = chapitre.pages.slice(0, imagesAPrelever).map((url, index) => `
             <div class="reader-slide" data-index="${index}" style="
                 width: 100%;
@@ -22,8 +23,8 @@ export default class VueLecteur {
                 line-height: 0;
             ">
                 <img 
-                    class="webtoon-page-horizontal" 
-                    src="${url}" 
+                    class="webtoon-page-horizontal ${index >= 2 ? 'lazy-image' : ''}" 
+                    ${index < 2 ? `src="${url}"` : `data-src="${url}"`}
                     alt="${I18n.t('reader_page')} ${index + 1}"
                     style="
                         width: 100%;
@@ -32,7 +33,6 @@ export default class VueLecteur {
                         user-select: none;
                         -webkit-user-drag: none;
                     "
-                    loading="${index < 2 ? 'eager' : 'lazy'}"
                 >
 
                 <div class="slide-number" style="
@@ -44,41 +44,86 @@ export default class VueLecteur {
                     font-family: 'Outfit', sans-serif;
                     letter-spacing: 2px;
                     pointer-events:none;
-                ">${index + 1} / ${imagesAPrelever}</div>
+                ">${index + 1} / ${chapitre.pages.length}</div>
             </div>
         `).join('');
 
-        // Paywall flou si non-connecté
+        // Paywall Fast Pass
         let sectionBloqueeHtml = '';
-        if (!estConnecte && chapitre.pages.length > maximumVuesLibres) {
-            const imgBloquee = chapitre.pages[maximumVuesLibres];
+        if (!estDebloque) {
+            const imgBloquee = chapitre.pages[1] || chapitre.pages[0]; // Image 2 floutée
+            
+            let messagePaywall = '';
+            if (!estConnecte) {
+                messagePaywall = `
+                    <h2 style="font-size:2.5rem; color:white; margin-bottom:15px; font-family:'Outfit',sans-serif;">Chapitre Restreint</h2>
+                    <p style="color:#aaa; font-size:1.1rem; margin-bottom:30px; max-width:450px; line-height:1.6;">Pour lire la suite de cette œuvre, vous devez créer un compte.</p>
+                    <a href="/inscription" data-link class="btn-primary" style="font-size:1.2rem; padding:15px 40px;">S'inscrire gratuitement</a>
+                    <a href="/connexion" data-link style="color:#aaa; margin-top:15px; font-size:0.9rem;">Déjà membre ? Se connecter</a>
+                `;
+            } else {
+                messagePaywall = `
+                    <div style="background:rgba(234, 179, 8, 0.1); border:1px solid #eab308; padding:5px 15px; border-radius:20px; color:#eab308; font-weight:800; font-size:0.8rem; letter-spacing:2px; margin-bottom:15px; text-transform:uppercase;">Exclusivité Fast Pass</div>
+                    <h2 style="font-size:2.5rem; color:white; margin-bottom:15px; font-family:'Outfit',sans-serif;">Débloquez ce Chapitre</h2>
+                    <p style="color:#aaa; font-size:1.1rem; margin-bottom:30px; max-width:450px; line-height:1.6;">Ce chapitre est en accès anticipé. Débloquez-le immédiatement avec <strong style="color:#eab308">50 Pièces</strong> ou abonnez-vous au grade Membre VIP pour un accès illimité !</p>
+                    
+                    <button id="btn-unlock-fastpass" class="btn-primary" style="font-size:1.2rem; padding:15px 40px; background:#eab308; color:black; border:none; display:flex; align-items:center; gap:10px; font-weight:bold; cursor:pointer; box-shadow:0 0 20px rgba(234,179,8,0.4);">
+                        <span class="material-symbols-outlined">toll</span> DÉBLOQUER - 50 COINS
+                    </button>
+                    
+                    <a href="/vip" data-link style="color:#aaa; margin-top:20px; font-size:0.9rem; text-decoration:underline;">Devenir Membre VIP</a>
+                `;
+            }
+
             sectionBloqueeHtml = `
                 <div class="reader-slide" style="width:100%; min-height:90vh; display:flex; justify-content:center; align-items:center; background:#000; position:relative; flex-shrink:0;">
-                    <img src="${imgBloquee}" style="max-width:1400px; width:100%; height:auto; filter:blur(16px) brightness(0.35); pointer-events:none;">
+                    <img src="${imgBloquee}" style="max-width:1400px; width:100%; height:auto; filter:blur(24px) brightness(0.25); pointer-events:none;">
                     <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:40px;">
-                        <span class="material-symbols-outlined" style="font-size:4rem; color:var(--primary); margin-bottom:20px;">lock</span>
-                        <h2 style="font-size:2.5rem; color:white; margin-bottom:15px; font-family:'Outfit',sans-serif;">${I18n.t('reader_paywall_title')}</h2>
-                        <p style="color:#aaa; font-size:1.1rem; margin-bottom:30px; max-width:450px; line-height:1.6;">${I18n.t('reader_paywall_text').replace('{title}', `<strong>${projet.titre}</strong>`)}</p>
-                        <a href="/inscription" data-link class="btn-primary" style="font-size:1.2rem; padding:15px 40px;">${I18n.t('reader_paywall_btn_signup')}</a>
-                        <a href="/connexion" data-link style="color:#aaa; margin-top:15px; font-size:0.9rem;">${I18n.t('reader_paywall_btn_login')}</a>
+                        <span class="material-symbols-outlined" style="font-size:4.5rem; color:${estConnecte ? '#eab308' : 'var(--primary)'}; margin-bottom:20px;">lock</span>
+                        ${messagePaywall}
                     </div>
                 </div>
             `;
         }
 
-        // Chapitre suivant
+        // Chapitre suivant + Espace Commentaires
         const chapSuivant = projet.chapitres.find(c => c.ordre === chapitre.ordre + 1);
         const footerHtml = `
-            <div class="reader-slide" style="width:100%; min-height:60vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#08080a; flex-shrink:0; gap:25px;">
-                <span class="material-symbols-outlined" style="font-size:3rem; color:var(--primary);">check_circle</span>
-                <h2 style="font-size:2rem; color:white; font-family:'Outfit',sans-serif;">${I18n.t('reader_end_ch')} ${chapitre.ordre}</h2>
-                <div style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center;">
+            <div class="reader-slide" style="width:100%; min-height:60vh; display:flex; flex-direction:column; justify-content:flex-start; align-items:center; background:#08080a; flex-shrink:0; padding:60px 20px;">
+                
+                <span class="material-symbols-outlined" style="font-size:3rem; color:var(--primary); margin-bottom:15px;">check_circle</span>
+                <h2 style="font-size:2rem; color:white; font-family:'Outfit',sans-serif; margin-bottom:25px;">${I18n.t('reader_end_ch')} ${chapitre.ordre}</h2>
+                <div style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center; margin-bottom:50px;">
                     ${chapSuivant 
                         ? `<a href="/lire/${projet.id}/${chapSuivant.id}" data-link class="btn-primary" style="font-size:1.1rem; display:flex; align-items:center; gap:8px;"><span class="material-symbols-outlined">skip_next</span> ${I18n.t('chapter')} ${chapSuivant.ordre}</a>`
                         : `<span style="color:#666; font-style:italic;">${I18n.t('reader_no_more_ch')}</span>`
                     }
                     <a href="/projet/${projet.slug}" data-link class="btn-secondary" style="font-size:1.1rem;">${I18n.t('reader_btn_back_serie')}</a>
                 </div>
+
+                <!-- NEW COMMENTS HTML -->
+                <div id="section-chapitre-commentaires" style="width:100%; max-width:800px; text-align:left; background:rgba(255,255,255,0.02); padding:30px; border-radius:12px; border:1px solid #111;">
+                    <h3 style="color:white; margin-bottom:20px; font-family:'Outfit',sans-serif; border-bottom:1px solid #222; padding-bottom:10px; display:flex; align-items:center; gap:10px;">
+                        <span class="material-symbols-outlined">forum</span> Espace Communauté
+                    </h3>
+                    
+                    ${estConnecte ? `
+                    <form id="form-chapitre-comment" style="display:flex; gap:10px; margin-bottom:30px;">
+                        <input type="text" id="chapitre-comment-input" placeholder="Partagez votre avis sur ce chapitre (+5 XP)..." required style="flex:1; background:rgba(255,255,255,0.05); border:1px solid #333; padding:12px; border-radius:8px; color:white; outline:none; transition: border 0.3s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='#333'">
+                        <button type="submit" class="btn-primary" style="padding:0 25px; border-radius:8px;">Publier</button>
+                    </form>
+                    ` : `
+                    <div style="background:rgba(255,255,255,0.03); padding:20px; text-align:center; border-radius:8px; margin-bottom:30px; border:1px solid #222;">
+                        <p style="color:#aaa; margin-bottom:10px;">Connectez-vous pour rejoindre la discussion et gagner de l'XP.</p>
+                        <a href="/connexion" data-link class="btn-secondary" style="font-size:0.9rem;">Se connecter</a>
+                    </div>
+                    `}
+                    
+                    <div id="chapitre-comments-list" style="display:flex; flex-direction:column; gap:20px;">
+                        <div style="color:#666; text-align:center; font-style:italic;">Chargement des commentaires...</div>
+                    </div>
+                </div>
+
             </div>
         `;
 
@@ -93,21 +138,27 @@ export default class VueLecteur {
             <div class="webtoon-reader" style="background:#000; position:relative; overflow:hidden;">
 
                 <!-- OVERLAY COMMENTAIRES TRANSPARENTS -->
-                <div id="comments-overlay" style="position:fixed; top:120px; left:0; right:0; bottom:80px; pointer-events:none; z-index:45; overflow:hidden;"></div>
+                <div id="comments-overlay" style="position:fixed; top:40px; left:0; right:0; bottom:80px; pointer-events:none; z-index:45; overflow:hidden;"></div>
 
-                <!-- BARRE NETFLIX COLLANTE (haut) -->
-                <div class="reader-toolbar" style="position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%); z-index:100; transition:opacity 0.4s;" id="reader-topbar">
-                    <a href="/projet/${projet.slug}" data-link style="color:white; text-decoration:none; display:flex; align-items:center; gap:6px; opacity:0.7; hover:opacity:1; font-size:0.9rem;">
-                        <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_back</span>
+                <!-- PILULE FLOTTANTE SUR SCROLL-UP -->
+                <div id="floating-reader-menu" class="floating-reader-menu">
+                    <a href="/projet/${projet.slug}" data-link class="floating-btn" title="${I18n.t('reader_btn_back')}">
+                        <span class="material-symbols-outlined">close</span>
                     </a>
-                    <span style="font-size:0.9rem; color:rgba(255,255,255,0.7); font-family:'Outfit',sans-serif; letter-spacing:1px; text-align:center;">
-                        Ch.<strong>${chapitre.ordre}</strong> — ${projet.titre}
-                        <div style="font-size:0.75rem; margin-top:2px;"><a href="/profil/${projet.authorPseudo}" data-link style="color:var(--primary); text-decoration:none; opacity:0.8; hover:opacity:1;">${I18n.t('by')} ${projet.authorPseudo}</a></div>
-                    </span>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        ${formComment}
-                        <button id="toggle-comments" style="background:none; border:none; color:rgba(255,255,255,0.5); cursor:pointer; padding:4px;" title="Commentaires"><span class="material-symbols-outlined" style="font-size:1.2rem;">chat</span></button>
+                    
+                    <div class="floating-title" title="${projet.titre} - Ch. ${chapitre.ordre}">
+                        Ch. ${chapitre.ordre} <br><span style="font-size:0.7rem; color:#888;">${projet.titre}</span>
                     </div>
+
+                    ${formComment}
+                    
+                    <button id="toggle-comments" class="floating-btn" title="Activer/Désactiver Niconico">
+                        <span class="material-symbols-outlined">chat</span>
+                    </button>
+
+                    <button id="btn-floating-play" class="floating-btn primary" title="Auto Scroll">
+                        <span class="material-symbols-outlined">swipe_down</span>
+                    </button>
                 </div>
 
                 <!-- CONTAINER SLIDES VERTICAL (scroll classique entre les planches) -->

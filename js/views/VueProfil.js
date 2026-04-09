@@ -128,6 +128,37 @@ export default class VueProfil {
                     <!-- Bio -->
                     ${bio ? `<p style="color:#aaa;font-size:0.95rem;line-height:1.6;margin-bottom:20px;max-width:600px;">${Security.escapeHTML(bio)}</p>` : ''}
 
+                    <!-- GAMIFICATION XP & COINS -->
+                    ${(profil.xp !== undefined || profil.coins !== undefined) ? (() => {
+                        const niveau = Badges.getNiveau(profil.xp || 0);
+                        const xpCurrentBase = 5 * Math.pow(niveau - 1, 2);
+                        const xpNextBase = 5 * Math.pow(niveau, 2);
+                        const progressXp = Math.min(100, Math.max(0, (((profil.xp||0) - xpCurrentBase) / (xpNextBase - xpCurrentBase)) * 100));
+
+                        return `
+                        <div style="background:rgba(0,0,0,0.3); border:1px solid #222; border-radius:12px; padding:15px; margin-bottom:24px; display:flex; gap:20px; align-items:center;">
+                            
+                            <div style="flex:1;">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-family:'Outfit',sans-serif;">
+                                    <span style="color:white; font-weight:bold; font-size:1.1rem;">Niveau ${niveau}</span>
+                                    <span style="color:#aaa; font-size:0.85rem;">${profil.xp || 0} / ${xpNextBase} XP</span>
+                                </div>
+                                <div style="width:100%; height:8px; background:#222; border-radius:4px; overflow:hidden;">
+                                    <div style="height:100%; width:${progressXp}%; background:linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius:4px; transition:width 0.5s ease;"></div>
+                                </div>
+                            </div>
+
+                            <div style="text-align:center; padding-left:20px; border-left:1px solid #333;">
+                                <div style="font-size:0.7rem; color:#888; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">Solde</div>
+                                <div style="display:flex; align-items:center; justify-content:center; gap:5px; color:#eab308; font-weight:800; font-size:1.3rem; font-family:'Outfit',sans-serif;">
+                                    <span class="material-symbols-outlined" style="font-size:1.4rem;">toll</span> ${profil.coins || 0}
+                                </div>
+                            </div>
+                            
+                        </div>
+                        `;
+                    })() : ''}
+
                     <!-- Genres / Style musique -->
                     ${genresArr.length > 0 ? `
                     <div style="margin-bottom:20px;display:flex;gap:8px;flex-wrap:wrap;">

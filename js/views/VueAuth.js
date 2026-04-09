@@ -12,6 +12,7 @@ export default class VueAuth {
                         <input type="text" id="ins-pseudo" placeholder="${I18n.t('auth_label_pseudo')}" style="padding:16px; border-radius:6px; border:none; background:#222; color:white; font-size:1rem; outline:none;" required>
                         <input type="email" id="ins-email" placeholder="${I18n.t('auth_label_email')}" style="padding:16px; border-radius:6px; border:none; background:#222; color:white; font-size:1rem; outline:none;" required>
                         <input type="password" id="ins-pass" placeholder="${I18n.t('auth_label_password_secret')}" style="padding:16px; border-radius:6px; border:none; background:#222; color:white; font-size:1rem; outline:none;" required>
+                        <a href="#" onclick="alert('La récupération de mot de passe sera bientôt disponible !'); return false;" style="color:#888; font-size:0.85rem; text-align:right; text-decoration:none; margin-top:-5px;">Mot de passe oublié ?</a>
                         
                         <button type="submit" class="btn-primary" style="padding:16px; font-size:1.1rem; border:none; cursor:pointer; margin-top:20px; text-transform:uppercase; font-weight:800; border-radius:6px;">${I18n.t('auth_btn_signup')}</button>
                     </form>
@@ -32,6 +33,7 @@ export default class VueAuth {
                     <form id="form-connexion" style="display:flex; flex-direction:column; gap:15px;">
                         <input type="email" id="log-email" placeholder="${I18n.t('auth_label_email')}" style="padding:16px; border-radius:6px; border:none; background:#222; color:white; font-size:1rem; outline:none;" required>
                         <input type="password" id="log-pass" placeholder="${I18n.t('auth_label_password')}" style="padding:16px; border-radius:6px; border:none; background:#222; color:white; font-size:1rem; outline:none;" required>
+                        <a href="#" onclick="alert('La récupération de mot de passe sera bientôt disponible !'); return false;" style="color:#888; font-size:0.85rem; text-align:right; text-decoration:none; margin-top:-5px;">Mot de passe oublié ?</a>
                         
                         <button type="submit" class="btn-primary" style="padding:16px; font-size:1.1rem; border:none; cursor:pointer; margin-top:20px; text-transform:uppercase; font-weight:800; border-radius:6px;">${I18n.t('auth_btn_login')}</button>
                     </form>

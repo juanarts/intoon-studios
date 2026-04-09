@@ -1,0 +1,21 @@
+{
+  "name": "INTOON STUDIOS",
+  "short_name": "InToon",
+  "description": "Lisez des webtoons Premium en avant-première.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#c91f27",
+  "icons": [
+    {
+      "src": "/assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

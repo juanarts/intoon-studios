@@ -139,6 +139,15 @@ export default class Badges {
             color: '#06b6d4',
             glow: '0 0 10px rgba(6,182,212,0.5)',
         },
+        addict: {
+            id: 'addict',
+            label: 'ADDICT 📱',
+            description: 'A atteint le Niveau 5 (Lecteur Assidu).',
+            image: '/assets/badges/badge_lecteur.png',
+            rarity: 'rare',
+            color: '#10b981',
+            glow: '0 0 12px rgba(16,185,129,0.5)',
+        },
 
         // ─── SPÉCIAUX ──────────────────────────────────────────
         intoon_team: {
@@ -174,8 +183,14 @@ export default class Badges {
     static BADGES_ADMIN = [
         'the_king','fondateur','pionnier','early_access',
         'createur','artiste','realisateur','scenariste','saga','producteur',
-        'vip','moderateur','beta_testeur'
+        'vip','moderateur','beta_testeur','addict'
     ];
+
+    static getNiveau(xp) {
+        if (!xp || xp < 0) return 1;
+        // La formule : Niveau = sqrt(XP / 5) -> Lvl 2 = 5xp, Lvl 5 = 125xp
+        return Math.floor(Math.sqrt(xp / 5)) + 1;
+    }
 
     static getBadgesUtilisateur(user) {
         if (!user) return [this.CATALOGUE.nouveau];
@@ -206,9 +221,18 @@ export default class Badges {
         if (user.is_beta_tester) {
             badges.push(this.CATALOGUE.beta_testeur);
         }
-        if (user.role === 'lecteur' && !user.is_beta_tester) {
+        if (user.role === 'lecteur' && !user.is_beta_tester && !user.is_vip) {
             badges.push(this.CATALOGUE.lecteur);
         }
+        
+        // Badges par niveau/XP
+        if (user.xp) {
+            const niveau = this.getNiveau(user.xp);
+            if (niveau >= 5) {
+                badges.push(this.CATALOGUE.addict);
+            }
+        }
+
         if (badges.length === 0) {
             badges.push(this.CATALOGUE.nouveau);
         }

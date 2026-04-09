@@ -52,8 +52,18 @@ export default class VueSoumission {
                             <input type="url" id="soumission-video-url" placeholder="${I18n.t('sub_placeholder_video_url')}" style="flex:1; padding:15px; border-radius:4px; border:1px solid #444; background:#111; color:white; font-size:1rem;">
                         </div>
 
-                        <input type="url" placeholder="${I18n.t('sub_placeholder_link_boards')}" style="padding:18px; border-radius:4px; border:1px solid #444; background:#111; color:white; font-size:1rem; margin-top:10px;" required>
+                        <!-- ZONE DRAG & DROP : PLANCHES DU CHAPITRE -->
+                        <div id="dropzone-planches" style="border: 2px dashed #555; padding: 40px 20px; text-align: center; border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer; transition: all 0.3s; margin-top: 10px;">
+                            <span class="material-symbols-outlined" style="font-size: 3rem; color: #666; margin-bottom: 15px;">cloud_upload</span>
+                            <h3 style="color: white; font-family: 'Outfit', sans-serif; font-size: 1.2rem; margin-bottom: 5px;">Planches du Chapitre 1 (Glissez-Déposez)</h3>
+                            <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">JPG/PNG autorisés. Redimensionnement automatique à 800px et conversion WebP.</p>
+                            <input type="file" id="input-planches" multiple accept="image/jpeg, image/png, image/webp" style="display: none;">
+                            <button type="button" class="btn-secondary" onclick="document.getElementById('input-planches').click();" style="pointer-events:none;">Parcourir les fichiers</button>
+                        </div>
                         
+                        <!-- Miniatures des planches uploadées -->
+                        <div id="preview-planches" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
+
                         <div style="background:rgba(229,9,20,0.05); padding:20px; border-radius:8px; border:1px solid rgba(229,9,20,0.3); margin-top:10px;">
                             <h3 style="color:white; margin-bottom:10px; font-size:1.1rem; display:flex; align-items:center; gap:8px;"><span class="material-symbols-outlined" style="color:#e50914;">gavel</span> ${I18n.t('sub_legal_title')}</h3>
                             <label style="display:flex; align-items:flex-start; gap:10px; color:#ccc; font-size:0.9rem; margin-bottom:12px; cursor:pointer;">

@@ -17,4 +17,28 @@ export default class Chapitre {
             .replace(/[\s_-]+/g, '-')
             .replace(/^-+|-+$/g, '') : `chapitre-${this.ordre}`;
     }
+
+    /**
+     * Insère un nouveau chapitre en BDD
+     */
+    static async ajouter(chapitreData) {
+        // Nécessite l'import de SupabaseService (réglé par injection ou chargement direct)
+        const { default: SupabaseService } = await import('../services/SupabaseService.js');
+        const client = SupabaseService.getClient();
+        
+        const { data, error } = await client
+            .from('chapitres')
+            .insert([{
+                projet_id: chapitreData.projet_id,
+                titre: chapitreData.titre,
+                ordre: chapitreData.ordre,
+                pages_urls: chapitreData.pages_urls,
+                is_premium: chapitreData.is_premium || false
+            }])
+            .select()
+            .single();
+            
+        if (error) throw error;
+        return data;
+    }
 }

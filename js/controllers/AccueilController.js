@@ -5,6 +5,7 @@ import Likes from '../models/Likes.js';
 import Reviews from '../models/Reviews.js';
 import Auth from '../models/Auth.js';
 import VueCatalogue from '../views/VueCatalogue.js';
+import SEOManager from '../utils/SEOManager.js';
 
 export default class AccueilController {
     static async afficherCatalogue(query = null) {
@@ -33,7 +34,7 @@ export default class AccueilController {
                 projetsLab = []; 
             }
             
-            const dataHisto = Historique.getDernier();
+            const dataHisto = await Historique.getDernier();
             let projetEnCours = null;
             let chapitreEnCours = null;
             
@@ -44,6 +45,12 @@ export default class AccueilController {
                     chapitreEnCours = projetEnCours.chapitres.find(c => c.id === dataHisto.idChapitre);
                 }
             }
+
+            SEOManager.update({
+                title: query ? `Recherche : ${query}` : 'Catalogue du Studio',
+                description: 'Plongez dans la bibliothèque gratuite de webtoons créés par la communauté INTOON STUDIOS.',
+                url: window.location.href
+            });
 
             app.innerHTML = VueCatalogue.rendreCatalogue(projets, projetsLab, projetEnCours, chapitreEnCours);
             AccueilController.initialiserCarousel();
@@ -175,6 +182,13 @@ export default class AccueilController {
                 const listeReviews = await Reviews.obtenirTous(projet.id);
                 const estConnecte = Auth.estConnecte();
                 const userRole = estConnecte ? Auth.getUtilisateur().role : null;
+
+                SEOManager.update({
+                    title: projet.titre,
+                    description: projet.description,
+                    image: projet.couverture,
+                    url: window.location.href
+                });
 
             app.innerHTML = VueCatalogue.rendreDetailProjet(projet, estFavori, aLikeLocal, statsReviews, listeReviews, estConnecte);
 

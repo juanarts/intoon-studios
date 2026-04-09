@@ -2,6 +2,8 @@ import Projet from '../models/Projet.js';
 import VueLecteur from '../views/VueLecteur.js';
 import Auth from '../models/Auth.js';
 import Historique from '../models/Historique.js';
+import Commentaires from '../models/Commentaires.js';
+import SEOManager from '../utils/SEOManager.js';
 
 export default class LecteurController {
     
@@ -58,13 +60,52 @@ export default class LecteurController {
                     history.replaceState(null, '', `/lire/${projet.slug}/${chapitre.slug}`);
                 }
 
-                Historique.enregistrer(projet.id, chapitre.id);
                 const userConnecte = Auth.estConnecte();
-                app.innerHTML = VueLecteur.rendreLecteur(projet, chapitre, userConnecte);
+                const user = Auth.getUtilisateur();
+                let estDebloque = true;
+
+                // Fast Pass (Chapitres 4 et +)
+                if (chapitre.ordre > 3) {
+                    if (!userConnecte) {
+                        estDebloque = false;
+                    } else {
+                        const estVip = user.role === 'vip' || user.role === 'admin' || user.role === 'createur';
+                        const achats = JSON.parse(localStorage.getItem('intoon_achats_chapitres') || '[]');
+                        const aAchete = achats.includes(chapitre.id);
+                        if (!estVip && !aAchete) {
+                            estDebloque = false;
+                        }
+                    }
+                }
+
+                app.innerHTML = VueLecteur.rendreLecteur(projet, chapitre, userConnecte, user, estDebloque);
 
                 LecteurController.initialiserControlesNetflix();
                 LecteurController.initialiserCommentairesImmersifs();
                 LecteurController.initialiserAutoHide();
+                LecteurController.initialiserLazyLoading();
+                
+                SEOManager.update({
+                    title: `Ch. ${chapitre.ordre} - ${projet.titre}`,
+                    description: `Lisez le chapitre ${chapitre.ordre} de ${projet.titre}.`,
+                    image: projet.couverture,
+                    url: window.location.href
+                });
+                
+                if (estDebloque) {
+                    LecteurController.initialiserTracking(projet.id, chapitre.id);
+                    LecteurController.initialiserSectionCommentaires(projet.id, chapitre.id);
+                    
+                    // Restauration du scroll
+                    const lastHisto = await Historique.getDernier();
+                    if (lastHisto && lastHisto.idChapitre === chapitre.id && lastHisto.scrollOffset > 0) {
+                        setTimeout(() => {
+                            window.scrollTo({ top: lastHisto.scrollOffset, behavior: 'smooth' });
+                        }, 500);
+                    }
+                } else {
+                    LecteurController.initialiserFastPass(projet.id, chapitre.id);
+                }
             } else {
                 app.innerHTML = '<div class="error">Projet ou chapitre temporairement indisponible.</div>';
             }
@@ -75,121 +116,146 @@ export default class LecteurController {
     }
 
     // ────────────────────────────────────────────────────────────
+    // DYNAMIQUE LAZY LOADING
+    // ────────────────────────────────────────────────────────────
+    static initialiserLazyLoading() {
+        const lazyImages = document.querySelectorAll('img.lazy-image');
+        if (!lazyImages.length) return;
+
+        const observer = new IntersectionObserver((entries, observerInfo) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy-image');
+                    observerInfo.unobserve(img);
+                }
+            });
+        }, {
+            rootMargin: '120% 0px' // Précharge environ un écran en avance
+        });
+
+        lazyImages.forEach(img => observer.observe(img));
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // TRACKING HISTORIQUE & BOOKMARK
+    // ────────────────────────────────────────────────────────────
+    static initialiserTracking(idProjet, idChapitre) {
+        let saveTimer = null;
+        
+        // Enregistrement initial (scroll 0 pour l'instant, maj au défilement)
+        Historique.enregistrer(idProjet, idChapitre, 0);
+
+        const onScroll = () => {
+            if (saveTimer) clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                const offset = window.scrollY || document.documentElement.scrollTop;
+                if(offset > 0) Historique.enregistrer(idProjet, idChapitre, Math.floor(offset));
+            }, 1000); // Debounce de 1 seconde pour limiter les appels réseau
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        // Nettoyage au changement de page
+        const cleanup = () => {
+            if(saveTimer) clearTimeout(saveTimer);
+            window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('popstate', cleanup);
+        };
+        window.addEventListener('popstate', cleanup);
+    }
+
+    // ────────────────────────────────────────────────────────────
     // MOTEUR NETFLIX : AUTO-SCROLL CINÉMATIQUE
     // ────────────────────────────────────────────────────────────
     static initialiserControlesNetflix() {
-        const btnPlay  = document.getElementById('btn-play-pause');
-        const btnStop  = document.getElementById('btn-stop');
-        const slider   = document.getElementById('scroll-speed');
-        const playIcon = document.getElementById('play-icon');
-        const btnFs    = document.getElementById('btn-fullscreen');
-        const engine   = LecteurController.scrollEngine;
+        // Transféré à la pilule flottante (voir initialiserAutoHide)
+    }
 
-        if (!btnPlay) return;
+    // ────────────────────────────────────────────────────────────
+    // ESPACE COMMENTAIRES & FAST PASS
+    // ────────────────────────────────────────────────────────────
+    
+    static async initialiserSectionCommentaires(idProjet, idChapitre) {
+        const listDiv = document.getElementById('chapitre-comments-list');
+        const form = document.getElementById('form-chapitre-comment');
 
-        // Lecture au RAF (requestAnimationFrame) pour un scroll fluide 60fps
-        const scrollLoop = () => {
-            if (!engine.active) return;
+        if (!listDiv) return;
 
-            // Accumulation des pixels fractionnaires pour éviter que scrollBy(0,0.3) = 0
-            engine.accumulator += engine.speed * 0.4;
-            const pixelsToScroll = Math.floor(engine.accumulator);
-            if (pixelsToScroll >= 1) {
-                window.scrollBy(0, pixelsToScroll);
-                engine.accumulator -= pixelsToScroll;
-            }
+        // Render d'un commentaire
+        const rendreUnCommentaire = (c) => `
+            <div style="display:flex; gap:15px; background:rgba(25,25,30,0.5); padding:15px; border-radius:10px; border:1px solid #222;">
+                <img src="${c.avatar_url || 'https://api.dicebear.com/7.x/identicon/svg?seed='+c.pseudo}" style="width:40px; height:40px; border-radius:50%; background:#222;">
+                <div>
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
+                        <span style="color:#eab308; font-weight:bold; font-family:'Outfit',sans-serif;">${c.pseudo || 'Utilisateur'}</span>
+                        <span style="color:#666; font-size:0.8rem;">${new Date(c.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <p style="color:#ccc; line-height:1.4; margin:0; word-break:break-word;">${c.texte}</p>
+                </div>
+            </div>
+        `;
 
-            // Fin naturelle de la page → pause automatique
-            const distanceRestante = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
-            if (distanceRestante <= 2) {
-                engine.active = false;
-                engine.commentsPaused = false;
-                engine.accumulator = 0;
-                if (playIcon) playIcon.textContent = 'play_arrow';
-                return;
-            }
-            engine.rafId = requestAnimationFrame(scrollLoop);
-        };
+        // Load initiaux
+        const comments = await Commentaires.obtenirParChapitre(idChapitre);
+        if (comments.length === 0) {
+            listDiv.innerHTML = `<div style="text-align:center; color:#555; font-style:italic;">Soyez le premier à commenter ce chapitre !</div>`;
+        } else {
+            listDiv.innerHTML = comments.map(rendreUnCommentaire).join('');
+        }
 
-        // Play / Pause
-        btnPlay.onclick = () => {
-            engine.active = !engine.active;
-            engine.commentsPaused = engine.active;
-            playIcon.textContent = engine.active ? 'pause' : 'play_arrow';
-            
-            // Si on lance la lecture dynamique, on efface les commentaires déjà existants en fondu pour immersion 100%
-            if (engine.active) {
-                const overlay = document.getElementById('comments-overlay');
-                if (overlay) {
-                    const spans = overlay.querySelectorAll('span');
-                    spans.forEach(span => span.style.opacity = '0');
+        // Submit form
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('chapitre-comment-input');
+                const text = input.value.trim();
+                if (!text) return;
+
+                const submitBtn = form.querySelector('button');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Publication...';
+
+                const newComment = await Commentaires.ajouter(idProjet, idChapitre, text);
+                
+                if (newComment) {
+                    input.value = '';
+                    if (comments.length === 0) listDiv.innerHTML = ''; // Enlever le fallback "soyez le premier"
+                    listDiv.insertAdjacentHTML('afterbegin', rendreUnCommentaire(newComment));
+                    
+                    // Gamification +5 XP
+                    if (Auth.gagnerXP) Auth.gagnerXP(5);
                 }
-            }
 
-            if (engine.active) {
-                engine.rafId = requestAnimationFrame(scrollLoop);
-            } else {
-                cancelAnimationFrame(engine.rafId);
-            }
-        };
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Publier';
+            });
+        }
+    }
 
-        // Stop → retour tout en haut + pause
-        btnStop.onclick = () => {
-            engine.active = false;
-            engine.commentsPaused = false;
-            cancelAnimationFrame(engine.rafId);
-            playIcon.textContent = 'play_arrow';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
+    static initialiserFastPass(idProjet, idChapitre) {
+        const btn = document.getElementById('btn-unlock-fastpass');
+        if (!btn) return;
 
-        // Vitesse
-        slider.oninput = (e) => {
-            engine.speed = parseInt(e.target.value);
-        };
-
-        // Molette souris : ajuste la vitesse ou pause si scroll manuel
-        window.addEventListener('wheel', (e) => {
-            if (engine.active) {
-                engine.active = false;
-                cancelAnimationFrame(engine.rafId);
-                playIcon.textContent = 'play_arrow';
-            }
-        }, { passive: true });
-
-        // Plein écran (expérience TV Canapé)
-        btnFs.onclick = () => {
-            const el = document.documentElement;
-            if (!document.fullscreenElement) {
-                el.requestFullscreen().catch(() => {});
-            } else {
-                document.exitFullscreen();
-            }
-        };
-
-        // Refonte de l'écouteur Plein Écran pour cacher la Navbar (Responsive Fullscreen)
-        document.onfullscreenchange = () => {
-            const isFs = !!document.fullscreenElement;
-            const navbar = document.querySelector('.navbar');
-            
-            if (btnFs) {
-                btnFs.querySelector('.material-symbols-outlined').textContent = isFs ? 'fullscreen_exit' : 'fullscreen';
-            }
-            if (navbar) {
-                if (isFs) navbar.classList.add('navbar-hidden');
-                else navbar.classList.remove('navbar-hidden');
-            }
-        };
-
-        // Raccourcis clavier (Space = Play/Pause, Esc = Stop, +/- = vitesse)
-        document.onkeydown = (e) => {
-            const forbiddenTags = ['INPUT', 'TEXTAREA', 'SELECT'];
-            if (forbiddenTags.includes(e.target.tagName)) return;
-            
-            if (e.code === 'Space') { e.preventDefault(); btnPlay.click(); }
-            if (e.code === 'KeyS' || e.key === 'Escape') { btnStop.click(); }
-            if (e.code === 'ArrowUp')   { slider.value = Math.min(10, parseInt(slider.value) + 1); engine.speed = parseInt(slider.value); }
-            if (e.code === 'ArrowDown') { slider.value = Math.max(1,  parseInt(slider.value) - 1); engine.speed = parseInt(slider.value); }
-        };
+        btn.addEventListener('click', () => {
+             // Retrait de 50 Coins
+             if (Auth.depenserCoins && Auth.depenserCoins(50)) {
+                 const achats = JSON.parse(localStorage.getItem('intoon_achats_chapitres') || '[]');
+                 achats.push(idChapitre);
+                 localStorage.setItem('intoon_achats_chapitres', JSON.stringify(achats));
+                 
+                 btn.innerHTML = 'Débloqué ! Rechargement...';
+                 btn.style.background = '#4ade80';
+                 
+                 setTimeout(() => {
+                     // Recharger le chapitre (sans modifier l'URL)
+                     LecteurController.lireChapitre(idProjet, idChapitre);
+                 }, 1000);
+             } else {
+                 alert('Fonds insuffisants ! Vous avez besoin de 50 Coins. Rechargez depuis le Profil V.I.P.');
+             }
+        });
     }
 
     // ────────────────────────────────────────────────────────────
@@ -248,31 +314,116 @@ export default class LecteurController {
     // AUTO-HIDE : Les contrôles disparaissent après 3s d'inactivité
     // ────────────────────────────────────────────────────────────
     static initialiserAutoHide() {
-        const controls  = document.getElementById('netflix-controls');
-        const topbar    = document.getElementById('reader-topbar');
-        const engine    = LecteurController.scrollEngine;
+        const menu = document.getElementById('floating-reader-menu');
+        const engine = LecteurController.scrollEngine;
+        if (!menu) return;
 
-        if (!controls) return;
-
+        let lastScrollY = window.scrollY;
+        
         const show = () => {
-            controls.style.opacity = '1';
-            controls.style.transform = 'translateX(-50%) translateY(0)';
-            if (topbar) topbar.style.opacity = '1';
+            menu.classList.add('visible');
             clearTimeout(engine.hideTimer);
             if (engine.active) {
                 engine.hideTimer = setTimeout(hide, 3000);
+            } else {
+                engine.hideTimer = setTimeout(hide, 5000); // Hide after 5s idle
             }
         };
 
         const hide = () => {
-            controls.style.opacity = '0';
-            controls.style.transform = 'translateX(-50%) translateY(20px)';
-            if (topbar) topbar.style.opacity = '0';
+            menu.classList.remove('visible');
         };
 
+        // On scroll UP shows menu, on scroll DOWN hides menu
+        const onScroll = () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY < lastScrollY - 15) {
+                show();
+            } else if (currentScrollY > lastScrollY + 15) {
+                if (!engine.active) hide();
+            }
+            lastScrollY = currentScrollY;
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
         document.addEventListener('mousemove', show);
         document.addEventListener('touchstart', show);
-        document.addEventListener('keydown', show);
+
+        // Initial show
+        show();
+        
+        // Auto-scroll logic mapped to the floating play button
+        const btnPlay = document.getElementById('btn-floating-play');
+        const playIcon = btnPlay ? btnPlay.querySelector('.material-symbols-outlined') : null;
+        
+        const scrollLoop = () => {
+            if (!engine.active) return;
+            engine.accumulator += engine.speed * 0.4;
+            const pixelsToScroll = Math.floor(engine.accumulator);
+            if (pixelsToScroll >= 1) {
+                window.scrollBy(0, pixelsToScroll);
+                engine.accumulator -= pixelsToScroll;
+            }
+            const distanceRestante = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
+            if (distanceRestante <= 2) {
+                engine.active = false;
+                engine.commentsPaused = false;
+                engine.accumulator = 0;
+                if (playIcon) playIcon.textContent = 'swipe_down';
+                return;
+            }
+            engine.rafId = requestAnimationFrame(scrollLoop);
+        };
+        
+        if (btnPlay) {
+            btnPlay.onclick = () => {
+                engine.active = !engine.active;
+                engine.commentsPaused = engine.active;
+                if (playIcon) playIcon.textContent = engine.active ? 'pause' : 'swipe_down';
+                
+                if (engine.active) {
+                    const overlay = document.getElementById('comments-overlay');
+                    if (overlay) {
+                        const spans = overlay.querySelectorAll('span');
+                        spans.forEach(span => span.style.opacity = '0');
+                    }
+                    engine.rafId = requestAnimationFrame(scrollLoop);
+                    engine.hideTimer = setTimeout(hide, 1500);
+                } else {
+                    cancelAnimationFrame(engine.rafId);
+                    show();
+                }
+            };
+        }
+        
+        // Connect key events for Space/Escape
+        document.onkeydown = (e) => {
+            const forbiddenTags = ['INPUT', 'TEXTAREA', 'SELECT'];
+            if (forbiddenTags.includes(e.target.tagName)) return;
+            if (e.code === 'Space') { 
+                e.preventDefault(); 
+                if (btnPlay) btnPlay.click(); 
+            }
+            if (e.code === 'Escape' || e.code === 'KeyS') {
+                engine.active = false;
+                engine.commentsPaused = false;
+                cancelAnimationFrame(engine.rafId);
+                if (playIcon) playIcon.textContent = 'swipe_down';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                show();
+            }
+            show();
+        };
+
+        // Fix mouse wheel pausing the auto-scroll
+        window.addEventListener('wheel', () => {
+            if (engine.active) {
+                engine.active = false;
+                cancelAnimationFrame(engine.rafId);
+                if (playIcon) playIcon.textContent = 'swipe_down';
+                show();
+            }
+        }, { passive: true });
     }
 
     // ────────────────────────────────────────────────────────────

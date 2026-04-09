@@ -31,6 +31,20 @@ export default class Router {
     }
 
     async handleRoute() {
+        if (!document.startViewTransition) {
+            return this.executeRoute();
+        }
+        
+        // Native View Transition API (Netflix / Native App feel)
+        document.startViewTransition(() => {
+            return this.executeRoute();
+        });
+    }
+
+    async executeRoute() {
+        // Scroll to top automatically on route change
+        window.scrollTo(0, 0);
+
         // Obtenir le chemin actuel
         const path = window.location.pathname;
 

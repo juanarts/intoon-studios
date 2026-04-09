@@ -15,12 +15,14 @@ export default class Auth {
         
         if (session) {
             this.currentUser = session.user;
-            const { data: profil } = await client.from('profils').select('role, pseudo, avatar_url, bio, genres_preferes, style_musique').eq('id', session.user.id).single();
+            const { data: profil } = await client.from('profils').select('role, pseudo, avatar_url, bio, genres_preferes, style_musique, xp, coins').eq('id', session.user.id).single();
             if (profil) {
                 this.currentRole = profil.role;
                 this.currentUser.pseudo = profil.pseudo;
                 this.currentUser.avatar_url = profil.avatar_url;
                 this.currentUser.bio = profil.bio;
+                this.currentUser.xp = profil.xp || 0;
+                this.currentUser.coins = profil.coins || 200; // 200 pour tester
                 
                 // Helper pour parser robustement (JSON ou Array)
                 const parseArray = (val) => {
@@ -40,12 +42,14 @@ export default class Auth {
         client.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN') {
                 this.currentUser = session.user;
-                const { data: profil } = await client.from('profils').select('role, pseudo, avatar_url, bio, genres_preferes, style_musique').eq('id', session.user.id).single();
+                const { data: profil } = await client.from('profils').select('role, pseudo, avatar_url, bio, genres_preferes, style_musique, xp, coins').eq('id', session.user.id).single();
                 if (profil) {
                     this.currentRole = profil.role;
                     this.currentUser.pseudo = profil.pseudo;
                     this.currentUser.avatar_url = profil.avatar_url;
                     this.currentUser.bio = profil.bio;
+                    this.currentUser.xp = profil.xp || 0;
+                    this.currentUser.coins = profil.coins || 200;
                     
                     const parseArray = (val) => {
                         if (Array.isArray(val)) return val;
@@ -133,8 +137,44 @@ export default class Auth {
             bio: this.currentUser.bio,
             genres_preferes: this.currentUser.genres_preferes,
             style_musique: this.currentUser.style_musique,
+            xp: this.currentUser.xp || 0,
+            coins: this.currentUser.coins || 0,
             statut: 'Membre', 
             role: this.currentRole 
         } : null;
+    }
+
+    // ────────────────────────────────────────────────────────────
+    // GAMIFICATION (XP & COINS)
+    // ────────────────────────────────────────────────────────────
+
+    static gagnerXP(montant) {
+        if (!this.currentUser) return;
+        this.currentUser.xp = (this.currentUser.xp || 0) + montant;
+        
+        // Update local (ou distant sur Supabase si défini)
+        const client = SupabaseService.getClient();
+        if (client) {
+            client.from('profils').update({ xp: this.currentUser.xp }).eq('id', this.currentUser.id).then();
+        }
+        
+        // Event pour l'UI
+        window.dispatchEvent(new CustomEvent('gamificationUpdate', { detail: { type: 'xp', value: montant } }));
+    }
+
+    static depenserCoins(montant) {
+        if (!this.currentUser) return false;
+        if ((this.currentUser.coins || 0) >= montant) {
+            this.currentUser.coins -= montant;
+            
+            const client = SupabaseService.getClient();
+            if (client) {
+                client.from('profils').update({ coins: this.currentUser.coins }).eq('id', this.currentUser.id).then();
+            }
+            
+            window.dispatchEvent(new CustomEvent('gamificationUpdate', { detail: { type: 'coins', value: -montant } }));
+            return true;
+        }
+        return false;
     }
 }
