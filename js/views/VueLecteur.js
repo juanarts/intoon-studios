@@ -21,6 +21,7 @@ export default class VueLecteur {
                 margin: 0;
                 padding: 0;
                 line-height: 0;
+                font-size: 0;
             ">
                 <img 
                     class="webtoon-page-horizontal ${index >= 2 ? 'lazy-image' : ''}" 
@@ -30,8 +31,12 @@ export default class VueLecteur {
                         width: 100%;
                         height: auto;
                         display: block;
+                        vertical-align: top;
                         user-select: none;
                         -webkit-user-drag: none;
+                        margin: 0 0 -1px 0;
+                        padding: 0;
+                        border: none;
                     "
                 >
 
@@ -158,7 +163,7 @@ export default class VueLecteur {
                 </div>
 
                 <!-- CONTAINER SLIDES VERTICAL (scroll classique entre les planches) -->
-                <div id="reader-slides-container" style="width:100%; position:relative;">
+                <div id="reader-slides-container" style="width:100%; position:relative; background:#000; display:flex; flex-direction:column; gap:0;">
                     ${pagesVisibles}
                     ${sectionBloqueeHtml}
                     ${!sectionBloqueeHtml ? footerHtml : ''}
