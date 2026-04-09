@@ -286,8 +286,8 @@ export default class VueCatalogue {
             <div class="projet-detail">
                 <div class="projet-hero">
                     ${trailerHtml}
-                    <!-- OVERLAY COMMENTAIRES FLOTTANTS NICONICO -->
-                    <div id="project-comments-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:3; overflow:hidden;"></div>
+                    <!-- OVERLAY COMMENTAIRES FLOTTANTS NICONICO (limité à la zone vidéo, ne couvre PAS les CTAs) -->
+                    <div id="project-comments-overlay" style="position:absolute; top:0; left:0; width:100%; height:55%; pointer-events:none; z-index:3; overflow:hidden;"></div>
                     
                     <div class="hero-overlay"></div>
                     <div class="hero-content">
