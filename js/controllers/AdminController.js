@@ -2,6 +2,7 @@ import VueAdmin from '../views/VueAdmin.js';
 import Projet from '../models/Projet.js';
 import Auth from '../models/Auth.js';
 import SupabaseService from '../services/SupabaseService.js';
+import Commandes from '../models/Commandes.js';
 
 export default class AdminController {
     static async afficher() {
@@ -16,13 +17,17 @@ export default class AdminController {
         
         try {
             const client = SupabaseService.getClient();
-            const [projets, rProfils] = await Promise.all([
+            const [projets, rProfils, revenusParCreateur, toutesCommandes] = await Promise.all([
                 Projet.chargerTous(),
-                client.from('profils').select('*').order('created_at', { ascending: false })
+                client.from('profils').select('*').order('created_at', { ascending: false }),
+                Commandes.getRevenusParCreateur(),
+                Commandes.getToutesLesCommandes()
             ]);
             
             const profils = rProfils.data || [];
-            app.innerHTML = VueAdmin.rendreDashboard(projets, profils);
+            const totalRevenusPlateforme = toutesCommandes.reduce((s, c) => s + (parseFloat(c.montant) || 0), 0);
+            const revenusData = { revenusParCreateur, toutesCommandes, totalRevenusPlateforme };
+            app.innerHTML = VueAdmin.rendreDashboard(projets, profils, revenusData);
 
             // GESTION DES CLICS STANDARDS
             app.onclick = async (e) => {

@@ -2,6 +2,7 @@ import VueDashboard from '../views/VueDashboard.js';
 import Favoris from '../models/Favoris.js';
 import Projet from '../models/Projet.js';
 import Auth from '../models/Auth.js';
+import Commandes from '../models/Commandes.js';
 import SupabaseService from '../services/SupabaseService.js';
 import ProfilController from './ProfilController.js';
 
@@ -17,21 +18,63 @@ export default class DashboardController {
 
         const utilisateur = Auth.getUtilisateur();
 
-        app.innerHTML = '<div class="loader" style="color:white;">Chargement de votre espace sécurisé INTOON...</div>';
+        app.innerHTML = '<div class="loader" style="color:white;">Chargement de votre espace créateur...</div>';
         
         try {
             const idsFavoris = Favoris.getTous();
             const client = SupabaseService.getClient();
 
-            // Parallélisation des requêtes Supabase
-            const [projetsFavoris, { data: dbProjets }] = await Promise.all([
+            // ── Chargement parallèle de TOUTES les données ──────────────────────
+            const [
+                projetsFavoris,
+                { data: dbProjets },
+                ventesCreateur,
+                ventesParSemaine
+            ] = await Promise.all([
                 idsFavoris.length > 0 ? Projet.chargerPlusieurs(idsFavoris) : Promise.resolve([]),
-                client.from('projets').select('*').eq('author_id', utilisateur.id)
+                client.from('projets').select('*').eq('author_id', utilisateur.id),
+                Commandes.getVentesParVendeur(utilisateur.id),
+                Commandes.getVentesParSemaine(utilisateur.id)
             ]);
 
             const mesProjets = dbProjets ? dbProjets.map(p => new Projet(p)) : [];
+            const mesProjetIds = mesProjets.map(p => p.id);
 
-            // RÉCUPÉRATION DE L'HISTORIQUE RÉEL
+            // ── Stats réelles depuis Supabase ────────────────────────────────────
+            let totalLikes = 0;
+            let totalCommentaires = 0;
+            let totalChapitres = 0;
+            let totalVentes = ventesCreateur.length;
+            let totalRevenus = ventesCreateur.reduce((s, v) => s + (parseFloat(v.montant) || 0), 0);
+
+            if (mesProjetIds.length > 0) {
+                const [likesRes, commentsRes, chapRes] = await Promise.all([
+                    client.from('likes')
+                        .select('*', { count: 'exact', head: true })
+                        .in('projet_id', mesProjetIds),
+                    client.from('commentaires_chapitres')
+                        .select('*', { count: 'exact', head: true })
+                        .in('projet_id', mesProjetIds),
+                    client.from('chapitres')
+                        .select('*', { count: 'exact', head: true })
+                        .in('projet_id', mesProjetIds)
+                ]);
+
+                totalLikes = likesRes.count || 0;
+                totalCommentaires = commentsRes.count || 0;
+                totalChapitres = chapRes.count || 0;
+            }
+
+            const statsReelles = {
+                totalLikes,
+                totalCommentaires,
+                totalChapitres,
+                totalProjets: mesProjets.length,
+                totalVentes,
+                totalRevenus
+            };
+
+            // ── Historique de lecture ────────────────────────────────────────────
             import('../models/Historique.js').then(async (m) => {
                 const Historique = m.default;
                 const dataHisto = Historique.getDernier();
@@ -39,17 +82,25 @@ export default class DashboardController {
                 let chapitreEnCours = null;
 
                 if (dataHisto) {
-                    // Charger le projet de l'historique (peut être un favori ou un autre)
                     projetEnCours = await Projet.chargerParId(dataHisto.idProjet) || await Projet.chargerParSlug(dataHisto.idProjet);
                     if (projetEnCours) {
                         chapitreEnCours = projetEnCours.chapitres.find(c => c.id === dataHisto.idChapitre);
                     }
                 }
 
-                app.innerHTML = VueDashboard.rendre(projetsFavoris, utilisateur, mesProjets, projetEnCours, chapitreEnCours);
+                app.innerHTML = VueDashboard.rendre(
+                    projetsFavoris,
+                    utilisateur,
+                    mesProjets,
+                    projetEnCours,
+                    chapitreEnCours,
+                    statsReelles,
+                    ventesCreateur.slice(0, 5), // 5 dernières ventes
+                    ventesParSemaine
+                );
             });
 
-            // GESTION DES ÉVÉNEMENTS DÉLÉGUÉS (DASHBOARD)
+            // ── GESTION DES ÉVÉNEMENTS (DASHBOARD) ──────────────────────────────
             app.onclick = async (e) => {
                 // Déconnexion
                 if (e.target.closest('.btn-logout')) {
@@ -66,7 +117,7 @@ export default class DashboardController {
                 }
             };
 
-            // Soumission du profil (Délégué sur le conteneur pour éviter les doublons document)
+            // Soumission du profil
             app.onsubmit = (e) => {
                 if (e.target.id === 'form-edit-profil') ProfilController.sauvegarderProfil(e);
             };
@@ -126,7 +177,7 @@ export default class DashboardController {
                             </h3>
                             
                             <div style="display:flex; flex-direction:column; gap:12px;">
-                                <label style="display:flex; align-items:center; gap:10px; color:white; cursor :pointer;">
+                                <label style="display:flex; align-items:center; gap:10px; color:white; cursor:pointer;">
                                     <input type="checkbox" id="shop-has-physical" ${projetActuel.hasPhysical ? 'checked' : ''} style="accent-color:#4ade80; width:18px; height:18px;">
                                     <span>Vendre une Version Physique (Comic)</span>
                                 </label>

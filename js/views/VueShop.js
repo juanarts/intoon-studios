@@ -15,7 +15,11 @@ export default class VueShop {
                     <p style="color:#aaa; line-height:1.6; margin-bottom:20px;">${I18n.t('shop_physical_text')}</p>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-size:2rem; font-weight:900; color:#4ade80;">${projet.pricePhysical.toFixed(2)}€ <small style="font-size:0.8rem; color:#777;">TTC</small></span>
-                        <button class="btn-primary btn-buy-item" data-item="Comic - ${projet.titre}" style="background:#4ade80; color:black; border:none; padding:12px 30px; font-weight:900; border-radius:30px;">
+                        <button class="btn-primary btn-buy-item" 
+                            data-item="Comic - ${projet.titre}" 
+                            data-type="physical" 
+                            data-montant="${projet.pricePhysical}"
+                            style="background:#4ade80; color:black; border:none; padding:12px 30px; font-weight:900; border-radius:30px;">
                             <span class="material-symbols-outlined">shopping_cart</span> ${I18n.t('shop_btn_buy_comic')}
                         </button>
                     </div>
@@ -35,7 +39,11 @@ export default class VueShop {
                                 <p style="color:#666; font-size:0.85rem; margin-bottom:20px;">${I18n.t('shop_original_desc')}</p>
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <span style="font-size:1.4rem; font-weight:bold; color:#f472b6;">${parseFloat(item.prix).toFixed(2)}€</span>
-                                    <button class="btn-secondary btn-buy-item" data-item="${item.titre}" style="border-color:#f472b6; color:#f472b6; padding:8px 15px; font-size:0.8rem;">${I18n.t('shop_btn_reserve')}</button>
+                                    <button class="btn-secondary btn-buy-item" 
+                                          data-item="${item.titre}" 
+                                          data-type="original" 
+                                          data-montant="${item.prix}"
+                                          style="border-color:#f472b6; color:#f472b6; padding:8px 15px; font-size:0.8rem;">${I18n.t('shop_btn_reserve')}</button>
                                 </div>
                             </div>
                         </div>
@@ -45,7 +53,11 @@ export default class VueShop {
                             <span class="material-symbols-outlined" style="font-size:3rem; color:#f472b6; margin-bottom:15px;">palette</span>
                             <h3 style="color:white; margin-bottom:10px;">${I18n.t('shop_sale_active')}</h3>
                             <p style="color:#aaa; max-width:500px; margin:0 auto 20px;">${I18n.t('shop_sale_text').replace('{price}', `<b>${projet.priceOriginal.toFixed(2)}€</b>`)}</p>
-                            <button class="btn-primary btn-buy-item" data-item="Planche Originale - ${projet.titre}" style="background:#f472b6; color:white; border:none; padding:12px 30px;">${I18n.t('shop_btn_contact')}</button>
+                            <button class="btn-primary btn-buy-item" 
+                                    data-item="Planche Originale - ${projet.titre}" 
+                                    data-type="original" 
+                                    data-montant="${projet.priceOriginal}"
+                                    style="background:#f472b6; color:white; border:none; padding:12px 30px;">${I18n.t('shop_btn_contact')}</button>
                         </div>
                     `}
                 </div>

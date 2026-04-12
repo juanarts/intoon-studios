@@ -50,9 +50,10 @@ export default class VueAdmin {
         `;
     }
 
-    static rendreDashboard(projets, profils = []) {
+    static rendreDashboard(projets, profils = [], revenusData = {}) {
         const projetsActifs = projets.filter(p => p.statut === 'publie');
         const projetsModeration = projets.filter(p => p.statut === 'banni' || p.statut === 'brouillon');
+        const { revenusParCreateur = [], toutesCommandes = [], totalRevenusPlateforme = 0 } = revenusData;
 
         return `
             <div style="max-width:1100px; margin:0 auto; padding:40px 4%;">
@@ -65,6 +66,7 @@ export default class VueAdmin {
                 <div style="display:flex; gap:10px; margin-bottom:30px; border-bottom:1 solid #222;">
                     <button class="admin-tab-btn active" data-tab="series" style="padding:12px 25px; background:none; border:none; color:white; font-family:'Outfit',sans-serif; font-weight:bold; cursor:pointer; border-bottom:3px solid var(--primary); font-size:1.1rem;">${I18n.t('admin_tab_series')}</button>
                     <button class="admin-tab-btn" data-tab="commu" style="padding:12px 25px; background:none; border:none; color:#777; font-family:'Outfit',sans-serif; font-weight:bold; cursor:pointer; font-size:1.1rem;">${I18n.t('admin_tab_commu')} (${profils.length})</button>
+                    <button class="admin-tab-btn" data-tab="revenus" style="padding:12px 25px; background:none; border:none; color:#777; font-family:'Outfit',sans-serif; font-weight:bold; cursor:pointer; font-size:1.1rem;">💰 Revenus</button>
                 </div>
 
                 <!-- SECTION SÉRIES -->
@@ -117,6 +119,82 @@ export default class VueAdmin {
                         </table>
                     </div>
                 </div>
+
+                <!-- ── SECTION REVENUS (SUPER ADMIN) ─────────────────────────────── -->
+                <div id="tab-revenus" class="admin-tab-content" style="display:none;">
+                    <h2 style="margin-bottom:25px; font-family:'Outfit', sans-serif; display:flex; align-items:center; gap:10px;">
+                        <span class="material-symbols-outlined" style="color:#4ade80;">payments</span> Revenus Globaux de la Plateforme
+                    </h2>
+
+                    <!-- KPIs plateforme -->
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; margin-bottom:35px;">
+                        <div style="background:rgba(74,222,128,0.06); border:1px solid rgba(74,222,128,0.2); border-radius:12px; padding:24px; text-align:center;">
+                            <span class="material-symbols-outlined" style="color:#4ade80; font-size:1.8rem; margin-bottom:8px; display:block;">account_balance</span>
+                            <div style="font-size:1.8rem; font-weight:800; color:#4ade80; font-family:'Outfit',sans-serif;">${totalRevenusPlateforme.toFixed(2)}€</div>
+                            <div style="font-size:0.72rem; color:#555; margin-top:5px; text-transform:uppercase;">CA Total Plateforme</div>
+                        </div>
+                        <div style="background:rgba(251,146,60,0.06); border:1px solid rgba(251,146,60,0.2); border-radius:12px; padding:24px; text-align:center;">
+                            <span class="material-symbols-outlined" style="color:#fb923c; font-size:1.8rem; margin-bottom:8px; display:block;">percent</span>
+                            <div style="font-size:1.8rem; font-weight:800; color:#fb923c; font-family:'Outfit',sans-serif;">${(totalRevenusPlateforme * 0.2).toFixed(2)}€</div>
+                            <div style="font-size:0.72rem; color:#555; margin-top:5px; text-transform:uppercase;">Commission InToon (20%)</div>
+                        </div>
+                        <div style="background:rgba(96,165,250,0.06); border:1px solid rgba(96,165,250,0.2); border-radius:12px; padding:24px; text-align:center;">
+                            <span class="material-symbols-outlined" style="color:#60a5fa; font-size:1.8rem; margin-bottom:8px; display:block;">group</span>
+                            <div style="font-size:1.8rem; font-weight:800; color:#60a5fa; font-family:'Outfit',sans-serif;">${(totalRevenusPlateforme * 0.8).toFixed(2)}€</div>
+                            <div style="font-size:0.72rem; color:#555; margin-top:5px; text-transform:uppercase;">Versé aux Créateurs (80%)</div>
+                        </div>
+                        <div style="background:rgba(167,139,250,0.06); border:1px solid rgba(167,139,250,0.2); border-radius:12px; padding:24px; text-align:center;">
+                            <span class="material-symbols-outlined" style="color:#a78bfa; font-size:1.8rem; margin-bottom:8px; display:block;">receipt_long</span>
+                            <div style="font-size:1.8rem; font-weight:800; color:#a78bfa; font-family:'Outfit',sans-serif;">${toutesCommandes.length}</div>
+                            <div style="font-size:0.72rem; color:#555; margin-top:5px; text-transform:uppercase;">Total Transactions</div>
+                        </div>
+                    </div>
+
+                    <!-- Tableau par créateur -->
+                    <h3 style="margin-bottom:15px; font-size:1.1rem; color:#e5e5e5;">📊 Revenus par Créateur</h3>
+                    <div style="background:rgba(255,255,255,0.02); border:1px solid #222; border-radius:12px; overflow:hidden; margin-bottom:40px;">
+                        <table style="width:100%; border-collapse:collapse; text-align:left;">
+                            <tr style="background:rgba(0,0,0,0.4); border-bottom:1px solid #333;">
+                                <th style="padding:15px; color:#aaa; font-size:0.8rem; text-transform:uppercase;">#</th>
+                                <th style="padding:15px; color:#aaa; font-size:0.8rem; text-transform:uppercase;">Créateur</th>
+                                <th style="padding:15px; color:#aaa; font-size:0.8rem; text-transform:uppercase;">Ventes</th>
+                                <th style="padding:15px; color:#aaa; font-size:0.8rem; text-transform:uppercase;">CA Brut</th>
+                                <th style="padding:15px; color:#aaa; font-size:0.8rem; text-transform:uppercase;">Net (80%)</th>
+                            </tr>
+                            ${revenusParCreateur.length > 0 ? revenusParCreateur.map((r, i) => `
+                                <tr style="border-bottom:1px solid #1a1a1a; transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.02)'" onmouseleave="this.style.background='transparent'">
+                                    <td style="padding:14px 15px; color:#555; font-weight:700;">${i + 1}</td>
+                                    <td style="padding:14px 15px;">
+                                        <a href="/profil/${r.pseudo}" data-link style="color:white; font-weight:700; text-decoration:none;">${Security.escapeHTML(r.pseudo)}</a>
+                                    </td>
+                                    <td style="padding:14px 15px; color:#aaa;">${r.totalVentes}</td>
+                                    <td style="padding:14px 15px; color:#4ade80; font-weight:700;">${r.totalMontant.toFixed(2)}€</td>
+                                    <td style="padding:14px 15px; color:#60a5fa; font-weight:700;">${(r.totalMontant * 0.8).toFixed(2)}€</td>
+                                </tr>
+                            `).join('') : `<tr><td colspan="5" style="padding:40px; text-align:center; color:#444;">Aucune transaction enregistrée pour l'instant.</td></tr>`}
+                        </table>
+                    </div>
+
+                    <!-- Bloc Stripe Admin -->
+                    <div style="background:linear-gradient(135deg, rgba(99,91,255,0.08) 0%, rgba(0,0,0,0) 60%); border:1px dashed rgba(99,91,255,0.3); padding:25px; border-radius:12px;">
+                        <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+                            <div style="background:rgba(99,91,255,0.15); border-radius:50%; width:50px; height:50px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">
+                                <span class="material-symbols-outlined" style="color:#a78bfa; font-size:1.5rem;">credit_card</span>
+                            </div>
+                            <div style="flex:1;">
+                                <h3 style="font-size:1rem; font-weight:700; color:#a78bfa; margin-bottom:4px;">💳 Stripe Connect — Paiements Automatiques</h3>
+                                <p style="font-size:0.85rem; color:#555; line-height:1.5;">
+                                    Une fois Stripe connecté, les virements aux créateurs seront automatisés. 
+                                    La table <code style="background:#1a1a1a; padding:1px 5px; border-radius:3px; color:#60a5fa;">commandes</code> est prête à recevoir les <code style="background:#1a1a1a; padding:1px 5px; border-radius:3px; color:#60a5fa;">stripe_session_id</code>.
+                                </p>
+                            </div>
+                            <button disabled style="padding:10px 20px; background:rgba(99,91,255,0.2); color:#a78bfa; border:1px solid rgba(99,91,255,0.3); border-radius:8px; font-size:0.85rem; font-weight:600; cursor:not-allowed; white-space:nowrap; opacity:0.7;">
+                                Connecter Stripe
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             
             <div id="admin-modal-root"></div>
