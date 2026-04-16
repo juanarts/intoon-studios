@@ -455,12 +455,20 @@ export default class AdminController {
                         }
 
                         // 3. Update BDD
-                        const { error: updateErr } = await client.from('chapitres').update({
-                            titre: titre,
-                            pages_urls: finalPages.filter(p => p !== null)
-                        }).eq('id', chapId);
+                        const pagesToSave = finalPages.filter(p => p !== null);
+                        console.log(`[ChapSave] Sauvegarde de ${pagesToSave.length} planches pour le chapitre ${chapId}`);
+
+                        const { data: updatedRows, error: updateErr } = await client
+                            .from('chapitres')
+                            .update({ titre: titre, pages_urls: pagesToSave })
+                            .eq('id', chapId)
+                            .select();
 
                         if (updateErr) throw updateErr;
+
+                        if (!updatedRows || updatedRows.length === 0) {
+                            throw new Error("Mise à jour bloquée par Supabase (RLS). Appliquez le correctif SQL dans l'éditeur Supabase.");
+                        }
 
                         // Cleanup temp state
                         AdminController._tempStudioFiles = [];
