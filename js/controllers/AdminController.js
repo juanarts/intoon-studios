@@ -388,15 +388,22 @@ export default class AdminController {
                         const pIndex = projets.findIndex(p => p.id === projetId);
                         const order = projets[pIndex]?.chapitres ? projets[pIndex].chapitres.length + 1 : 1;
                         
-                        await client.from('chapitres').insert([{
+                        const commentsEnabled = document.getElementById('chap-comments-enabled')?.checked !== false;
+
+                        const { error: insertErr } = await client.from('chapitres').insert([{
                             projet_id: projetId,
                             titre: titre,
                             ordre: order,
-                            pages_urls: pagesArray
+                            pages_urls: pagesArray,
+                            is_premium: false,
+                            comments_enabled: commentsEnabled
                         }]);
+
+                        if (insertErr) throw insertErr;
 
                         document.getElementById('admin-modal-root').innerHTML = '';
                         AdminController.afficher();
+                        alert(`✅ Chapitre "${titre}" publié avec ${pagesArray.length} planches !`);
                     } catch(e) {
                         alert("Erreur lors de l'Upload : " + e.message);
                         btn.disabled = false;
@@ -448,19 +455,23 @@ export default class AdminController {
                         }
 
                         // 3. Update BDD
-                        await client.from('chapitres').update({
+                        const { error: updateErr } = await client.from('chapitres').update({
                             titre: titre,
-                            pages_urls: finalPages
+                            pages_urls: finalPages.filter(p => p !== null)
                         }).eq('id', chapId);
+
+                        if (updateErr) throw updateErr;
 
                         // Cleanup temp state
                         AdminController._tempStudioFiles = [];
                         document.getElementById('admin-modal-root').innerHTML = '';
                         AdminController.afficher();
+                        alert('✅ Chapitre mis à jour avec succès !');
                     } catch(errUp) {
-                        alert("Erreur MAJ Chapitre : " + errUp.message);
+                        console.error('[form-update-chap] Erreur:', errUp);
+                        alert("❌ Erreur MAJ Chapitre : " + (errUp.message || errUp.details || JSON.stringify(errUp)));
                         btn.disabled = false;
-                        btn.innerHTML = 'Enregistrer les modifications';
+                        btn.innerHTML = '<span class="material-symbols-outlined">save</span> Enregistrer les modifications';
                     }
                 }
             };
