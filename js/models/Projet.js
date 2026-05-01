@@ -17,7 +17,7 @@ export default class Projet {
         this.likes = data.likes_total || data.likes || 0;
         this.pegi = data.pegi_rating || data.pegi || "TP";
         this.statut = data.statut || "publie";
-        this.langues = ["fr"]; 
+        this.langues = data.langues || ['fr']; // Lu depuis Supabase (colonne text[])
         this.authorPseudo = data.profils?.pseudo || "Studio InToon";
         
         // Génération du Slug SEO (ex: "Mon Titre" -> "mon-titre")
