@@ -10,6 +10,22 @@ export default class VueCatalogue {
         const mapDrapeaux = { 'fr': '🇫🇷', 'en': '🇬🇧', 'es': '🇪🇸', 'jp': '🇯🇵' };
         return langues.map(l => mapDrapeaux[l] || '🏳️').join(' ');
     }
+
+    static genererBadgesLangues(langues) {
+        if (!langues || langues.length === 0) return '';
+        const mapLangues = {
+            'fr': { drapeau: '🇫🇷', nom: 'FR' },
+            'en': { drapeau: '🇬🇧', nom: 'EN' },
+            'es': { drapeau: '🇪🇸', nom: 'ES' },
+            'jp': { drapeau: '🇯🇵', nom: 'JP' }
+        };
+        return langues.map(l => {
+            const info = mapLangues[l] || { drapeau: '🏳️', nom: l.toUpperCase() };
+            return `<span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:20px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); font-size:0.8rem; font-weight:700; font-family:'Outfit',sans-serif; color:white; backdrop-filter:blur(4px);">
+                ${info.drapeau} ${info.nom}
+            </span>`;
+        }).join('');
+    }
     
     static rendreCatalogue(projets, projetsLab, projetEnCours = null, chapitreEnCours = null) {
         if (!projets || projets.length === 0) return `<h1 class="page-title">${I18n.t('empty_catalog')}</h1>`;
@@ -295,7 +311,14 @@ export default class VueCatalogue {
                         <h1>${projet.titre}</h1>
                         <div style="margin-bottom:20px; display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
                             <span style="display:inline-block; border:1px solid ${projet.pegi==='18+' ? 'red' : projet.pegi==='16+' ? 'orange' : '#555'}; color:white; font-weight:bold; font-size:0.9rem; padding:3px 8px; border-radius:var(--radius-badge);">${projet.pegi || 'TP'}</span>
-                            <span style="font-size:1.3rem; letter-spacing:5px;">${VueCatalogue.genererDrapeaux(projet.langues)}</span>
+
+                            <!-- Badges Langues Premium -->
+                            ${projet.langues && projet.langues.length > 0 ? `
+                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                <span style="color:rgba(255,255,255,0.4); font-size:0.75rem; font-family:'Outfit',sans-serif; text-transform:uppercase; letter-spacing:1px; margin-right:2px;">Dispo en</span>
+                                ${VueCatalogue.genererBadgesLangues(projet.langues)}
+                            </div>
+                            ` : `<span style="font-size:1.3rem; letter-spacing:5px;">${VueCatalogue.genererDrapeaux(projet.langues)}</span>`}
                             
                             <!-- Etoiles Visuelles -->
                             <div style="display:flex; align-items:center; gap:10px;">

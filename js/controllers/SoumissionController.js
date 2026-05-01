@@ -99,6 +99,28 @@ export default class SoumissionController {
             }
         }
 
+        // --- INTERACTION VISUELLE DES CHIPS DE LANGUE ---
+        document.querySelectorAll('.lang-chip').forEach(chip => {
+            const checkbox = chip.querySelector('input[type="checkbox"]');
+            const checkIcon = chip.querySelector('.lang-check');
+
+            // État initial
+            const updateChipStyle = () => {
+                if (checkbox.checked) {
+                    chip.style.borderColor = 'var(--primary)';
+                    chip.style.background = 'rgba(229,9,20,0.12)';
+                    checkIcon.style.opacity = '1';
+                } else {
+                    chip.style.borderColor = '#444';
+                    chip.style.background = 'rgba(255,255,255,0.04)';
+                    checkIcon.style.opacity = '0';
+                }
+            };
+
+            updateChipStyle(); // init
+            checkbox.addEventListener('change', updateChipStyle);
+        });
+
         // --- SOUMISSION ---
         document.getElementById('form-soumission').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -107,6 +129,13 @@ export default class SoumissionController {
             const auteurNom = inputs[0].value;
             const titreProjet = inputs[2].value;
             const descriptionPitch = inputs[4].value;
+
+            // Récupérer les langues sélectionnées
+            const languesSelectionnees = [...document.querySelectorAll('input[name="langues"]:checked')].map(cb => cb.value);
+            if (languesSelectionnees.length === 0) {
+                alert('Veuillez sélectionner au moins une langue de publication.');
+                return;
+            }
             
             const btn = e.target.querySelector('button[type="submit"]');
             btn.innerHTML = 'Upload en cours (Création du Chapitre 1)...';
@@ -155,7 +184,8 @@ export default class SoumissionController {
                     couverture: uploadedCoverUrl || 'https://images.unsplash.com/photo-1542435503-956c469947f6?w=600&q=80',
                     videoPromoUrl: uploadedVideoUrl,
                     statut: 'brouillon',
-                    pegi: 'TP'
+                    pegi: 'TP',
+                    langues: languesSelectionnees
                 });
 
                 // 2. Upload des planches & Création du Chapitre 1

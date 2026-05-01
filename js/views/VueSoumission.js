@@ -52,6 +52,49 @@ export default class VueSoumission {
                             <input type="url" id="soumission-video-url" placeholder="${I18n.t('sub_placeholder_video_url')}" style="flex:1; padding:15px; border-radius:4px; border:1px solid #444; background:#111; color:white; font-size:1rem;">
                         </div>
 
+
+                        <!-- SÉLECTEUR MULTI-LANGUES -->
+                        <div style="margin-top:5px;">
+                            <label style="display:block; color:#aaa; font-size:0.9rem; margin-bottom:12px; font-family:'Outfit',sans-serif;">
+                                <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:middle; margin-right:5px; color:var(--primary);">translate</span>
+                                Dans quelle(s) langue(s) allez-vous publier cette œuvre ? <span style="color:var(--primary);">*</span>
+                            </label>
+                            <div id="lang-selector" style="display:flex; gap:12px; flex-wrap:wrap;">
+                                <label class="lang-chip" for="lang-fr" style="display:flex; align-items:center; gap:8px; padding:12px 20px; border-radius:50px; border:2px solid #444; background:rgba(255,255,255,0.04); cursor:pointer; transition:all 0.2s; user-select:none;">
+                                    <input type="checkbox" id="lang-fr" name="langues" value="fr" checked style="display:none;">
+                                    <span style="font-size:1.3rem;">🇫🇷</span>
+                                    <span style="color:white; font-weight:600; font-family:'Outfit',sans-serif;">Français</span>
+                                    <span class="lang-check" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:var(--primary); opacity:1; transition:opacity 0.2s;">
+                                        <span class="material-symbols-outlined" style="font-size:0.8rem; color:white;">check</span>
+                                    </span>
+                                </label>
+                                <label class="lang-chip" for="lang-en" style="display:flex; align-items:center; gap:8px; padding:12px 20px; border-radius:50px; border:2px solid #444; background:rgba(255,255,255,0.04); cursor:pointer; transition:all 0.2s; user-select:none;">
+                                    <input type="checkbox" id="lang-en" name="langues" value="en" style="display:none;">
+                                    <span style="font-size:1.3rem;">🇬🇧</span>
+                                    <span style="color:white; font-weight:600; font-family:'Outfit',sans-serif;">English</span>
+                                    <span class="lang-check" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:var(--primary); opacity:0; transition:opacity 0.2s;">
+                                        <span class="material-symbols-outlined" style="font-size:0.8rem; color:white;">check</span>
+                                    </span>
+                                </label>
+                                <label class="lang-chip" for="lang-es" style="display:flex; align-items:center; gap:8px; padding:12px 20px; border-radius:50px; border:2px solid #444; background:rgba(255,255,255,0.04); cursor:pointer; transition:all 0.2s; user-select:none;">
+                                    <input type="checkbox" id="lang-es" name="langues" value="es" style="display:none;">
+                                    <span style="font-size:1.3rem;">🇪🇸</span>
+                                    <span style="color:white; font-weight:600; font-family:'Outfit',sans-serif;">Español</span>
+                                    <span class="lang-check" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:var(--primary); opacity:0; transition:opacity 0.2s;">
+                                        <span class="material-symbols-outlined" style="font-size:0.8rem; color:white;">check</span>
+                                    </span>
+                                </label>
+                                <label class="lang-chip" for="lang-jp" style="display:flex; align-items:center; gap:8px; padding:12px 20px; border-radius:50px; border:2px solid #444; background:rgba(255,255,255,0.04); cursor:pointer; transition:all 0.2s; user-select:none;">
+                                    <input type="checkbox" id="lang-jp" name="langues" value="jp" style="display:none;">
+                                    <span style="font-size:1.3rem;">🇯🇵</span>
+                                    <span style="color:white; font-weight:600; font-family:'Outfit',sans-serif;">日本語</span>
+                                    <span class="lang-check" style="display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:var(--primary); opacity:0; transition:opacity 0.2s;">
+                                        <span class="material-symbols-outlined" style="font-size:0.8rem; color:white;">check</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
                         <!-- ZONE DRAG & DROP : PLANCHES DU CHAPITRE -->
                         <div id="dropzone-planches" style="border: 2px dashed #555; padding: 40px 20px; text-align: center; border-radius: 8px; background: rgba(0,0,0,0.3); cursor: pointer; transition: all 0.3s; margin-top: 10px;">
                             <span class="material-symbols-outlined" style="font-size: 3rem; color: #666; margin-bottom: 15px;">cloud_upload</span>
